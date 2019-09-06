@@ -10,16 +10,32 @@
 
 #include <map> 
 #include <stdint.h>
+#include <iostream>
+#include <sstream>
+#include <math.h>
 
 #define IP_ADDR			uint32_t
 
 using namespace std;
 
-IP_ADDR getIPFromString(string ipStr)
+IP_ADDR getIpFromString(string ipStr)
 {
-	cout << ipStr << endl;
+	IP_ADDR ip = 0;
 
-	IP_ADDR ip = 255; 
+  istringstream iss(ipStr);
+  string num;
+
+	int pow = 24;
+  while (getline(iss, num, '.'))
+  {
+		// increment ip 
+		ip += (stoi(num) << pow);
+		pow -= 8;
+  }
+ 
+	cout << ipStr << " = " << ip << endl;
+	 
+	return ip;
 }
 
 /* Routing Table row class */
