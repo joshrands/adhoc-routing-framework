@@ -33,7 +33,15 @@ void test_test()
 void test_routing_table()
 {
 	RoutingTable table;
+
+	// add a test entry
+	IP_ADDR dest = getIPFromString("192.168.0.20");
+	IP_ADDR nextHop = getIPFromString("192.168.0.21");
 	
+	assert(0 == table.getNextHop(dest));
+	
+	table.updateTableEntry(dest, nextHop);
+	assert(nextHop == table.getNextHop(dest));
 }
 
 // **************************************************************************************
