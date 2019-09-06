@@ -48,6 +48,11 @@ void test_routing_table()
 	assert(nextHop == table.getNextHop(dest));
 }
 
+void test_aodv()
+{
+	AODV aodv;
+}
+
 // **************************************************************************************
 // * main()
 // **************************************************************************************
@@ -57,6 +62,7 @@ int main (int argc, char *argv[])
 
 	test_test();
 	test_routing_table();
+	test_aodv();
 
 	DEBUG << "Tests complete." << ENDL;
 

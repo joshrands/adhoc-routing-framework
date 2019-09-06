@@ -69,3 +69,10 @@ void RoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop)
 	}
 }
 
+
+RoutingProtocol::RoutingProtocol()
+{
+
+}
+
+
