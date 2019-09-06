@@ -21,7 +21,8 @@ using namespace std;
 // get a 32 bit ip address from a string
 IP_ADDR getIpFromString(string ipStr);
 
-/* Routing Table row class */
+/* Routing Table row class 
+ * This class exists to make future modifications to priority in routing protocols */
 class TableInfo 
 {
 public:

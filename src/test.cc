@@ -39,13 +39,18 @@ void test_routing_table()
 	IP_ADDR nextHop = getIpFromString("192.168.0.22");
 	
 	assert(0 == table.getNextHop(dest));
-	
+
+	// haven't updated the routing table so shouldn't be the next hop yet...
+	assert(nextHop != table.getNextHop(dest));
+
 	table.updateTableEntry(dest, nextHop);
 	assert(nextHop == table.getNextHop(dest));
 
 	nextHop = getIpFromString("192.168.0.11");
 	table.updateTableEntry(dest, nextHop);
+	// test that the table entry changed 
 	assert(nextHop == table.getNextHop(dest));
+	assert(getIpFromString("192.168.0.22") != table.getNextHop(dest));
 }
 
 void test_aodv()
