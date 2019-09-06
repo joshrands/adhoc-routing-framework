@@ -1,10 +1,33 @@
 #include "RoutingProtocol.h"
 
+#define ROUTE_DEBUG					1
+
 using namespace std;
+
+IP_ADDR getIpFromString(string ipStr)
+{
+	IP_ADDR ip = 0;
+
+  istringstream iss(ipStr);
+  string num;
+
+  int pow = 24;
+  while (getline(iss, num, '.'))
+  {
+    // increment ip  
+    ip += (stoi(num) << pow);
+    pow -= 8;
+  }
+ 
+  cout << ipStr << " = " << ip << endl;
+   
+  return ip;
+}
 
 RoutingTable::RoutingTable()
 {
-	cout << "Routing table created" << endl;
+	if (ROUTE_DEBUG)	
+		cout << "Routing table created" << endl;
 }
 
 IP_ADDR RoutingTable::getNextHop(const IP_ADDR dest)

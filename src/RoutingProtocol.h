@@ -18,25 +18,8 @@
 
 using namespace std;
 
-IP_ADDR getIpFromString(string ipStr)
-{
-	IP_ADDR ip = 0;
-
-  istringstream iss(ipStr);
-  string num;
-
-	int pow = 24;
-  while (getline(iss, num, '.'))
-  {
-		// increment ip 
-		ip += (stoi(num) << pow);
-		pow -= 8;
-  }
- 
-	cout << ipStr << " = " << ip << endl;
-	 
-	return ip;
-}
+// get a 32 bit ip address from a string
+IP_ADDR getIpFromString(string ipStr);
 
 /* Routing Table row class */
 class TableInfo 

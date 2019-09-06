@@ -42,6 +42,10 @@ void test_routing_table()
 	
 	table.updateTableEntry(dest, nextHop);
 	assert(nextHop == table.getNextHop(dest));
+
+	nextHop = getIpFromString("192.168.0.11");
+	table.updateTableEntry(dest, nextHop);
+	assert(nextHop == table.getNextHop(dest));
 }
 
 // **************************************************************************************
