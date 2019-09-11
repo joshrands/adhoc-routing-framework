@@ -1,11 +1,29 @@
 #include "aodv.h"
 
+uint32_t AODVRoutingTable::getDestSequenceNumber(const IP_ADDR dest)
+{
+	// check if this entry exists 
+	if (this->table.count(dest))
+	{
+		// entry exists, return dest sequence number  
+		return ((AODVInfo*)&(this->table[dest]))->destSequenceNumber; 
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 AODV::AODV()
 {
 	cout << "Created new aodv routing protocol." << endl;
 
+	this->table = new AODVRoutingTable();
+}
 
-//	this->table = new AODVRoutingTable();
+AODV::~AODV()
+{
+	delete this->table;
 }
 
 RREQ AODV::createRREQ(const IP_ADDR dest)
@@ -22,7 +40,7 @@ RREQ AODV::createRREQ(const IP_ADDR dest)
 	rreq.destIP = dest;
 	// TODO: Get the latest sequence number from routing table
 	// IF UNKNOWN, SET SEQ NUM UNKOWN FLAG
-	rreq.destSeqNum = 0;
+	rreq.destSeqNum = ((AODVRoutingTable*)(this->table))->getDestSequenceNumber(dest);
 	rreq.origIP = this->getIp();
 	rreq.origSeqNum = (++this->sequenceNum);
 

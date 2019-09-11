@@ -50,7 +50,7 @@ public:
 	// adds an element to the table 
 	void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
 
-private:
+protected:
 	// internal routing table maps destination to next hop 
 	map<IP_ADDR, TableInfo> table;
 
@@ -68,7 +68,7 @@ public:
 	void setIp(const uint32_t ip) { ipAddress = ip; }
 
 protected:
-	RoutingTable table;	
+	RoutingTable* table;	
 
 	uint32_t ipAddress;
 };

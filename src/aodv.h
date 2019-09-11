@@ -61,6 +61,7 @@ class AODV : public RoutingProtocol
 public:
 	// default constructor 
 	AODV();
+	~AODV();
 
 	// RREQ - Route Request 
 	// initiating RREQ enters state of waiting for RREP
