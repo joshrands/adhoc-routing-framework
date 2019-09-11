@@ -63,8 +63,12 @@ public:
 	// default constructor
 	RoutingProtocol();
 
+	const uint32_t getIp() { return ipAddress; }
+	void setIp(const uint32_t ip) { ipAddress = ip; }
+
 private:
 	RoutingTable table;	
 
+	uint32_t ipAddress;
 };
 
