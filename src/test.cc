@@ -76,7 +76,7 @@ void test_routing_table()
 
 void test_aodv()
 {
-	AODV aodv;
+	test_aodv_rreq();
 }
 
 void test_aodv_rreq_simple()
@@ -146,9 +146,11 @@ void test_aodv_rreq_forwarding()
 	// check routing table update 
 	// for mid3 to send packet to orig, go through mid2
 	assert(aodv3.getTable()->getNextHop(orig) == mid2);
+	assert(aodv3.getTable()->getNextHop(orig) != mid1);
 }
 
 void test_aodv_rreq()
 {
 	test_aodv_rreq_simple();
+	test_aodv_rreq_forwarding();
 }
