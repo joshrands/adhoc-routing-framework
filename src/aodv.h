@@ -44,7 +44,19 @@ struct RERR
 	uint32_t unreachableDestSeqNum;
 };
 
-class AODV : RoutingProtocol
+class AODVInfo : public TableInfo
+{
+public:
+	uint32_t destSequenceNumber;
+};
+
+class AODVRoutingTable : public RoutingTable
+{
+public:
+	uint32_t getDestSequenceNumber(const IP_ADDR dest);
+};
+
+class AODV : public RoutingProtocol
 {
 public:
 	// default constructor 
@@ -81,7 +93,9 @@ public:
 	RERR readRERRBuffer(char* buffer);
 
 private:
+	// node sequence number. MUST increment on a route discovery
 	uint32_t sequenceNum;
-
+	// node rreq id. Incremented by one during route discovery
+	uint32_t rreqID;
 };
 

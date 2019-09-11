@@ -39,6 +39,7 @@ class RoutingTable
 public:
 	// default constructor 
 	RoutingTable();
+	~RoutingTable();
 
 	const uint16_t DEFAULT_TTL = 1800; // 1800 seconds = 30 minutes 
 
@@ -66,7 +67,7 @@ public:
 	const uint32_t getIp() { return ipAddress; }
 	void setIp(const uint32_t ip) { ipAddress = ip; }
 
-private:
+protected:
 	RoutingTable table;	
 
 	uint32_t ipAddress;

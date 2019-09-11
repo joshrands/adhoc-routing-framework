@@ -30,6 +30,11 @@ RoutingTable::RoutingTable()
 		cout << "Routing table created" << endl;
 }
 
+RoutingTable::~RoutingTable()
+{
+	this->table.empty();
+}
+
 IP_ADDR RoutingTable::getNextHop(const IP_ADDR dest)
 {
 	IP_ADDR nextHop;
@@ -68,7 +73,6 @@ void RoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop)
 		this->table[dest] = info;
 	}
 }
-
 
 RoutingProtocol::RoutingProtocol()
 {

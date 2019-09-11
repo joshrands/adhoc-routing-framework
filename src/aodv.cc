@@ -3,13 +3,28 @@
 AODV::AODV()
 {
 	cout << "Created new aodv routing protocol." << endl;
+
+
+//	this->table = new AODVRoutingTable();
 }
 
 RREQ AODV::createRREQ(const IP_ADDR dest)
 {
+	// there is no current path to the destination, create a RREQ 
 	RREQ rreq; 
 
-	// populate fields of rreq 
+	// Section 6.3 rfc3561
+	rreq.type = 0x01;
+	rreq.flags = 0;
+	rreq.hopCount = 0;
+	
+	rreq.rreqID = (++this->rreqID);
+	rreq.destIP = dest;
+	// TODO: Get the latest sequence number from routing table
+	// IF UNKNOWN, SET SEQ NUM UNKOWN FLAG
+	rreq.destSeqNum = 0;
+	rreq.origIP = this->getIp();
+	rreq.origSeqNum = (++this->sequenceNum);
 
 	return rreq;
 }
@@ -35,7 +50,12 @@ RREQ readRREQBuffer(char* buffer)
 
 RREP createRREP(const IP_ADDR dest)
 {
-
+/*
+Immediately before a destination node originates a RREP in
+response to a RREQ, it MUST update its own sequence number to the
+maximum of its current sequence number and the destination
+sequence number in the RREQ packet.
+*/
 }
 
 void forwardRREP(const RREP receivedRREP)
