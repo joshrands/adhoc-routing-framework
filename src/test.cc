@@ -149,8 +149,29 @@ void test_aodv_rreq_forwarding()
 	assert(aodv3.getTable()->getNextHop(orig) != mid1);
 }
 
+void test_aodv_rreq_buffer()
+{
+	IP_ADDR orig = getIpFromString("192.168.0.11");
+	IP_ADDR dest = getIpFromString("192.168.0.21");
+
+	AODV aodv;
+	aodv.setIp(orig);
+
+	RREQ rreq = aodv.createRREQ(dest);
+	char* buffer = (char*)(malloc(sizeof(rreq))); 
+	buffer = aodv.createRREQBuffer(rreq);
+
+	RREQ receivedRREQ;
+	receivedRREQ = aodv.readRREQBuffer(buffer);
+
+	assert(receivedRREQ.type == rreq.type);
+	assert(receivedRREQ.origIP == rreq.origIP);
+	cout << receivedRREQ.destIP << endl;
+}
+
 void test_aodv_rreq()
 {
 	test_aodv_rreq_simple();
 	test_aodv_rreq_forwarding();
+	test_aodv_rreq_buffer();
 }

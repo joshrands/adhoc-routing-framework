@@ -1,4 +1,5 @@
 #include "aodv.h"
+#include "string.h"
 
 uint32_t AODVRoutingTable::getDestSequenceNumber(const IP_ADDR dest)
 {
@@ -92,16 +93,22 @@ RREQ AODV::createForwardRREQ(RREQ receivedRREQ, IP_ADDR sourceIP)
 	return forwardRREQ;
 }
 
-char* getRREQBuffer(const RREQ rreq)
+char* AODV::createRREQBuffer(const RREQ rreq)
 {
 	char* buffer = (char*)(malloc(sizeof(rreq)));	
+
+	// fill buffer with all rreq information
+	memcpy(buffer, &(rreq), sizeof(rreq));
 
 	return buffer;
 }
 
-RREQ readRREQBuffer(char* buffer)
+RREQ AODV::readRREQBuffer(char* buffer)
 {
 	RREQ rreq;
+
+	// convert buffer to rreq 
+	memcpy(&(rreq), buffer, sizeof(rreq));
 
 	return rreq;
 }
