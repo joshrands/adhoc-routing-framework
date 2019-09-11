@@ -38,9 +38,12 @@ RREQ AODV::createRREQ(const IP_ADDR dest)
 	
 	rreq.rreqID = (++this->rreqID);
 	rreq.destIP = dest;
-	// TODO: Get the latest sequence number from routing table
-	// IF UNKNOWN, SET SEQ NUM UNKOWN FLAG
 	rreq.destSeqNum = ((AODVRoutingTable*)(this->table))->getDestSequenceNumber(dest);
+	if (0 == rreq.destSeqNum)
+	{
+		// unknown destSeqNum flag is 00001000 
+		rreq.flags |= 0x08;
+	}
 	rreq.origIP = this->getIp();
 	rreq.origSeqNum = (++this->sequenceNum);
 
