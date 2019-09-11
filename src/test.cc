@@ -25,6 +25,27 @@
 // * Very cheap testing framework
 // **************************************************************************************
 
+void test_test();
+void test_routing_table();
+void test_aodv();
+void test_aodv_rreq();
+
+// **************************************************************************************
+// * main()
+// **************************************************************************************
+int main (int argc, char *argv[]) 
+{	
+	DEBUG << "Running tests..." << ENDL;	
+
+	test_test();
+	test_routing_table();
+	test_aodv();
+
+	DEBUG << "TESTS COMPLETE." << ENDL;
+
+	return 0;
+}
+
 void test_test()
 {
 	assert(true == true);
@@ -58,18 +79,31 @@ void test_aodv()
 	AODV aodv;
 }
 
-// **************************************************************************************
-// * main()
-// **************************************************************************************
-int main (int argc, char *argv[]) 
-{	
-	DEBUG << "Running tests..." << ENDL;	
+void test_aodv_rreq()
+{
+	AODV aodv;
+	aodv.setIp(getIpFromString("192.168.0.20"));
 
-	test_test();
-	test_routing_table();
-	test_aodv();
+	// test simple rreq 
+	IP_ADDR dest = getIpFromString("192.168.0.21");
 
-	DEBUG << "Tests complete." << ENDL;
+	RREQ rreq;
+	rreq = aodv.createRREQ(dest);
 
-	return 0;
+	assert(rreq.type == 0x01);
+	assert(rreq.hopCount == 0);
+	assert(rreq.rreqID == 1);
+	assert(rreq.destIP == dest);
+	assert(rreq.origIP == aodv.getIp());
+	assert(rreq.origSeqNum == 1);	
+
+	dest = getIpFromString("192.168.0.22");
+	rreq = aodv.createRREQ(dest);
+
+	assert(rreq.type == 0x01);
+	assert(rreq.hopCount == 0);
+	assert(rreq.rreqID == 2);
+	assert(rreq.destIP == dest);
+	assert(rreq.origIP == aodv.getIp());
+	assert(rreq.origSeqNum == 2);	
 }
