@@ -32,3 +32,43 @@ RREQ readRREQBuffer(char* buffer)
 
 	return rreq;
 }
+
+RREP createRREP(const IP_ADDR dest)
+{
+
+}
+
+void forwardRREP(const RREP receivedRREP)
+{
+
+}
+
+char* createRREPBuffer(const RREP rrep)
+{
+
+}
+
+RREP readRREPBuffer(char* buffer)
+{
+
+}
+
+RERR createRERR(const IP_ADDR dest)
+{
+
+}
+
+void forwardRERR(const RERR receivedRERR)
+{
+
+}
+
+char* createRERRBuffer(const RERR rerr)
+{
+
+}
+
+RERR readRERRBuffer(char* buffer)
+{
+
+}

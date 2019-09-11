@@ -22,13 +22,33 @@ struct RREQ
 	uint32_t origSeqNum;
 };
 
+struct RREP
+{
+	uint8_t type;
+	uint16_t flags;
+	uint8_t hopCount;
+
+	uint32_t destIP;
+	uint32_t destSeqNum;
+	uint32_t origIP;
+	uint32_t lifetime;
+};
+
+struct RERR
+{
+	uint8_t type;
+	uint16_t flags;
+	uint8_t destCount;
+
+	uint32_t unreachableDestIP;
+	uint32_t unreachableDestSeqNum;
+};
+
 class AODV : RoutingProtocol
 {
 public:
 	// default constructor 
 	AODV();
-
-	// TODO: Create aodv packet for each message? Only needs to be couple of bits.  
 
 	// RREQ - Route Request 
 	// initiating RREQ enters state of waiting for RREP
@@ -41,13 +61,24 @@ public:
 	RREQ readRREQBuffer(char* buffer);
 
 	// RREP - Route Reply
-	// add this entry to routing able 
-	void initiateRREP(const IP_ADDR dest);
-	void forwardRREP(const IP_ADDR dest);
+	// initiating RREP enters state of waiting for RREP
+	RREP createRREP(const IP_ADDR dest);
+	// forward RREP enters state of maybe receiving RREP
+	void forwardRREP(const RREP receivedRREP);
+	// convert rrep message to a char* buffer
+	char* createRREPBuffer(const RREP rrep);
+	// read a received rrep buffer
+	RREP readRREPBuffer(char* buffer);
 
 	// RERR - Route Error
-	void initiateRERR(const IP_ADDR dest);
-	void forwardRERR(const IP_ADDR dest);
+	// initiating RERR enters state of waiting for RREP
+	RERR createRERR(const IP_ADDR dest);
+	// forward RERR enters state of maybe receiving RREP
+	void forwardRERR(const RERR receivedRERR);
+	// convert rerr message to a char* buffer
+	char* createRERRBuffer(const RERR rerr);
+	// read a received rrep buffer
+	RERR readRERRBuffer(char* buffer);
 
 private:
 	uint32_t sequenceNum;
