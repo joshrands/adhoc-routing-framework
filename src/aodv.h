@@ -53,7 +53,10 @@ public:
 class AODVRoutingTable : public RoutingTable
 {
 public:
+	void updateAODVRoutingTableFromRREQ(RREQ receivedRREQ, IP_ADDR sourceIP);
+
 	uint32_t getDestSequenceNumber(const IP_ADDR dest);
+	void setDestSequenceNumber(const IP_ADDR dest, uint32_t destSeqNum);
 };
 
 class AODV : public RoutingProtocol
@@ -67,7 +70,7 @@ public:
 	// initiating RREQ enters state of waiting for RREP
 	RREQ createRREQ(const IP_ADDR dest);
 	// forward RREQ enters state of maybe receiving RREP
-	void forwardRREQ(const RREQ receivedRREQ);
+	RREQ createForwardRREQ(RREQ receivedRREQ, IP_ADDR sourceIP);
 	// convert rreq message to a char* buffer
 	char* createRREQBuffer(const RREQ rreq);
 	// read a received rreq buffer
@@ -93,6 +96,8 @@ public:
 	// read a received rrep buffer
 	RERR readRERRBuffer(char* buffer);
 
+	// cast table to AODVRoutingTable
+	AODVRoutingTable* getTable() { return (AODVRoutingTable*)(this->table);}
 private:
 	// node sequence number. MUST increment on a route discovery
 	uint32_t sequenceNum;
