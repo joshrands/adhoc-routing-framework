@@ -79,7 +79,7 @@ void test_aodv()
 	AODV aodv;
 }
 
-void test_aodv_rreq()
+void test_aodv_rreq_simple()
 {
 	AODV aodv;
 	aodv.setIp(getIpFromString("192.168.0.20"));
@@ -106,4 +106,49 @@ void test_aodv_rreq()
 	assert(rreq.destIP == dest);
 	assert(rreq.origIP == aodv.getIp());
 	assert(rreq.origSeqNum == 2);	
+
+}
+
+void test_aodv_rreq_forwarding()
+{
+	// test forwarding capabilities for rreq messages 
+	// after forwarding, middle nodes should also have table entry for path back to originator 
+
+	// 0 - 1 - 2 - 3 - 4
+
+	IP_ADDR orig = getIpFromString("192.168.0.0");
+	IP_ADDR mid1 = getIpFromString("192.168.0.1");
+	IP_ADDR mid2 = getIpFromString("192.168.0.2");
+	IP_ADDR mid3 = getIpFromString("192.168.0.3");
+	IP_ADDR dest = getIpFromString("192.168.0.4");
+
+	AODV aodv; 
+	aodv.setIp(orig);
+
+	RREQ rreq = aodv.createRREQ(dest);
+
+	// Note: In practice, each node will have its own AODV. Here we recycle the orig AODV
+	// rreq sent from orig to mid1 
+	rreq = aodv.createForwardRREQ(rreq, orig);
+	// mid1->mid2
+	rreq = aodv.createForwardRREQ(rreq, mid1);
+	// mid2->mid3
+	// using mid3 for routing table update test... need AODV 
+	AODV aodv3;
+	aodv3.setIp(mid3);
+	rreq = aodv3.createForwardRREQ(rreq, mid2);
+	// mid3->dest
+	// final hop count increment... 
+	rreq = aodv.createForwardRREQ(rreq, mid3);
+
+	// Create RREP! 
+	assert(rreq.hopCount == 4);
+	// check routing table update 
+	// for mid3 to send packet to orig, go through mid2
+	assert(aodv3.getTable()->getNextHop(orig) == mid2);
+}
+
+void test_aodv_rreq()
+{
+	test_aodv_rreq_simple();
 }
