@@ -6,6 +6,8 @@
 Author: Josh Rands
 
 ## To Do
+
+### AODV 
 1. Add functions for generating RREQ
 2. Add functions for generating RREP
   - Create struct for packet format (section 5.2)
@@ -16,6 +18,12 @@ Author: Josh Rands
   - Generate RERR in all 3 situations (section 6.11)
 4. Add TTL for RREQ dissemination (section 6.4)
 5. Add AODVRoutingTable updates 
+
+### RPi
+1. Make a Daemon to accept network packets
+  - https://stackoverflow.com/questions/17954432/creating-a-daemon-in-linux
+2. Use AODV object for routing table
+3. Use AODV packets
 
 ## Running the code
 
