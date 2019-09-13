@@ -11,7 +11,7 @@
 
 struct RREQ
 {
-	uint8_t type;
+	uint8_t type = 1;
 	uint16_t flags;
 	uint8_t hopCount;
 	
@@ -24,7 +24,7 @@ struct RREQ
 
 struct RREP
 {
-	uint8_t type;
+	uint8_t type = 2;
 	uint16_t flags;
 	uint8_t hopCount;
 
@@ -36,7 +36,7 @@ struct RREP
 
 struct RERR
 {
-	uint8_t type;
+	uint8_t type = 3;
 	uint16_t flags;
 	uint8_t destCount;
 
@@ -66,7 +66,13 @@ public:
 	AODV();
 	~AODV();
 
+	static const int AODV_PORT = 654;
+	// decode a received packet buffer from UPD port 654
+	void decodeReceivedPacketBuffer(char* buffer, int length);
+
 	// RREQ - Route Request 
+	// handle a received rreq message 
+	void handleRREQBuffer(char* buffer, int length);
 	// initiating RREQ enters state of waiting for RREP
 	RREQ createRREQ(const IP_ADDR dest);
 	// forward RREQ enters state of maybe receiving RREP
@@ -77,6 +83,8 @@ public:
 	RREQ readRREQBuffer(char* buffer);
 
 	// RREP - Route Reply
+	// handle a received rrep message 
+	void handleRREPBuffer(char* buffer, int length);
 	// initiating RREP enters state of waiting for RREP
 	RREP createRREP(const IP_ADDR dest);
 	// forward RREP enters state of maybe receiving RREP
@@ -87,6 +95,8 @@ public:
 	RREP readRREPBuffer(char* buffer);
 
 	// RERR - Route Error
+	// handle a received rerr message 
+	void handleRERRBuffer(char* buffer, int length);
 	// initiating RERR enters state of waiting for RREP
 	RERR createRERR(const IP_ADDR dest);
 	// forward RERR enters state of maybe receiving RREP

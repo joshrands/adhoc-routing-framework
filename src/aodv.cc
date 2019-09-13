@@ -51,6 +51,39 @@ AODV::~AODV()
 	delete this->table;
 }
 
+void AODV::decodeReceivedPacketBuffer(char* buffer, int length)
+{
+	if (length <= 0)
+	{
+		cout << "ERROR DECODING PACKET. Length = 0." << endl;
+	}
+
+	// determine type of message 
+	uint8_t type;
+	memcpy(&type, buffer, 1);
+
+	switch (type)
+	{
+		case 1:
+			handleRREQBuffer(buffer, length);
+			break;
+		case 2: 
+			handleRREPBuffer(buffer, length);
+			break;
+		case 3:
+			handleRERRBuffer(buffer, length);
+			break;
+		default:
+			cout << "Packet not AODV." << endl;
+			break;
+	}
+}
+
+void AODV::handleRREQBuffer(char* buffer, int length)
+{
+	cout << "Handling rreq message." << endl;
+}
+
 RREQ AODV::createRREQ(const IP_ADDR dest)
 {
 	// Section 6.3 rfc3561
@@ -113,6 +146,11 @@ RREQ AODV::readRREQBuffer(char* buffer)
 	return rreq;
 }
 
+void AODV::handleRREPBuffer(char* buffer, int length)
+{
+
+}
+
 RREP createRREP(const IP_ADDR dest)
 {
 /*
@@ -136,6 +174,11 @@ char* createRREPBuffer(const RREP rrep)
 RREP readRREPBuffer(char* buffer)
 {
 
+}
+
+void AODV::handleRERRBuffer(char* buffer, int length)
+{
+	
 }
 
 RERR createRERR(const IP_ADDR dest)
