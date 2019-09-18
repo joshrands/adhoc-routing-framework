@@ -7,20 +7,9 @@
  * Date: 9/4/2019
  ********************************/
 
-#include "RoutingProtocol.h"
-
-struct RREQ
-{
-	uint8_t type = 1;
-	uint16_t flags;
-	uint8_t hopCount;
-	
-	uint32_t rreqID;
-	uint32_t destIP;
-	uint32_t destSeqNum;
-	uint32_t origIP;
-	uint32_t origSeqNum;
-};
+/* aodv includes */
+#include "aodv_routing_table.h"
+#include "aodv_rreq.h"
 
 struct RREP
 {
@@ -44,26 +33,13 @@ struct RERR
 	uint32_t unreachableDestSeqNum;
 };
 
-class AODVInfo : public TableInfo
-{
-public:
-	uint32_t destSequenceNumber;
-};
-
-class AODVRoutingTable : public RoutingTable
-{
-public:
-	void updateAODVRoutingTableFromRREQ(RREQ receivedRREQ, IP_ADDR sourceIP);
-
-	uint32_t getDestSequenceNumber(const IP_ADDR dest);
-	void setDestSequenceNumber(const IP_ADDR dest, uint32_t destSeqNum);
-};
 
 class AODV : public RoutingProtocol
 {
 public:
 	// default constructor 
 	AODV();
+	AODV(IP_ADDR ip);
 	~AODV();
 
 	static const int AODV_PORT = 654;
@@ -71,16 +47,7 @@ public:
 	void decodeReceivedPacketBuffer(char* buffer, int length);
 
 	// RREQ - Route Request 
-	// handle a received rreq message 
-	void handleRREQBuffer(char* buffer, int length);
-	// initiating RREQ enters state of waiting for RREP
-	RREQ createRREQ(const IP_ADDR dest);
-	// forward RREQ enters state of maybe receiving RREP
-	RREQ createForwardRREQ(RREQ receivedRREQ, IP_ADDR sourceIP);
-	// convert rreq message to a char* buffer
-	char* createRREQBuffer(const RREQ rreq);
-	// read a received rreq buffer
-	RREQ readRREQBuffer(char* buffer);
+	RREQHelper rreqHelper;
 
 	// RREP - Route Reply
 	// handle a received rrep message 

@@ -14,7 +14,7 @@
 #include <sstream>
 #include <math.h>
 
-#define IP_ADDR			uint32_t
+#include "defines.h"
 
 using namespace std;
 
