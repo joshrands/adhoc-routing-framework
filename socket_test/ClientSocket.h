@@ -1,6 +1,7 @@
 // Client side implementation of UDP client-server model 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
