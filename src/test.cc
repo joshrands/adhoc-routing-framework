@@ -1,4 +1,5 @@
 #include "aodv.h"
+#include "send_packet.h"
 
 #include <assert.h>
 
@@ -142,7 +143,43 @@ void test_aodv_rreq_buffer()
 
 void test_aodv_rreq_loop_detection()
 {
-	// 
+	// simple test to prevent a simple loop 
+	// 0 <---> 1 <---> 2 ---> 3
+	AODV node0 = AODV(getIpFromString("192.168.1.0"));
+	AODV node1 = AODV(getIpFromString("192.168.1.1"));
+	AODV node2 = AODV(getIpFromString("192.168.1.2"));
+	AODV node3 = AODV(getIpFromString("192.168.1.3"));
+
+	// generate a rreq from node 0 to node 3
+	rreqPacket rreq = node0.rreqHelper.createRREQ(node3.getIp());
+
+	// node 0 broadcasts rreq, which is received by node 1
+	sendBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node0.getIp(), getIpFromString(BROADCAST));
+	node1.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node0.getIp());
+
+	// node1 ip and packet count = 2 because node 0 sent one and then node 1 should have handled it and broadcasted
+	assert(getLastSource() == node1.getIp());
+	assert(getGlobalPacketCount() == 2);
+
+	// node1 broadcasted a forward packet it received from node0, which should be received by node0 and node2
+	rreq = node1.rreqHelper.createForwardRREQ(rreq, node0.getIp());
+	node0.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node1.getIp());
+	node2.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node1.getIp());
+
+	// node 0 should have discarded the duplicate, but node 2 should have generated a forward rreq
+	assert(getLastSource() == node2.getIp());
+	assert(getGlobalPacketCount() == 3);
+
+	// node 2 broadcasted a forward packet it received from node1, and it was received by node 1 and 3
+	rreq = node2.rreqHelper.createForwardRREQ(rreq, node1.getIp());
+	node1.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node2.getIp());
+	node3.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node2.getIp());
+
+	// node 1 and 3 should have both received the packet, but neither should have generated a forward rreq. 
+	// node 1 should have discarded the duplicate, and node 3 should have generated and sent a rrep 
+	// TODO: Update once rrep is implemented to reflect actual packet send
+	assert(getLastSource() == node2.getIp());
+	assert(getGlobalPacketCount() == 3);	
 }
 
 void test_aodv_rreq()
@@ -150,4 +187,5 @@ void test_aodv_rreq()
 	test_aodv_rreq_simple();
 	test_aodv_rreq_forwarding();
 	test_aodv_rreq_buffer();
+	test_aodv_rreq_loop_detection();
 }

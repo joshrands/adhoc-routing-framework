@@ -2,7 +2,7 @@
 #include "string.h"
 #include "send_packet.h"
 
-#define AODV_DEBUG		0
+#define AODV_DEBUG		1
 
 AODV::AODV(IP_ADDR ip)
 {
@@ -80,7 +80,7 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		// generate a rreq message from this rreq
 		// TODO: Implement this 
 		cout << "Generating RREP message..." << endl;
-		// TODO: SEND PACKET 
+		// TODO: SEND PACKET
 		return;
 	}
 

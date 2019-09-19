@@ -31,9 +31,9 @@ public:
 	// forward RREQ enters state of maybe receiving RREP
 	rreqPacket createForwardRREQ(rreqPacket receivedRREQ, IP_ADDR sourceIP);
 	// convert rreq message to a char* buffer
-	char* createRREQBuffer(const rreqPacket rreq);
+	static char* createRREQBuffer(const rreqPacket rreq);
 	// read a received rreq buffer
-	rreqPacket readRREQBuffer(char* buffer);
+	static rreqPacket readRREQBuffer(char* buffer);
 	// return true if this is a duplicate rreq
 	bool isDuplicateRREQ(rreqPacket receivedRREQ);
 
