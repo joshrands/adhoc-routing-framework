@@ -48,8 +48,31 @@ struct rreqPacket
 	uint32_t origSeqNum;
 };
 
+/* RREP Flags: */
+#define RREP_ACK       0x1
+#define RREP_REPAIR    0x2
+
 struct rrepPacket
 {
     uint8_t type = 0x02;
-    // TODO: Add the rest 
+#if defined(__LITTLE_ENDIAN)
+    uint16_t res1:6;
+    uint16_t a:1;
+    uint16_t r:1;
+    uint16_t prefix:5;
+    uint16_t res2:3;
+#elif defined(__BIG_ENDIAN)
+    uint16_t r:1;
+    uint16_t a:1;
+    uint16_t res1:6;
+    uint16_t res2:3;
+    uint16_t prefix:5;
+#else
+#error "Adjust your <bits/endian.h> defines"
+#endif
+    uint8_t hopCount;
+    uint32_t destIP;
+    uint32_t destSeqNum;
+    uint32_t origIP;
+    uint32_t lifetime;
 };
