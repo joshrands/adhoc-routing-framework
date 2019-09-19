@@ -1,5 +1,6 @@
 #include "aodv.h"
 #include "string.h"
+#include "send_packet.h"
 
 #define AODV_DEBUG		0
 
@@ -86,6 +87,7 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 	// 4. not final destination, forward the rreq 
 	rreqPacket forwardRREQ = rreqHelper.createForwardRREQ(rreq, source);
 	// TODO: SEND PACKET 
+	sendBuffer(rreqHelper.createRREQBuffer(forwardRREQ), sizeof(forwardRREQ), this->getIp(), getIpFromString("255.255.255.255"));
 }
 
 void AODV::handleRREPBuffer(char* buffer, int length)
