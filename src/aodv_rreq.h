@@ -24,8 +24,6 @@ public:
 	// check if a rrep should be generated
 	bool shouldGenerateRREP(rreqPacket receivedRREQ);
 
-	// handle a received rreq message 
-	void handleRREQBuffer(char* buffer, int length);
 	// initiating RREQ enters state of waiting for RREP
 	rreqPacket createRREQ(const IP_ADDR destIP, const uint32_t destSeqNum=0);
 	// forward RREQ enters state of maybe receiving RREP

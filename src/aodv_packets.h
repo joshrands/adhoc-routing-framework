@@ -47,3 +47,9 @@ struct rreqPacket
 	uint32_t origIP;
 	uint32_t origSeqNum;
 };
+
+struct rrepPacket
+{
+    uint8_t type = 0x02;
+    // TODO: Add the rest 
+};

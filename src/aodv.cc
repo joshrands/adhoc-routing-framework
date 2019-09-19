@@ -37,7 +37,7 @@ void AODV::decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source)
 			handleRREQ(buffer, length, source);
 			break;
 		case 2: 
-			handleRREPBuffer(buffer, length);
+			handleRREP(buffer, length, source);
 			break;
 		case 3:
 			handleRERRBuffer(buffer, length);
@@ -90,35 +90,12 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 	sendBuffer(rreqHelper.createRREQBuffer(forwardRREQ), sizeof(forwardRREQ), this->getIp(), getIpFromString("255.255.255.255"));
 }
 
-void AODV::handleRREPBuffer(char* buffer, int length)
+void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 {
-
+	
 }
 
-RREP createRREP(const IP_ADDR dest)
-{
-/*
-Immediately before a destination node originates a RREP in
-response to a RREQ, it MUST update its own sequence number to the
-maximum of its current sequence number and the destination
-sequence number in the RREQ packet.
-*/
-}
 
-void forwardRREP(const RREP receivedRREP)
-{
-
-}
-
-char* createRREPBuffer(const RREP rrep)
-{
-
-}
-
-RREP readRREPBuffer(char* buffer)
-{
-
-}
 
 void AODV::handleRERRBuffer(char* buffer, int length)
 {

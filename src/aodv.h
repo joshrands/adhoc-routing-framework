@@ -10,18 +10,7 @@
 /* aodv includes */
 #include "aodv_routing_table.h"
 #include "aodv_rreq.h"
-
-struct RREP
-{
-	uint8_t type = 2;
-	uint16_t flags;
-	uint8_t hopCount;
-
-	uint32_t destIP;
-	uint32_t destSeqNum;
-	uint32_t origIP;
-	uint32_t lifetime;
-};
+#include "aodv_rrep.h"
 
 struct RERR
 {
@@ -46,23 +35,16 @@ public:
 	// decode a received packet buffer from UPD port 654
 	void decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source);
 
+	// RREQ - Route Request 
+	RREQHelper rreqHelper;
 	// make a decision on a received rreq packet using the rreq helper 
 	void handleRREQ(char* buffer, int length, IP_ADDR source);
 
-	// RREQ - Route Request 
-	RREQHelper rreqHelper;
-
 	// RREP - Route Reply
+	RREPHelper rrepHelper;
 	// handle a received rrep message 
-	void handleRREPBuffer(char* buffer, int length);
-	// initiating RREP enters state of waiting for RREP
-	RREP createRREP(const IP_ADDR dest);
-	// forward RREP enters state of maybe receiving RREP
-	void forwardRREP(const RREP receivedRREP);
-	// convert rrep message to a char* buffer
-	char* createRREPBuffer(const RREP rrep);
-	// read a received rrep buffer
-	RREP readRREPBuffer(char* buffer);
+	void handleRREP(char* buffer, int length, IP_ADDR source);
+
 
 	// RERR - Route Error
 	// handle a received rerr message 

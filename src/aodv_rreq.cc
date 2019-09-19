@@ -36,7 +36,7 @@ bool RREQHelper::isDuplicateRREQ(rreqPacket receivedRREQ)
 	uint32_t packetSeqNum = receivedRREQ.origSeqNum;
 	uint32_t tableSeqNum = this->m_table->getDestSequenceNumber(receivedRREQ.origIP);
 
-	// special case that this rreq is from this node
+	// special case that this rreq is originally from this node
 	if (receivedRREQ.origIP == this->m_ip)
 		return true;
 
