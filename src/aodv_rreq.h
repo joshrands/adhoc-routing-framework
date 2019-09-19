@@ -21,6 +21,9 @@ public:
 	void setIp(const IP_ADDR ip) { this->m_ip = ip; }
 	void setRoutingTable(AODVRoutingTable* table) { this->m_table = table; }
 
+	// check if a rrep should be generated
+	bool shouldGenerateRREP(rreqPacket receivedRREQ);
+
 	// handle a received rreq message 
 	void handleRREQBuffer(char* buffer, int length);
 	// initiating RREQ enters state of waiting for RREP
@@ -31,6 +34,8 @@ public:
 	char* createRREQBuffer(const rreqPacket rreq);
 	// read a received rreq buffer
 	rreqPacket readRREQBuffer(char* buffer);
+	// return true if this is a duplicate rreq
+	bool isDuplicateRREQ(rreqPacket receivedRREQ);
 
 private:
 	AODVRoutingTable* m_table;

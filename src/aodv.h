@@ -44,7 +44,10 @@ public:
 
 	static const int AODV_PORT = 654;
 	// decode a received packet buffer from UPD port 654
-	void decodeReceivedPacketBuffer(char* buffer, int length);
+	void decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source);
+
+	// make a decision on a received rreq packet using the rreq helper 
+	void handleRREQ(char* buffer, int length, IP_ADDR source);
 
 	// RREQ - Route Request 
 	RREQHelper rreqHelper;

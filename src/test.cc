@@ -140,6 +140,11 @@ void test_aodv_rreq_buffer()
 //	cout << receivedRREQ.destIP << endl;
 }
 
+void test_aodv_rreq_loop_detection()
+{
+	// 
+}
+
 void test_aodv_rreq()
 {
 	test_aodv_rreq_simple();

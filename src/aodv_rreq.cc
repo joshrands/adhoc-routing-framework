@@ -1,3 +1,5 @@
+#define RREQ_DEBUG		1
+
 #include "aodv_rreq.h"
 
 #include <iostream>
@@ -19,9 +21,25 @@ RREQHelper::RREQHelper(IP_ADDR ip, AODVRoutingTable* table)
     this->m_sequenceNum = 0;
 }
 
-void RREQHelper::handleRREQBuffer(char* buffer, int length)
+bool RREQHelper::shouldGenerateRREP(rreqPacket receivedRREQ)
 {
-	cout << "Handling rreq message." << endl;
+	// compare the destination ip addr to this node's ip
+	if (receivedRREQ.destIP == this->m_ip)
+		return true;
+	else
+		return false;
+}
+
+bool RREQHelper::isDuplicateRREQ(rreqPacket receivedRREQ)
+{
+	// if the origIP exists in the routing table AND the sequence number matches 
+	uint32_t packetSeqNum = receivedRREQ.origSeqNum;
+	uint32_t tableSeqNum = this->m_table->getDestSequenceNumber(receivedRREQ.origIP);
+
+	if (packetSeqNum == tableSeqNum)
+		return true;
+	else
+		return false;
 }
 
 rreqPacket RREQHelper::createRREQ(const IP_ADDR destIP, const uint32_t destSeqNum)

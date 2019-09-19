@@ -19,7 +19,7 @@ AODV::~AODV()
 	delete this->table;
 }
 
-void AODV::decodeReceivedPacketBuffer(char* buffer, int length)
+void AODV::decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source)
 {
 	if (length <= 0)
 	{
@@ -33,7 +33,7 @@ void AODV::decodeReceivedPacketBuffer(char* buffer, int length)
 	switch (type)
 	{
 		case 1:
-			rreqHelper.handleRREQBuffer(buffer, length);
+			handleRREQ(buffer, length, source);
 			break;
 		case 2: 
 			handleRREPBuffer(buffer, length);
@@ -43,9 +43,49 @@ void AODV::decodeReceivedPacketBuffer(char* buffer, int length)
 			break;
 		default:
 			if (AODV_DEBUG)
-				cout << "Packet not AODV." << endl;
+				cout << "ERROR: Packet not AODV." << endl;
 			break;
 	}
+}
+
+void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
+{
+	// handle a received rreq message
+
+	// 1. make sure this is a valid rreq message 
+	if (length != sizeof(rreqPacket))
+	{
+		if (AODV_DEBUG)
+			cout << "ERROR handling rreq packet. Invalid length." << endl;
+
+		return;
+	}
+
+	// valid rreq packet, make a decision
+	rreqPacket rreq = rreqHelper.readRREQBuffer(buffer);
+
+	// 2. is this a duplicate rreq? 
+	if (rreqHelper.isDuplicateRREQ(rreq))
+	{
+		if (AODV_DEBUG)
+			cout << "Duplicate RREQ message received." << endl;
+
+		return;
+	}
+
+	// 3. should we generate a rrep? are we the final destination?
+	if (rreqHelper.shouldGenerateRREP(rreq))
+	{
+		// generate a rreq message from this rreq
+		// TODO: Implement this 
+		cout << "Generating RREP message..." << endl;
+		// TODO: SEND PACKET 
+		return;
+	}
+
+	// 4. not final destination, forward the rreq 
+	rreqPacket forwardRREQ = rreqHelper.createForwardRREQ(rreq, source);
+	// TODO: SEND PACKET 
 }
 
 void AODV::handleRREPBuffer(char* buffer, int length)
