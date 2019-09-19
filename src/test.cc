@@ -24,6 +24,7 @@ int main (int argc, char *argv[])
 
 void test_test()
 {
+	// this test tests tests
 	assert(true == true);
 }
 
@@ -57,13 +58,14 @@ void test_aodv()
 
 void test_aodv_rreq_simple()
 {
+	// create an aodv routing object for ip .20
 	AODV aodv(getIpFromString("192.168.0.20"));
 
 	// test simple rreq 
 	IP_ADDR dest = getIpFromString("192.168.0.21");
 
-	rreqPacket rreq;
-	rreq = aodv.rreqHelper.createRREQ(dest);
+	// create a rreq packet to destination
+	rreqPacket rreq = aodv.rreqHelper.createRREQ(dest);
 
 	assert(rreq.type == 0x01);
 	assert(rreq.hopCount == 0);
@@ -72,6 +74,7 @@ void test_aodv_rreq_simple()
 	assert(rreq.origIP == aodv.getIp());
 	assert(rreq.origSeqNum == 1);	
 
+	// try a rreq for a different destination 
 	dest = getIpFromString("192.168.0.22");
 	rreq = aodv.rreqHelper.createRREQ(dest);
 
@@ -81,7 +84,6 @@ void test_aodv_rreq_simple()
 	assert(rreq.destIP == dest);
 	assert(rreq.origIP == aodv.getIp());
 	assert(rreq.origSeqNum == 2);	
-
 }
 
 void test_aodv_rreq_forwarding()
@@ -91,35 +93,32 @@ void test_aodv_rreq_forwarding()
 
 	// 0 - 1 - 2 - 3 - 4
 
-	IP_ADDR orig = getIpFromString("192.168.0.0");
-	IP_ADDR mid1 = getIpFromString("192.168.0.1");
-	IP_ADDR mid2 = getIpFromString("192.168.0.2");
-	IP_ADDR mid3 = getIpFromString("192.168.0.3");
-	IP_ADDR dest = getIpFromString("192.168.0.4");
+	AODV node0 = AODV(getIpFromString("192.168.0.0"));
+	AODV node1 = AODV(getIpFromString("192.168.0.1"));
+	AODV node2 = AODV(getIpFromString("192.168.0.2"));
+	AODV node3 = AODV(getIpFromString("192.168.0.3"));
+	AODV node4 = AODV(getIpFromString("192.168.0.4"));
 
-	AODV aodv(orig);
+	// create a rreq from node 0 to node 4
+	rreqPacket rreq = node0.rreqHelper.createRREQ(node4.getIp());
 
-	rreqPacket rreq = aodv.rreqHelper.createRREQ(dest);
-
-	// Note: In practice, each node will have its own AODV. Here we recycle the orig AODV
-	// rreq sent from orig to mid1 
-	rreq = aodv.rreqHelper.createForwardRREQ(rreq, orig);
-	// mid1->mid2
-	rreq = aodv.rreqHelper.createForwardRREQ(rreq, mid1);
-	// mid2->mid3
-	// using mid3 for routing table update test... need AODV 
-	AODV aodv3(mid3);
-	rreq = aodv3.rreqHelper.createForwardRREQ(rreq, mid2);
-	// mid3->dest
+	// rreq received by node1 from node0 
+	rreq = node1.rreqHelper.createForwardRREQ(rreq, node0.getIp());
+	// rreq received by node2 from node1
+	rreq = node2.rreqHelper.createForwardRREQ(rreq, node1.getIp());
+	// req received by node3 from node2
+	rreq = node3.rreqHelper.createForwardRREQ(rreq, node2.getIp());
 	// final hop count increment... 
-	rreq = aodv.rreqHelper.createForwardRREQ(rreq, mid3);
+	rreq = node4.rreqHelper.createForwardRREQ(rreq, node3.getIp());
 
 	// Create RREP! 
+
 	assert(rreq.hopCount == 4);
+
 	// check routing table update 
-	// for mid3 to send packet to orig, go through mid2
-	assert(aodv3.getTable()->getNextHop(orig) == mid2);
-	assert(aodv3.getTable()->getNextHop(orig) != mid1);
+	// for node3 to send packet to node0, go through node2
+	assert(node3.getTable()->getNextHop(node0.getIp()) == node2.getIp());
+	assert(node3.getTable()->getNextHop(node0.getIp()) != node1.getIp());
 }
 
 void test_aodv_rreq_buffer()
