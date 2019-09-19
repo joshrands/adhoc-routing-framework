@@ -1,9 +1,11 @@
 #include "aodv.h"
 #include "string.h"
 
+#define AODV_DEBUG		0
+
 AODV::AODV(IP_ADDR ip)
 {
-	cout << "Created new aodv routing protocol." << endl;
+//	cout << "Created new aodv routing protocol." << endl;
 
 	this->ipAddress = ip;
 	this->table = new AODVRoutingTable();
@@ -40,7 +42,8 @@ void AODV::decodeReceivedPacketBuffer(char* buffer, int length)
 			handleRERRBuffer(buffer, length);
 			break;
 		default:
-			cout << "Packet not AODV." << endl;
+			if (AODV_DEBUG)
+				cout << "Packet not AODV." << endl;
 			break;
 	}
 }

@@ -1,6 +1,6 @@
 #include "RoutingProtocol.h"
 
-#define ROUTE_DEBUG					1
+#define ROUTE_DEBUG		0
 
 using namespace std;
 
@@ -19,7 +19,7 @@ IP_ADDR getIpFromString(string ipStr)
     pow -= 8;
   }
  
-  cout << ipStr << " = " << ip << endl;
+  //cout << ipStr << " = " << ip << endl;
    
   return ip;
 }
@@ -41,12 +41,12 @@ IP_ADDR RoutingTable::getNextHop(const IP_ADDR dest)
 
 	if (this->table.count(dest))
 	{
-		cout << "Entry exists." << endl;
+//		cout << "Entry exists." << endl;
 		nextHop = table[dest].nextHop;
 	}
 	else
 	{
-		cout << "Table entry does not exist." << endl;
+//		cout << "Table entry does not exist." << endl;
 		nextHop = 0;
 	}
 

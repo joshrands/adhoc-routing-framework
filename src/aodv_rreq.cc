@@ -1,5 +1,4 @@
 #include "aodv_rreq.h"
-#include "defines.h"
 
 #include <iostream>
 #include <string.h>
@@ -15,7 +14,7 @@ RREQHelper::RREQHelper()
 RREQHelper::RREQHelper(IP_ADDR ip, AODVRoutingTable* table) 
 {
     this->m_table = table;
-    this->m_ip = ip; 
+    this->m_ip = ip;
     this->m_rreqID = 0;
     this->m_sequenceNum = 0;
 }
@@ -34,7 +33,8 @@ rreqPacket RREQHelper::createRREQ(const IP_ADDR destIP, const uint32_t destSeqNu
 
 	rreq.type = 0x01;
 
-    // set the flags 
+    // TODO: set the flags
+	// default is all 0... 
 
 	rreq.hopCount = 0;
 	

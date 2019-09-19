@@ -138,7 +138,7 @@ void test_aodv_rreq_buffer()
 
 	assert(receivedRREQ.type == rreq.type);
 	assert(receivedRREQ.origIP == rreq.origIP);
-	cout << receivedRREQ.destIP << endl;
+//	cout << receivedRREQ.destIP << endl;
 }
 
 void test_aodv_rreq()
