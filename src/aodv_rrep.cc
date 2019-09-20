@@ -1,5 +1,3 @@
-#define RREP_DEBUG		1
-
 #include "aodv_rrep.h"
 
 #include <iostream>

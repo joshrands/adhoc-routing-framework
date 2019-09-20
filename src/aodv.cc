@@ -4,8 +4,6 @@
 #include <fstream>
 #include <stdio.h>
 
-#define AODV_DEBUG		1
-
 AODV::AODV(IP_ADDR ip)
 {
 //	cout << "Created new aodv routing protocol." << endl;
@@ -124,7 +122,8 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 	{
 		// generate a rreq message from this rreq
 		// TODO: Implement this 
-		cout << "Generating RREP message..." << endl;
+		if (RREP_DEBUG)
+			cout << "Generating RREP message..." << endl;
 		rrepPacket rrep = rrepHelper.createRREPFromRREQ(rreq,source);
 
 		// convert packet to buffer and send 

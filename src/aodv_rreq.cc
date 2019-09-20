@@ -1,5 +1,3 @@
-#define RREQ_DEBUG		1
-
 #include "aodv_rreq.h"
 
 #include <iostream>

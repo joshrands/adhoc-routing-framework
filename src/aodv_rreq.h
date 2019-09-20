@@ -7,6 +7,8 @@
  * Date: 9/18/2019
  ********************************/
 
+#define RREQ_DEBUG		0
+
 #include "defines.h"
 #include "aodv_packets.h"
 #include "aodv_routing_table.h"
