@@ -12,20 +12,42 @@ RREPHelper::RREPHelper()
 
 }
 
-RREPHelper::RREPHelper(IP_ADDR ip, AODVRoutingTable* table) 
+RREPHelper::RREPHelper(IP_ADDR ip, AODVRoutingTable* table, uint32_t* seqNum) 
 {
-    this->m_table = table;
+    this->m_pTable = table;
     this->m_ip = ip;
+    this->m_pSequenceNum = seqNum;
 }
 
-rrepPacket RREPHelper::createRREP(const IP_ADDR dest)
+rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq)
 {
-/*
-Immediately before a destination node originates a RREP in
-response to a RREQ, it MUST update its own sequence number to the
-maximum of its current sequence number and the destination
-sequence number in the RREQ packet.
-*/
+	rrepPacket rrep;    
+
+    // populate fields of rrep
+    rrep.type = 0x02;
+    rrep.destIP = rreq.destIP;
+    // is this node the destination? 
+    if (rreq.destIP == this->m_ip)
+    {
+        // yes, copy this sequence number in
+//        if (rreq.origSeqNum == this->m_seq)
+        // TODO: increment this node sequence number if equal to orig sequence number 
+
+        rrep.hopCount = 0x00; // this is weird... what is the point of rreq hops?  
+    }
+    else 
+    {
+        // we are an intermediary hop
+        // TODO: copy known sequence number for destination into destSeq field
+        // TODO: put hop count from routing table 
+    }
+    rrep.destSeqNum = rreq.destSeqNum;
+    rrep.origIP = rreq.origIP;
+    rrep.lifetime = MY_ROUTE_TIMEOUT_MS;
+
+    // TODO: update routing table! 
+
+    return rrep;
 }
 
 void RREPHelper::forwardRREP(const rrepPacket receivedRREP)

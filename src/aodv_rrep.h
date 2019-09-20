@@ -16,13 +16,16 @@ class RREPHelper
 public: 
 	// default constructor
 	RREPHelper();
-	RREPHelper(IP_ADDR ip, AODVRoutingTable* table);
+	RREPHelper(IP_ADDR ip, AODVRoutingTable* table, uint32_t* seqNum);
+
+	uint32_t MY_ROUTE_TIMEOUT_MS = 10000;
 
 	void setIp(const IP_ADDR ip) { this->m_ip = ip; }
-	void setRoutingTable(AODVRoutingTable* table) { this->m_table = table; }
+	void setRoutingTable(AODVRoutingTable* table) { this->m_pTable = table; }
+	void setSequenceNum(uint32_t* seqNum) { this->m_pSequenceNum = seqNum; }
 
 	// initiating RREP enters state of waiting for RREP
-	rrepPacket createRREP(const IP_ADDR dest);
+	rrepPacket createRREPFromRREQ(rreqPacket rreq);
 	// forward RREP enters state of maybe receiving RREP
 	void forwardRREP(const rrepPacket receivedRREP);
 	// convert rrep message to a char* buffer
@@ -32,5 +35,6 @@ public:
 
 private:
     IP_ADDR m_ip;
-    AODVRoutingTable* m_table;
+    AODVRoutingTable* m_pTable;
+	uint32_t* m_pSequenceNum;
 };

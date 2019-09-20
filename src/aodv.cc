@@ -11,10 +11,16 @@ AODV::AODV(IP_ADDR ip)
 //	cout << "Created new aodv routing protocol." << endl;
 
 	this->ipAddress = ip;
+	this->sequenceNum = 0;
 	this->table = new AODVRoutingTable();
 
 	this->rreqHelper.setRoutingTable((AODVRoutingTable*)(this->table));
 	this->rreqHelper.setIp(ip);
+	this->rreqHelper.setSequenceNumPointer(&(this->sequenceNum));
+
+	this->rrepHelper.setIp(ip);
+	this->rrepHelper.setRoutingTable((AODVRoutingTable*)(this->table));
+	this->rrepHelper.setSequenceNum(&(this->sequenceNum));
 }
 
 AODV::~AODV()
