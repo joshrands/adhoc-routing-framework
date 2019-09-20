@@ -1,8 +1,7 @@
 // Client side implementation of UDP client-server model
-#include "Endpoint.h"
-#include "ServerSocket.h"
-#include "Socket.h"
-#include "UDPSocket.h"
+#include "endpoint.h"
+#include "socket.h"
+#include "udp_socket.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
