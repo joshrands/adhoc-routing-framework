@@ -29,9 +29,9 @@ public:
 	// forward RREP enters state of maybe receiving RREP
 	void forwardRREP(const rrepPacket receivedRREP);
 	// convert rrep message to a char* buffer
-	char* createRREPBuffer(const rrepPacket rrep);
+	static char* createRREPBuffer(const rrepPacket rrep);
 	// read a received rrep buffer
-	rrepPacket readRREPBuffer(char* buffer);
+	static rrepPacket readRREPBuffer(char* buffer);
 
 private:
     IP_ADDR m_ip;

@@ -126,13 +126,18 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		// TODO: Implement this 
 		cout << "Generating RREP message..." << endl;
 		rrepPacket rrep = rrepHelper.createRREPFromRREQ(rreq,source);
-		// TODO: SEND PACKET
+
+		// convert packet to buffer and send 
+		char* buffer;
+		buffer = RREPHelper::createRREPBuffer(rrep);
+
+		sendBuffer(buffer, sizeof(rrep), this->getIp(), rrep.origIP);
+
 		return;
 	}
 
 	// 4. not final destination, forward the rreq 
 	rreqPacket forwardRREQ = rreqHelper.createForwardRREQ(rreq, source);
-	// TODO: SEND PACKET 
 	broadcastRREQBuffer(forwardRREQ);
 }
 

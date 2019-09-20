@@ -62,10 +62,20 @@ void RREPHelper::forwardRREP(const rrepPacket receivedRREP)
 
 char* RREPHelper::createRREPBuffer(const rrepPacket rrep)
 {
+	char* buffer = (char*)(malloc(sizeof(rrep)));	
 
+	// fill buffer with all rreq information
+	memcpy(buffer, &(rrep), sizeof(rrep));
+
+	return buffer;
 }
 
 rrepPacket RREPHelper::readRREPBuffer(char* buffer)
 {
+	rrepPacket rrep;
 
+	// convert buffer to rrep 
+	memcpy(&(rrep), buffer, sizeof(rrep));
+
+	return rrep;
 }
