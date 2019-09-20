@@ -150,9 +150,9 @@ void AODV::logRoutingTable()
 
 	for ( it = this->getTable()->getInternalTable().begin(); it != this->getTable()->getInternalTable().end(); it++ )
 	{
-		logFile << it->first
+		logFile << getStringFromIp(it->first)
 				<< " : "
-				<< it->second.nextHop
+				<< getStringFromIp(it->second.nextHop)
 				<< endl;
 	}
 
