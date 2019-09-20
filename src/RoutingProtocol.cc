@@ -26,6 +26,18 @@ IP_ADDR getIpFromString(string ipStr)
   return ip;
 }
 
+string getStringFromIp(IP_ADDR ip)
+{
+	string ipString = "";
+
+	ipString += to_string((uint8_t)(ip>>24)) + ".";
+	ipString += to_string((uint8_t)(ip>>16)) + ".";
+	ipString += to_string((uint8_t)(ip>>8)) + ".";
+	ipString += to_string((uint8_t)ip);
+
+	return ipString;
+}
+
 RoutingTable::RoutingTable()
 {
 	if (ROUTE_DEBUG)	
