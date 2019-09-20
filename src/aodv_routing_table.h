@@ -27,8 +27,10 @@ class AODVRoutingTable : public RoutingTable
 {
 public:
 	void updateAODVRoutingTableFromRREQ(rreqPacket* receivedRREQ, IP_ADDR sourceIP);
+	void updateAODVRoutingTableFromRREP(rrepPacket* receivedRREP, IP_ADDR sourceIP);
 
 	uint32_t getDestSequenceNumber(const IP_ADDR dest);
+	uint8_t getDestHopCount(const IP_ADDR dest);
 	void setDestSequenceNumber(const IP_ADDR dest, uint32_t destSeqNum);
 	void setHopCount(const IP_ADDR dest, uint8_t hopCount);
 };

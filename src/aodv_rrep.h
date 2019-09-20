@@ -24,8 +24,8 @@ public:
 	void setRoutingTable(AODVRoutingTable* table) { this->m_pTable = table; }
 	void setSequenceNum(uint32_t* seqNum) { this->m_pSequenceNum = seqNum; }
 
-	// initiating RREP enters state of waiting for RREP
-	rrepPacket createRREPFromRREQ(rreqPacket rreq);
+	// initiating RREP enters state of waiting for RREP - source is to update routing table on reverse route 
+	rrepPacket createRREPFromRREQ(rreqPacket rreq, IP_ADDR source);
 	// forward RREP enters state of maybe receiving RREP
 	void forwardRREP(const rrepPacket receivedRREP);
 	// convert rrep message to a char* buffer

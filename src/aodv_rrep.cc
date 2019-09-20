@@ -19,7 +19,7 @@ RREPHelper::RREPHelper(IP_ADDR ip, AODVRoutingTable* table, uint32_t* seqNum)
     this->m_pSequenceNum = seqNum;
 }
 
-rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq)
+rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
 {
 	rrepPacket rrep;    
 
@@ -30,8 +30,7 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq)
     if (rreq.destIP == this->m_ip)
     {
         // yes, copy this sequence number in
-//        if (rreq.origSeqNum == this->m_seq)
-        // TODO: increment this node sequence number if equal to orig sequence number 
+        // increment this node sequence number if equal to orig sequence number 
         if (*(this->m_pSequenceNum) == rreq.destSeqNum)
             *(this->m_pSequenceNum)++;
 
@@ -43,13 +42,15 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq)
         // we are an intermediary hop
         // copy known sequence number for destination into destSeq field
         rrep.destSeqNum = this->m_pTable->getDestSequenceNumber(rreq.destIP);
-        // TODO: put hop count from routing table 
+        // put hop count from routing table 
+        rrep.hopCount = this->m_pTable->getDestHopCount(rreq.destIP);
     }
-    rrep.destSeqNum = rreq.destSeqNum;
+
     rrep.origIP = rreq.origIP;
     rrep.lifetime = MY_ROUTE_TIMEOUT_MS;
 
-    // TODO: update routing table! 
+    // update the routing table from the original rreq message
+    this->m_pTable->updateAODVRoutingTableFromRREQ(&(rreq), source);
 
     return rrep;
 }
