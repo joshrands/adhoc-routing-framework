@@ -32,13 +32,17 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq)
         // yes, copy this sequence number in
 //        if (rreq.origSeqNum == this->m_seq)
         // TODO: increment this node sequence number if equal to orig sequence number 
+        if (*(this->m_pSequenceNum) == rreq.destSeqNum)
+            *(this->m_pSequenceNum)++;
 
+        rrep.destSeqNum = *(this->m_pSequenceNum);
         rrep.hopCount = 0x00; // this is weird... what is the point of rreq hops?  
     }
     else 
     {
         // we are an intermediary hop
-        // TODO: copy known sequence number for destination into destSeq field
+        // copy known sequence number for destination into destSeq field
+        rrep.destSeqNum = this->m_pTable->getDestSequenceNumber(rreq.destIP);
         // TODO: put hop count from routing table 
     }
     rrep.destSeqNum = rreq.destSeqNum;

@@ -19,6 +19,7 @@ class AODVInfo : public TableInfo
 {
 public:
 	uint32_t destSequenceNumber;
+	uint8_t hopCount;
 };
 
 
@@ -29,4 +30,5 @@ public:
 
 	uint32_t getDestSequenceNumber(const IP_ADDR dest);
 	void setDestSequenceNumber(const IP_ADDR dest, uint32_t destSeqNum);
+	void setHopCount(const IP_ADDR dest, uint8_t hopCount);
 };
