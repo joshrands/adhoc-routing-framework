@@ -1,49 +1,20 @@
 #include "aodv.h"
 #include "string.h"
+#include "send_packet.h"
+#include <fstream>
+#include <stdio.h>
 
-uint32_t AODVRoutingTable::getDestSequenceNumber(const IP_ADDR dest)
+#define AODV_DEBUG		1
+
+AODV::AODV(IP_ADDR ip)
 {
-	// check if this entry exists 
-	if (this->table.count(dest))
-	{
-		// entry exists, return dest sequence number  
-		return ((AODVInfo*)&(this->table[dest]))->destSequenceNumber; 
-	}
-	else
-	{
-		return 0;
-	}
-}
+//	cout << "Created new aodv routing protocol." << endl;
 
-void AODVRoutingTable::setDestSequenceNumber(const IP_ADDR dest, uint32_t destSeqNum)
-{
-	// check if this entry exists 
-	if (this->table.count(dest))
-	{
-		// entry exists, update dest sequence number  
-		((AODVInfo*)&(this->table[dest]))->destSequenceNumber = destSeqNum; 
-	}
-	else
-	{
-		cout << "DEBUG: Error update sequence number: Unknown table entry." << endl;
-		return;
-	}
-}
-
-void AODVRoutingTable::updateAODVRoutingTableFromRREQ(RREQ receivedRREQ, IP_ADDR sourceIP)
-{
-	this->updateTableEntry(receivedRREQ.origIP, sourceIP);
-	if (receivedRREQ.origSeqNum > getDestSequenceNumber(receivedRREQ.origIP))
-	{
-		this->setDestSequenceNumber(receivedRREQ.origIP, receivedRREQ.origSeqNum);
-	}
-}
-
-AODV::AODV()
-{
-	cout << "Created new aodv routing protocol." << endl;
-
+	this->ipAddress = ip;
 	this->table = new AODVRoutingTable();
+
+	this->rreqHelper.setRoutingTable((AODVRoutingTable*)(this->table));
+	this->rreqHelper.setIp(ip);
 }
 
 AODV::~AODV()
@@ -51,7 +22,44 @@ AODV::~AODV()
 	delete this->table;
 }
 
-void AODV::decodeReceivedPacketBuffer(char* buffer, int length)
+void AODV::sendPacketBuffer(char* packet, int length, IP_ADDR finalDestination)
+{
+	// if entry exists in routing table, send it! 
+	// check routing table 
+	IP_ADDR nextHop = this->getTable()->getNextHop(finalDestination);
+	if (0 == nextHop)
+	{
+		// start a thread for an rreq and wait for a response 
+		rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
+
+		broadcastRREQBuffer(rreq);
+	}
+
+	// add aodv header to buffer 
+	char* buffer = (char*)(malloc(5 + length));
+	uint8_t zero = 0x00;
+	memcpy(buffer, &(zero), 1);
+	buffer++;
+	memcpy(buffer, &finalDestination, 4);
+	buffer+=4;
+
+	// copy data into packet 
+	memcpy(buffer, packet, length);
+	// reset packet 
+	packet-=5;
+
+	sendBuffer(buffer, length+5, this->getIp(), nextHop);
+}
+
+void AODV::broadcastRREQBuffer(rreqPacket rreq)
+{
+	char* rreqBuffer = RREQHelper::createRREQBuffer(rreq);
+	sendBuffer(rreqBuffer, sizeof(rreq), this->getIp(), getIpFromString(BROADCAST));
+
+	delete rreqBuffer;
+}
+
+void AODV::decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source)
 {
 	if (length <= 0)
 	{
@@ -65,116 +73,93 @@ void AODV::decodeReceivedPacketBuffer(char* buffer, int length)
 	switch (type)
 	{
 		case 1:
-			handleRREQBuffer(buffer, length);
+			handleRREQ(buffer, length, source);
 			break;
 		case 2: 
-			handleRREPBuffer(buffer, length);
+			handleRREP(buffer, length, source);
 			break;
 		case 3:
 			handleRERRBuffer(buffer, length);
 			break;
 		default:
-			cout << "Packet not AODV." << endl;
+			if (AODV_DEBUG)
+				cout << "ERROR: Packet not AODV." << endl;
 			break;
 	}
 }
 
-void AODV::handleRREQBuffer(char* buffer, int length)
+void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 {
-	cout << "Handling rreq message." << endl;
-}
+	// handle a received rreq message
 
-RREQ AODV::createRREQ(const IP_ADDR dest)
-{
-	// Section 6.3 rfc3561
-
-	// there is no current path to the destination, create a RREQ 
-	RREQ rreq; 
-
-	rreq.type = 0x01;
-	rreq.flags = 0;
-	rreq.hopCount = 0;
-	
-	rreq.rreqID = (++this->rreqID);
-	rreq.destIP = dest;
-	rreq.destSeqNum = getTable()->getDestSequenceNumber(dest);
-	if (0 == rreq.destSeqNum)
+	// 1. make sure this is a valid rreq message 
+	if (length != sizeof(rreqPacket))
 	{
-		// unknown destSeqNum flag is 00001000 
-		rreq.flags |= 0x08;
+		if (AODV_DEBUG)
+			cout << "ERROR handling rreq packet. Invalid length." << endl;
+
+		return;
 	}
-	rreq.origIP = this->getIp();
-	rreq.origSeqNum = (++this->sequenceNum);
 
-	return rreq;
+	// valid rreq packet, make a decision
+	rreqPacket rreq = rreqHelper.readRREQBuffer(buffer);
+
+	// 2. is this a duplicate rreq? 
+	if (rreqHelper.isDuplicateRREQ(rreq))
+	{
+		if (AODV_DEBUG)
+			cout << "Duplicate RREQ message received." << endl;
+
+		return;
+	}
+
+	// 3. should we generate a rrep? are we the final destination?
+	if (rreqHelper.shouldGenerateRREP(rreq))
+	{
+		// generate a rreq message from this rreq
+		// TODO: Implement this 
+		cout << "Generating RREP message..." << endl;
+		// TODO: SEND PACKET
+		return;
+	}
+
+	// 4. not final destination, forward the rreq 
+	rreqPacket forwardRREQ = rreqHelper.createForwardRREQ(rreq, source);
+	// TODO: SEND PACKET 
+	broadcastRREQBuffer(forwardRREQ);
 }
 
-RREQ AODV::createForwardRREQ(RREQ receivedRREQ, IP_ADDR sourceIP)
+void AODV::logRoutingTable()
 {
-	// Section 6.5 rfc3561
+	ofstream logFile;
+	logFile.open("aodv-log.txt", ios::out);
 
-	RREQ forwardRREQ = receivedRREQ;
+	if (logFile.is_open())
+		logFile << "AODV Log for node " << this->getIp() << endl;
 
-	// 1. Increment the hop count 
-	forwardRREQ.hopCount++;
+	map<IP_ADDR, TableInfo>::iterator it;
 
-	// 2. Update routing table for this node with orig sequence nubmer 
-	this->getTable()->updateAODVRoutingTableFromRREQ(receivedRREQ, sourceIP);
+	logFile << "DESTINATION IP : NEXT HOP" << endl;
 
-	// 3. TODO: Set lifetime of table entry
+	for ( it = this->getTable()->getInternalTable().begin(); it != this->getTable()->getInternalTable().end(); it++ )
+	{
+		logFile << it->first
+				<< " : "
+				<< it->second.nextHop
+				<< endl;
+	}
 
-	return forwardRREQ;
+	logFile.close();
+
+	while (logFile.is_open());
 }
 
-char* AODV::createRREQBuffer(const RREQ rreq)
+void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 {
-	char* buffer = (char*)(malloc(sizeof(rreq)));	
-
-	// fill buffer with all rreq information
-	memcpy(buffer, &(rreq), sizeof(rreq));
-
-	return buffer;
+	
 }
 
-RREQ AODV::readRREQBuffer(char* buffer)
-{
-	RREQ rreq;
 
-	// convert buffer to rreq 
-	memcpy(&(rreq), buffer, sizeof(rreq));
-
-	return rreq;
-}
-
-void AODV::handleRREPBuffer(char* buffer, int length)
-{
-
-}
-
-RREP createRREP(const IP_ADDR dest)
-{
-/*
-Immediately before a destination node originates a RREP in
-response to a RREQ, it MUST update its own sequence number to the
-maximum of its current sequence number and the destination
-sequence number in the RREQ packet.
-*/
-}
-
-void forwardRREP(const RREP receivedRREP)
-{
-
-}
-
-char* createRREPBuffer(const RREP rrep)
-{
-
-}
-
-RREP readRREPBuffer(char* buffer)
-{
-
-}
 
 void AODV::handleRERRBuffer(char* buffer, int length)
 {

@@ -7,32 +7,10 @@
  * Date: 9/4/2019
  ********************************/
 
-#include "RoutingProtocol.h"
-
-struct RREQ
-{
-	uint8_t type = 1;
-	uint16_t flags;
-	uint8_t hopCount;
-	
-	uint32_t rreqID;
-	uint32_t destIP;
-	uint32_t destSeqNum;
-	uint32_t origIP;
-	uint32_t origSeqNum;
-};
-
-struct RREP
-{
-	uint8_t type = 2;
-	uint16_t flags;
-	uint8_t hopCount;
-
-	uint32_t destIP;
-	uint32_t destSeqNum;
-	uint32_t origIP;
-	uint32_t lifetime;
-};
+/* aodv includes */
+#include "aodv_routing_table.h"
+#include "aodv_rreq.h"
+#include "aodv_rrep.h"
 
 struct RERR
 {
@@ -44,55 +22,36 @@ struct RERR
 	uint32_t unreachableDestSeqNum;
 };
 
-class AODVInfo : public TableInfo
-{
-public:
-	uint32_t destSequenceNumber;
-};
-
-class AODVRoutingTable : public RoutingTable
-{
-public:
-	void updateAODVRoutingTableFromRREQ(RREQ receivedRREQ, IP_ADDR sourceIP);
-
-	uint32_t getDestSequenceNumber(const IP_ADDR dest);
-	void setDestSequenceNumber(const IP_ADDR dest, uint32_t destSeqNum);
-};
 
 class AODV : public RoutingProtocol
 {
 public:
 	// default constructor 
 	AODV();
+	AODV(IP_ADDR ip);
 	~AODV();
+
+	// try to send data to a destination - the next hop is determined from the routing table  
+	void sendPacketBuffer(char* buffer, int length, IP_ADDR finalDestination);
 
 	static const int AODV_PORT = 654;
 	// decode a received packet buffer from UPD port 654
-	void decodeReceivedPacketBuffer(char* buffer, int length);
+	void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source);
 
 	// RREQ - Route Request 
-	// handle a received rreq message 
-	void handleRREQBuffer(char* buffer, int length);
-	// initiating RREQ enters state of waiting for RREP
-	RREQ createRREQ(const IP_ADDR dest);
-	// forward RREQ enters state of maybe receiving RREP
-	RREQ createForwardRREQ(RREQ receivedRREQ, IP_ADDR sourceIP);
-	// convert rreq message to a char* buffer
-	char* createRREQBuffer(const RREQ rreq);
-	// read a received rreq buffer
-	RREQ readRREQBuffer(char* buffer);
+	RREQHelper rreqHelper;
+	// broadcast rreq to all neighbors
+	void broadcastRREQBuffer(rreqPacket rreq);
+	// make a decision on a received rreq packet using the rreq helper 
+	void handleRREQ(char* buffer, int length, IP_ADDR source);
 
 	// RREP - Route Reply
+	RREPHelper rrepHelper;
 	// handle a received rrep message 
-	void handleRREPBuffer(char* buffer, int length);
-	// initiating RREP enters state of waiting for RREP
-	RREP createRREP(const IP_ADDR dest);
-	// forward RREP enters state of maybe receiving RREP
-	void forwardRREP(const RREP receivedRREP);
-	// convert rrep message to a char* buffer
-	char* createRREPBuffer(const RREP rrep);
-	// read a received rrep buffer
-	RREP readRREPBuffer(char* buffer);
+	void handleRREP(char* buffer, int length, IP_ADDR source);
+
+	// output the current contents of the routing table 
+	void logRoutingTable();
 
 	// RERR - Route Error
 	// handle a received rerr message 

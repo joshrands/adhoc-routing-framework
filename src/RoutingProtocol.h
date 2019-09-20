@@ -1,3 +1,5 @@
+#pragma once
+
 /********************************
  * RoutingProtocol.h 
  * 
@@ -14,7 +16,7 @@
 #include <sstream>
 #include <math.h>
 
-#define IP_ADDR			uint32_t
+#include "defines.h"
 
 using namespace std;
 
@@ -49,6 +51,9 @@ public:
 
 	// adds an element to the table 
 	void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
+
+	// get the map 
+	map<IP_ADDR, TableInfo> getInternalTable() { return this->table; }
 
 protected:
 	// internal routing table maps destination to next hop 
