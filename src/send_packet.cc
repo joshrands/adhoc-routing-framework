@@ -6,13 +6,7 @@ uint32_t globalPacketCount = 0;
 extern void sendBuffer(char* buffer, int length, IP_ADDR source, IP_ADDR dest)
 {
     if (DEBUG)
-        cout << "Sending buffer from " << source << " to " << dest << endl;
-
-    if (dest = getIpFromString("255.255.255.255"))
-    {
-        if (DEBUG)
-            cout << "Broadcasting packet!" << endl;
-    }
+        cout << "Sending buffer from " << getStringFromIp(source) << " to " << getStringFromIp(dest) << endl;
 
     lastSource = source;
     globalPacketCount++;
