@@ -137,6 +137,13 @@ void AODV::logRoutingTable()
 	if (logFile.is_open())
 		logFile << "AODV Log for node " << this->getIp() << endl;
 
+	// check if there are any entries 
+	if (this->getTable()->getInternalTable().size() == 0)
+	{
+		logFile << "Routing table empty." << endl;
+		return;
+	}
+
 	map<IP_ADDR, TableInfo>::iterator it;
 
 	logFile << "DESTINATION IP : NEXT HOP" << endl;
