@@ -1,4 +1,4 @@
-/* Highly modified version of the following code, which was liscenced under MIT
+/* Modified version of the following code, which was liscenced under MIT
  * source: https://github.com/ARMmbed/mbed-os
  */
 /* Copyright (C) 2012 mbed.org, MIT License
@@ -29,6 +29,8 @@ using std::memset;
 
 Socket::Socket() : sockfd(-1), blocking(true), timeout(1500) {}
 
+Socket::~Socket() { sclose(); }
+
 void Socket::setBlocking(bool blocking, unsigned int timeout) {
   blocking = blocking;
   timeout = timeout;
@@ -36,13 +38,13 @@ void Socket::setBlocking(bool blocking, unsigned int timeout) {
 
 bool Socket::initSocket(int type) {
   if (sockfd != -1) {
-    perror("Socket already created");
+    perror("Socket already created\n");
     return false;
   }
 
   int fd = socket(AF_INET, type, 0);
   if (fd < 0) {
-    perror("socket creation failed");
+    perror("socket creation failed\n");
     return false;
   }
 
@@ -70,13 +72,11 @@ int Socket::_select(struct timeval *timeout, bool read, bool write) {
   return (ret <= 0 || !FD_ISSET(sockfd, &fdSet)) ? (false) : (true);
 }
 
+void Socket::sclose() { close(sockfd); }
+
 int Socket::waitReadable(TimeInterval &timeout) { return _select(&timeout.time, true, false); }
 
 int Socket::waitWritable(TimeInterval &timeout) { return _select(&timeout.time, false, true); }
-
-Socket::~Socket() {
-  close(); // Don't want to leak
-}
 
 TimeInterval::TimeInterval(unsigned int ms) {
   time.tv_sec = ms / 1000;

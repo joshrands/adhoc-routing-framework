@@ -1,4 +1,4 @@
-/* Highly modified version of the following code, which was liscenced under MIT
+/* Modified version of the following code, which was liscenced under MIT
  * source: https://github.com/ARMmbed/mbed-os
  */
 /* Copyright (C) 2012 mbed.org, MIT License
@@ -61,7 +61,7 @@ public:
    *  @param port The endpoint port
    *  @return true on success or false on failure
    */
-  int setAddress(const char *host, const int port);
+  bool setAddress(const char *host, const int port);
 
   /*! Get the IP address of this endpoint
    *  @return the IP address of this point

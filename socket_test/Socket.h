@@ -1,4 +1,4 @@
-/* Highly modified version of the following code, which was liscenced under MIT
+/* Modified version of the following code, which was liscenced under MIT
  * source: https://github.com/ARMmbed/mbed-os
  */
 /* Copyright (C) 2012 mbed.org, MIT License
@@ -45,7 +45,7 @@ class Socket {
 public:
   Socket();
 
-  ~Socket() { close(sockfd); }
+  ~Socket();
 
   /*! Set blocking or non-blocking mode of the socket and a timeout on
    *  blocking socket operations
@@ -73,10 +73,8 @@ public:
   bool getOption(int level, int optname, void *optval, socklen_t *optlen);
 
   /*! Close the socket
-   *  @param shutdown free the left-over data in message queues
-   *
    */
-  int close(bool shutdown = true);
+  void sclose();
 
 protected:
   int sockfd;

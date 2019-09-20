@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="socket_test"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="socket_test">
+				<Option output="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/socket_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/."/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 socket_test"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="socket_test/fast">
+				<Option output="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/socket_test" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/."/>
+					<Add directory="/usr/include/c++/7"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/7"/>
+					<Add directory="/usr/include/c++/7/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/7/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 socket_test/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/ClientSocket.h">
+			<Option target="socket_test"/>
+		</Unit>
+		<Unit filename="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/Endpoint.cpp">
+			<Option target="socket_test"/>
+		</Unit>
+		<Unit filename="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/Endpoint.h">
+			<Option target="socket_test"/>
+		</Unit>
+		<Unit filename="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/Pi2.cpp">
+			<Option target="socket_test"/>
+		</Unit>
+		<Unit filename="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/Socket.cpp">
+			<Option target="socket_test"/>
+		</Unit>
+		<Unit filename="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/Socket.h">
+			<Option target="socket_test"/>
+		</Unit>
+		<Unit filename="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/UDPSocket.cpp">
+			<Option target="socket_test"/>
+		</Unit>
+		<Unit filename="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/UDPSocket.h">
+			<Option target="socket_test"/>
+		</Unit>
+		<Unit filename="/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

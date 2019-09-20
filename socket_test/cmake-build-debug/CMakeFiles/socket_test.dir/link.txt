@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/socket_test.dir/Endpoint.cpp.o CMakeFiles/socket_test.dir/Pi2.cpp.o CMakeFiles/socket_test.dir/Socket.cpp.o CMakeFiles/socket_test.dir/UDPSocket.cpp.o  -o socket_test 

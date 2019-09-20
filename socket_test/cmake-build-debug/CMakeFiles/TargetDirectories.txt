@@ -1,0 +1,3 @@
+/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/CMakeFiles/rebuild_cache.dir
+/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/CMakeFiles/socket_test.dir
+/home/zsmeton/Dropbox/Research/SmallSat/AdHocRouting/socket_test/cmake-build-debug/CMakeFiles/edit_cache.dir

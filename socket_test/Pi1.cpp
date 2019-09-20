@@ -1,24 +1,27 @@
-// Client side implementation of UDP client-server model 
+// Client side implementation of UDP client-server model
+#include "Endpoint.h"
+#include "ServerSocket.h"
+#include "Socket.h"
+#include "UDPSocket.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include "ClientSocket.h"
-#include "ServerSocket.h"
 
-#define PORT 8080 
+#define PORT 8080
 
-// Driver code 
+// Driver code
 int main() {
-	ServerSocket server(PORT);
-	while(true){
-		char* buffer = server.listen();
-		printf("Received: %s\n", buffer);
-	}
-	return 0;
+  UDPSocket server;
+  if (!server.bindToPort(PORT)) {
+    fprintf(stderr, "Couldn't bind to port\n");
+    exit(-1);
+  }
+  while (true) {
+    char buffer[MAXLINE];
+    Endpoint client;
+    int n = server.receiveFrom(client, buffer, MAXLINE);
+    buffer[n] = '\0';
+    printf("Received: %s\n", buffer);
+  }
+  return 0;
 }
-
