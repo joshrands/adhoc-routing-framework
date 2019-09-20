@@ -52,6 +52,9 @@ public:
 	// adds an element to the table 
 	void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
 
+	// get the map 
+	map<IP_ADDR, TableInfo> getInternalTable() { return this->table; }
+
 protected:
 	// internal routing table maps destination to next hop 
 	map<IP_ADDR, TableInfo> table;

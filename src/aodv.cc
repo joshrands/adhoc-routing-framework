@@ -1,6 +1,8 @@
 #include "aodv.h"
 #include "string.h"
 #include "send_packet.h"
+#include <fstream>
+#include <stdio.h>
 
 #define AODV_DEBUG		1
 
@@ -18,6 +20,43 @@ AODV::AODV(IP_ADDR ip)
 AODV::~AODV()
 {
 	delete this->table;
+}
+
+void AODV::sendPacketBuffer(char* packet, int length, IP_ADDR finalDestination)
+{
+	// if entry exists in routing table, send it! 
+	// check routing table 
+	IP_ADDR nextHop = this->getTable()->getNextHop(finalDestination);
+	if (0 == nextHop)
+	{
+		// start a thread for an rreq and wait for a response 
+		rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
+
+		broadcastRREQBuffer(rreq);
+	}
+
+	// add aodv header to buffer 
+	char* buffer = (char*)(malloc(5 + length));
+	uint8_t zero = 0x00;
+	memcpy(buffer, &(zero), 1);
+	buffer++;
+	memcpy(buffer, &finalDestination, 4);
+	buffer+=4;
+
+	// copy data into packet 
+	memcpy(buffer, packet, length);
+	// reset packet 
+	packet-=5;
+
+	sendBuffer(buffer, length+5, this->getIp(), nextHop);
+}
+
+void AODV::broadcastRREQBuffer(rreqPacket rreq)
+{
+	char* rreqBuffer = RREQHelper::createRREQBuffer(rreq);
+	sendBuffer(rreqBuffer, sizeof(rreq), this->getIp(), getIpFromString(BROADCAST));
+
+	delete rreqBuffer;
 }
 
 void AODV::decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source)
@@ -87,7 +126,32 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 	// 4. not final destination, forward the rreq 
 	rreqPacket forwardRREQ = rreqHelper.createForwardRREQ(rreq, source);
 	// TODO: SEND PACKET 
-	sendBuffer(rreqHelper.createRREQBuffer(forwardRREQ), sizeof(forwardRREQ), this->getIp(), getIpFromString("255.255.255.255"));
+	broadcastRREQBuffer(forwardRREQ);
+}
+
+void AODV::logRoutingTable()
+{
+	ofstream logFile;
+	logFile.open("aodv-log.txt", ios::out);
+
+	if (logFile.is_open())
+		logFile << "AODV Log for node " << this->getIp() << endl;
+
+	map<IP_ADDR, TableInfo>::iterator it;
+
+	logFile << "DESTINATION IP : NEXT HOP" << endl;
+
+	for ( it = this->getTable()->getInternalTable().begin(); it != this->getTable()->getInternalTable().end(); it++ )
+	{
+		logFile << it->first
+				<< " : "
+				<< it->second.nextHop
+				<< endl;
+	}
+
+	logFile.close();
+
+	while (logFile.is_open());
 }
 
 void AODV::handleRREP(char* buffer, int length, IP_ADDR source)

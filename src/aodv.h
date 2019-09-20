@@ -31,12 +31,17 @@ public:
 	AODV(IP_ADDR ip);
 	~AODV();
 
+	// try to send data to a destination - the next hop is determined from the routing table  
+	void sendPacketBuffer(char* buffer, int length, IP_ADDR finalDestination);
+
 	static const int AODV_PORT = 654;
 	// decode a received packet buffer from UPD port 654
-	void decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source);
+	void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source);
 
 	// RREQ - Route Request 
 	RREQHelper rreqHelper;
+	// broadcast rreq to all neighbors
+	void broadcastRREQBuffer(rreqPacket rreq);
 	// make a decision on a received rreq packet using the rreq helper 
 	void handleRREQ(char* buffer, int length, IP_ADDR source);
 
@@ -45,6 +50,8 @@ public:
 	// handle a received rrep message 
 	void handleRREP(char* buffer, int length, IP_ADDR source);
 
+	// output the current contents of the routing table 
+	void logRoutingTable();
 
 	// RERR - Route Error
 	// handle a received rerr message 

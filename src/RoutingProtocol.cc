@@ -2,6 +2,8 @@
 
 #define ROUTE_DEBUG		0
 
+#include <fstream>
+
 using namespace std;
 
 IP_ADDR getIpFromString(string ipStr)

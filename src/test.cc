@@ -145,10 +145,10 @@ void test_aodv_rreq_loop_detection()
 {
 	// simple test to prevent a simple loop 
 	// 0 <---> 1 <---> 2 ---> 3
-	AODV node0 = AODV(getIpFromString("192.168.1.0"));
-	AODV node1 = AODV(getIpFromString("192.168.1.1"));
-	AODV node2 = AODV(getIpFromString("192.168.1.2"));
-	AODV node3 = AODV(getIpFromString("192.168.1.3"));
+	AODV node0(getIpFromString("192.168.1.0"));
+	AODV node1(getIpFromString("192.168.1.1"));
+	AODV node2(getIpFromString("192.168.1.2"));
+	AODV node3(getIpFromString("192.168.1.3"));
 
 	// generate a rreq from node 0 to node 3
 	rreqPacket rreq = node0.rreqHelper.createRREQ(node3.getIp());
@@ -180,6 +180,8 @@ void test_aodv_rreq_loop_detection()
 	// TODO: Update once rrep is implemented to reflect actual packet send
 	assert(getLastSource() == node2.getIp());
 	assert(getGlobalPacketCount() == 3);	
+
+	node2.logRoutingTable();
 }
 
 void test_aodv_rreq()
