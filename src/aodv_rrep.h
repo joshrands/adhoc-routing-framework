@@ -27,7 +27,7 @@ public:
 	// initiating RREP enters state of waiting for RREP - source is to update routing table on reverse route 
 	rrepPacket createRREPFromRREQ(rreqPacket rreq, IP_ADDR source);
 	// forward RREP enters state of maybe receiving RREP
-	void forwardRREP(const rrepPacket receivedRREP);
+	rrepPacket createForwardRREP(rrepPacket receivedRREP, IP_ADDR source);
 	// convert rrep message to a char* buffer
 	static char* createRREPBuffer(const rrepPacket rrep);
 	// read a received rrep buffer

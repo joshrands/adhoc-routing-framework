@@ -141,7 +141,7 @@ void test_aodv_rreq_buffer()
 //	cout << receivedRREQ.destIP << endl;
 }
 
-void test_aodv_rreq_loop_detection()
+void test_aodv_rreq_to_rrep()
 {
 	// simple test to prevent a simple loop 
 	// 0 <---> 1 <---> 2 ---> 3
@@ -180,6 +180,19 @@ void test_aodv_rreq_loop_detection()
 	assert(getLastSource() == node3.getIp());
 	assert(getGlobalPacketCount() == 4);	
 
+	// node 3 generate a rrep from the rreq from node 2 and unicasted back to node 2
+	rrepPacket rrep = node3.rrepHelper.createRREPFromRREQ(rreq, node2.getIp());
+	node2.decodeReceivedPacketBuffer(RREPHelper::createRREPBuffer(rrep), sizeof(rrep), node3.getIp());
+
+	// node 2 received rrep and forwarded to node 1
+	assert(getLastSource() == node2.getIp());
+	rrep = node2.rrepHelper.createForwardRREP(rrep, node3.getIp());
+	node1.decodeReceivedPacketBuffer(RREPHelper::createRREPBuffer(rrep), sizeof(rrep), node2.getIp());
+	// node 1 received rrep and forwarded to node 0 who completed the route!
+	assert(getLastSource() == node1.getIp());
+	rrep = node1.rrepHelper.createForwardRREP(rrep, node2.getIp());
+	node0.decodeReceivedPacketBuffer(RREPHelper::createRREPBuffer(rrep), sizeof(rrep), node1.getIp());
+
 	node0.logRoutingTable();
 	node1.logRoutingTable();
 	node2.logRoutingTable();
@@ -191,5 +204,5 @@ void test_aodv_rreq()
 	test_aodv_rreq_simple();
 	test_aodv_rreq_forwarding();
 	test_aodv_rreq_buffer();
-	test_aodv_rreq_loop_detection();
+	test_aodv_rreq_to_rrep();
 }

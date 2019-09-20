@@ -55,9 +55,24 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
     return rrep;
 }
 
-void RREPHelper::forwardRREP(const rrepPacket receivedRREP)
+rrepPacket RREPHelper::createForwardRREP(rrepPacket receivedRREP, IP_ADDR source)
 {
+    // TODO: Longest prefix matching? We are in the same subnet...
 
+    receivedRREP.hopCount++;
+
+    // update routing table for destination IF
+    // 1. TODO: Sequence number in routing table is invalid?
+    // 2. The destination sequence number is greater than the stored one
+    // 3. TODO: Route is inactive? 
+    // 4. Sequence numbers are the same, but the new hop count is smaller
+    if  (receivedRREP.destSeqNum > this->m_pTable->getDestSequenceNumber(receivedRREP.destIP)
+     || (receivedRREP.hopCount < this->m_pTable->getDestHopCount(receivedRREP.hopCount)))
+    {
+        this->m_pTable->updateAODVRoutingTableFromRREP(&receivedRREP,source);
+    }
+
+    return receivedRREP;
 }
 
 char* RREPHelper::createRREPBuffer(const rrepPacket rrep)

@@ -141,6 +141,69 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 	broadcastRREQBuffer(forwardRREQ);
 }
 
+void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
+{
+	// handle a received rrep message
+
+	// 1. make sure this is a valid rrep message 
+	if (length != sizeof(rrepPacket))
+	{
+		if (AODV_DEBUG)
+			cout << "ERROR handling rrep packet. Invalid length." << endl;
+
+		return;
+	}
+
+	// valid rreq packet, make a decision
+	rrepPacket rrep = rrepHelper.readRREPBuffer(buffer);
+
+	// 2. are with the original ip? was this our route request reply? 
+    if (this->getIp() == rrep.origIP)
+    {
+        // packet made it back! 
+        if (AODV_DEBUG)
+            cout << "Route discovery complete!" << endl;
+
+        this->getTable()->updateAODVRoutingTableFromRREP(&rrep,source);
+    }
+    else 
+    {
+        // forward this packet 
+		rrepPacket forwardRREP = this->rrepHelper.createForwardRREP(rrep, source);
+
+        IP_ADDR nextHopIp = this->getTable()->getNextHop(forwardRREP.origIP);
+        char* buffer = RREPHelper::createRREPBuffer(forwardRREP);
+		sendBuffer(buffer, sizeof(forwardRREP), this->getIp(), nextHopIp);
+
+		delete buffer;
+    }
+}
+
+void AODV::handleRERRBuffer(char* buffer, int length)
+{
+	
+}
+
+RERR createRERR(const IP_ADDR dest)
+{
+
+}
+
+void forwardRERR(const RERR receivedRERR)
+{
+
+}
+
+char* createRERRBuffer(const RERR rerr)
+{
+
+}
+
+RERR readRERRBuffer(char* buffer)
+{
+
+}
+
 void AODV::logRoutingTable()
 {
 	ofstream logFile;
@@ -173,34 +236,3 @@ void AODV::logRoutingTable()
 	while (logFile.is_open());
 }
 
-void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
-{
-	
-}
-
-
-
-void AODV::handleRERRBuffer(char* buffer, int length)
-{
-	
-}
-
-RERR createRERR(const IP_ADDR dest)
-{
-
-}
-
-void forwardRERR(const RERR receivedRERR)
-{
-
-}
-
-char* createRERRBuffer(const RERR rerr)
-{
-
-}
-
-RERR readRERRBuffer(char* buffer)
-{
-
-}
