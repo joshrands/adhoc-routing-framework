@@ -18,8 +18,8 @@
  * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-#include "Endpoint.h"
-#include "Socket.h"
+#include "endpoint.h"
+#include "socket.h"
 #include <arpa/inet.h>
 #include <cstdio>
 #include <cstring>

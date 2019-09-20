@@ -23,8 +23,8 @@
 #ifndef UDPSOCKET_H
 #define UDPSOCKET_H
 
-#include "Endpoint.h"
-#include "Socket.h"
+#include "endpoint.h"
+#include "socket.h"
 
 /*!
 UDP Socket

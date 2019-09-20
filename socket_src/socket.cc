@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-#include "Socket.h"
+#include "socket.h"
 #include <cstring>
 
 using std::memset;
