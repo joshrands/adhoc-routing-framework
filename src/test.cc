@@ -182,6 +182,14 @@ void test_aodv_rreq_loop_detection()
 	assert(getGlobalPacketCount() == 3);	
 
 	node2.logRoutingTable();
+
+	// if node 2 generates rreq to node 0, node 1 should return the rrep
+	rreqPacket rreq2 = node2.rreqHelper.createRREQ(node0.getIp());
+	sendBuffer(RREQHelper::createRREQBuffer(rreq2),sizeof(rreq2),node2.getIp(),getIpFromString(BROADCAST));
+	node1.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq2), sizeof(rreq2), node2.getIp());
+
+	assert(getLastSource() == node2.getIp());
+	assert(getGlobalPacketCount() == 4);
 }
 
 void test_aodv_rreq()

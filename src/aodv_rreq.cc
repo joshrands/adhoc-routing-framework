@@ -23,9 +23,19 @@ RREQHelper::RREQHelper(IP_ADDR ip, AODVRoutingTable* table)
 
 bool RREQHelper::shouldGenerateRREP(rreqPacket receivedRREQ)
 {
-	// compare the destination ip addr to this node's ip
+	// generate RREP on 2 conditions:
+	// 1. This node is the final destination
+	// 2. This node has an existing route to the final destination
 	if (receivedRREQ.destIP == this->m_ip)
+	{
 		return true;
+	}
+	else if (this->m_table->getNextHop(receivedRREQ.destIP) != 0)
+	{
+		if (RREQ_DEBUG)
+			cout << "This node has a path to the final node in its routing table." << endl;
+		return true;
+	}
 	else
 		return false;
 }

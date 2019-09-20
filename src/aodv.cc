@@ -132,7 +132,7 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 void AODV::logRoutingTable()
 {
 	ofstream logFile;
-	logFile.open("aodv-log.txt", ios::out);
+	logFile.open("./logs/" + getStringFromIp(this->getIp()) + "-log.txt", ios::out);
 
 	if (logFile.is_open())
 		logFile << "AODV Log for node " << this->getIp() << endl;
