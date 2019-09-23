@@ -47,8 +47,14 @@ bool Socket::initSocket(int type) {
     perror("socket creation failed\n");
     return false;
   }
-
   sockfd = fd;
+
+  int truth = 1;
+  if (!setOption(SOL_SOCKET, SO_REUSEADDR, &truth, sizeof(int))) {
+    fprintf(stderr, "socket not set to reusable\n");
+    return false;
+  }
+
   return true;
 }
 

@@ -56,4 +56,10 @@ char *Endpoint::getAddress() {
   return ipAddress;
 }
 
-int Endpoint::getPort() { return ntohs(remoteHost.sin_port); }
+int Endpoint::getPort() const { return ntohs(remoteHost.sin_port); }
+
+bool Endpoint::operator==(Endpoint &rhs) {
+  return (strcmp(this->getAddress(), rhs.getAddress()) == 0 && this->getPort() == rhs.getPort());
+}
+
+bool Endpoint::operator!=(Endpoint &rhs) { return (!((*this) == rhs)); }
