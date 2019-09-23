@@ -1,5 +1,6 @@
 /aodv/test
-/ns-allinone-3.28/*
+/ns-allinone-3.28
+!/ns-allinone-3.28/ns-3.28/scratch/*
 /.vscode
 
 # Prerequisites
