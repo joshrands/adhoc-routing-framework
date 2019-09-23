@@ -71,7 +71,10 @@ public:
   /*! Get the port of this endpoint
    *  @return the port of this point
    */
-  int getPort(void);
+  int getPort(void) const;
+
+  bool operator==(Endpoint &rhs);
+  bool operator!=(Endpoint &rhs);
 
 protected:
   char ipAddress[17];

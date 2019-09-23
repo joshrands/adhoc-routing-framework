@@ -24,7 +24,11 @@
 #define UDPSOCKET_H
 
 #include "endpoint.h"
+#include "safe_queue.h"
 #include "socket.h"
+#include <iostream>
+#include <utility>
+using namespace std;
 
 /*!
 UDP Socket
@@ -76,6 +80,19 @@ public:
    *  @return the number of received bytes on success (>=0) or -1 on failure
    */
   int receiveFrom(Endpoint &remote, char *buffer, int length);
+
+  /*! Continuously reads data from the port, placing messages onto the
+   *  socket's message queue.
+   */
+  void receiveFromPortThread();
+
+  /*! TODO: FIX DESCRIPTION
+   */
+  bool getMessage(pair<Endpoint, char *> &message);
+
+private:
+  // To hold threaded messages
+  SafeQueue<pair<Endpoint, char *>> messages;
 };
 
 #endif

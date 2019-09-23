@@ -21,10 +21,9 @@
 
 #include "udp_socket.h"
 #include <cstring>
-
 using std::memset;
 
-UDPSocket::UDPSocket() {}
+UDPSocket::UDPSocket() : messages() {}
 
 bool UDPSocket::init(void) { return initSocket(SOCK_DGRAM); }
 
@@ -92,3 +91,21 @@ int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {
   socklen_t remoteHostLen = sizeof(remote.remoteHost);
   return recvfrom(sockfd, buffer, length, 0, (struct sockaddr *)&remote.remoteHost, &remoteHostLen);
 }
+
+void UDPSocket::receiveFromPortThread() {
+  // Continually calls receiveFrom placing the returned messages on the message queue
+  while (true) {
+    char *buffer = (char *)malloc(MAXLINE * sizeof(char));
+    Endpoint client;
+    int n = receiveFrom(client, buffer, MAXLINE);
+    if (n <= 0) {
+      continue;
+    }
+    buffer[n] = '\0';
+    messages.push(pair<Endpoint, char *>(client, buffer));
+    // Need to find out why this is neccesary
+    printf("\n");
+  }
+}
+
+bool UDPSocket::getMessage(pair<Endpoint, char *> &message) { return messages.pop(message); }
