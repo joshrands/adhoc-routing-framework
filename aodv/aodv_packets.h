@@ -4,6 +4,8 @@
  * aodv_packets.h
  *
  * Custom c++ implementation of the aodv packets  
+ * Packet structure built off of the following open source aodv implementation: 
+ * https://github.com/erimatnor/aodv-uu
  * 
  * Author: Josh Rands
  * Date: 9/18/2019
@@ -75,4 +77,25 @@ struct rrepPacket
     uint32_t destSeqNum;
     uint32_t origIP;
     uint32_t lifetime;
+};
+
+/* RERR Flags: */
+#define RERR_NODELETE 0x1
+
+struct rerrPacket 
+{
+    uint8_t type = 0x03;
+#if defined(__LITTLE_ENDIAN)
+    uint8_t res1:7;
+    uint8_t n:1;
+#elif defined(__BIG_ENDIAN)
+    uint8_t n:1;
+    uint8_t res1:7;
+#else
+#error "Adjust your <bits/endian.h> defines"
+#endif
+    uint8_t res2;
+    uint8_t destCount;
+    uint32_t unreachableIP;
+    uint32_t unreachableSeqNum;
 };
