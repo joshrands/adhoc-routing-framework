@@ -31,6 +31,10 @@ AODV Protocol: https://www.ietf.org/rfc/rfc3561.txt
 ### AODV-REM
 1. Add network monitoring 
 
+### ns3 Simulation
+1. Create a module with this aodv
+  - https://www.nsnam.org/docs/manual/html/new-modules.html
+
 ## Running the code
 
 This code is currently stand alone classes, but I added test.cc to so we can test while we develop. 
