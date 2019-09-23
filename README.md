@@ -1,7 +1,8 @@
 # Ad hoc Network Routing Protocol Implementations
 
 ### NASA SmallSat Project - Colorado School of Mines
-### Classes designed for physical implementation and simulated implementation. 
+
+Classes designed for physical implementation and simulated implementation of an ad-hoc network on a single decentralized subnet.
 
 Author: Josh Rands
 
