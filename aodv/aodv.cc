@@ -6,19 +6,24 @@
 
 AODV::AODV(IP_ADDR ip)
 {
-//	cout << "Created new aodv routing protocol." << endl;
+	if (AODV_DEBUG)
+		cout << "Created new aodv routing protocol." << endl;
 
 	this->ipAddress = ip;
 	this->sequenceNum = 0;
 	this->table = new AODVRoutingTable();
 
-	this->rreqHelper.setRoutingTable((AODVRoutingTable*)(this->table));
+	this->rreqHelper.setRoutingTable(this->getTable());
 	this->rreqHelper.setIp(ip);
 	this->rreqHelper.setSequenceNumPointer(&(this->sequenceNum));
 
 	this->rrepHelper.setIp(ip);
-	this->rrepHelper.setRoutingTable((AODVRoutingTable*)(this->table));
+	this->rrepHelper.setRoutingTable(this->getTable());
 	this->rrepHelper.setSequenceNum(&(this->sequenceNum));
+
+	this->rerrHelper.setIp(ip);
+	this->rerrHelper.setRoutingTable(this->getTable());
+	this->rerrHelper.setSequenceNum(&(this->sequenceNum));
 }
 
 AODV::~AODV()
@@ -83,7 +88,7 @@ void AODV::decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source)
 			handleRREP(buffer, length, source);
 			break;
 		case 3:
-			handleRERRBuffer(buffer, length);
+			handleRERR(buffer, length, source);
 			break;
 		default:
 			if (AODV_DEBUG)
@@ -178,29 +183,11 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
     }
 }
 
-void AODV::handleRERRBuffer(char* buffer, int length)
+void AODV::handleRERR(char* buffer, int length, IP_ADDR source)
 {
-	
-}
-
-RERR createRERR(const IP_ADDR dest)
-{
-
-}
-
-void forwardRERR(const RERR receivedRERR)
-{
-
-}
-
-char* createRERRBuffer(const RERR rerr)
-{
-
-}
-
-RERR readRERRBuffer(char* buffer)
-{
-
+	// handle a received rerr message. most likely forwarding it...	
+	if (RERR_DEBUG)
+		cout << "Handling RERR message..." << endl;
 }
 
 void AODV::logRoutingTable()

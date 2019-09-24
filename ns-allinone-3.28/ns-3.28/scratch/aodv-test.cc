@@ -62,7 +62,7 @@ void GenerateTraffic (NodeContainer c, uint32_t pktSize,
 int main (int argc, char *argv[])
 {
   std::string phyMode ("DsssRate1Mbps");
-  double rss = -95;  // -dBm
+  double rss = -80;  // -dBm
   uint16_t numNodes = 5;
 
   uint32_t packetSize = 20; // bytes
