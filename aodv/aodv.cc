@@ -31,7 +31,38 @@ AODV::~AODV()
 	delete this->table;
 }
 
-void AODV::sendPacketBuffer(char* packet, int length, IP_ADDR finalDestination)
+void AODV::receivePacket(char* packet, int length, IP_ADDR source)
+{
+	// get final destination
+	IP_ADDR finalDestination;
+	memcpy(&finalDestination, &(packet[1]), 4);
+	
+	if (this->getIp() == finalDestination)
+	{
+		// packet has reached its final destination! 
+		// TODO: Now what? 
+		if (AODV_DEBUG)
+		{
+			cout << "Node " << getStringFromIp(this->getIp()) << " received packet: " << endl;
+
+			// output the contents of this packet 
+			for (int i = 5; i < length; i++)
+			{
+				cout << packet[i];
+			}			
+			cout << endl;
+		}
+
+		return;
+	}
+	else 
+	{
+		// send the packet to final destination - will check routing table
+		sendPacket(packet, length, finalDestination);
+	}
+}
+
+void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 {
 	// if entry exists in routing table, send it! 
 	// check routing table 
@@ -42,7 +73,10 @@ void AODV::sendPacketBuffer(char* packet, int length, IP_ADDR finalDestination)
 		rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
 
 		broadcastRREQBuffer(rreq);
+		// TODO: Put this packet in a buffer/queue to be sent when the rrep is received 
 	}
+	// TODO: Check if there was a broken link and generate rerr 
+	
 
 	// add aodv header to buffer 
 	char* buffer = (char*)(malloc(5 + length));
@@ -55,9 +89,11 @@ void AODV::sendPacketBuffer(char* packet, int length, IP_ADDR finalDestination)
 	// copy data into packet 
 	memcpy(buffer, packet, length);
 	// reset packet 
-	packet-=5;
+	buffer-=5;
 
 	sendBuffer(buffer, length+5, this->getIp(), nextHop);
+
+	delete buffer;
 }
 
 void AODV::broadcastRREQBuffer(rreqPacket rreq)
@@ -91,8 +127,8 @@ void AODV::decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source)
 			handleRERR(buffer, length, source);
 			break;
 		default:
-			if (AODV_DEBUG)
-				cout << "ERROR: Packet not AODV." << endl;
+			// the packet is not AODV. Forward the packet 
+			receivePacket(buffer, length, source);
 			break;
 	}
 }
@@ -136,6 +172,8 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		buffer = RREPHelper::createRREPBuffer(rrep);
 
 		sendBuffer(buffer, sizeof(rrep), this->getIp(), rrep.origIP);
+
+		delete buffer;
 
 		return;
 	}
@@ -188,6 +226,9 @@ void AODV::handleRERR(char* buffer, int length, IP_ADDR source)
 	// handle a received rerr message. most likely forwarding it...	
 	if (RERR_DEBUG)
 		cout << "Handling RERR message..." << endl;
+
+	// when a link breaks, mark a routing table entry as invalid 
+	// when forwarding packets, make sure the routing table entry is valid
 }
 
 void AODV::logRoutingTable()

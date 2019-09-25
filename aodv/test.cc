@@ -2,6 +2,7 @@
 #include "send_packet.h"
 
 #include <assert.h>
+#include "string.h"
 
 // Very cheap testing framework
 
@@ -192,6 +193,24 @@ void test_aodv_rreq_to_rrep()
 	assert(getLastSource() == node1.getIp());
 	rrep = node1.rrepHelper.createForwardRREP(rrep, node2.getIp());
 	node0.decodeReceivedPacketBuffer(RREPHelper::createRREPBuffer(rrep), sizeof(rrep), node1.getIp());
+
+	// nodes should have routing entries to get to node0 and node3. Test these 
+	char* packet = "Hello world! From node 0";
+	int length = sizeof("Hello world! From node 0");
+	node0.sendPacket(packet, length, node1.getIp());
+	// add aodv header to buffer 
+	char* buffer = (char*)(malloc(5 + length));
+	uint8_t zero = 0x00;
+	memcpy(buffer, &(zero), 1);
+	buffer++;
+	IP_ADDR finalDest = node1.getIp();
+	memcpy(buffer, &finalDest, 4);
+	buffer+=4;
+	memcpy(buffer, packet, length);
+	buffer-=5;	
+	node1.decodeReceivedPacketBuffer(buffer, length+5, node0.getIp());
+
+	delete buffer;
 
 	node0.logRoutingTable();
 	node1.logRoutingTable();

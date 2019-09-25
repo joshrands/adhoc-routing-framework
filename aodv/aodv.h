@@ -7,7 +7,7 @@
  * Date: 9/4/2019
  ********************************/
 
-#define AODV_DEBUG		0
+#define AODV_DEBUG		1
 
 /* aodv includes */
 #include "aodv_routing_table.h"
@@ -25,8 +25,10 @@ public:
 	AODV(IP_ADDR ip);
 	~AODV();
 
+	// handle received data. if not in routing table, attempt local fix and then RERR 
+	void receivePacket(char* packet, int length, IP_ADDR source);
 	// try to send data to a destination - the next hop is determined from the routing table  
-	void sendPacketBuffer(char* buffer, int length, IP_ADDR finalDestination);
+	void sendPacket(char* packet, int length, IP_ADDR finalDestination);
 
 	static const int AODV_PORT = 654;
 	// decode a received packet buffer from UPD port 654
