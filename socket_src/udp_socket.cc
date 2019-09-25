@@ -104,7 +104,7 @@ void UDPSocket::receiveFromPortThread() {
     buffer[n] = '\0';
     messages.push(pair<Endpoint, char *>(client, buffer));
     // Need to find out why this is neccesary
-    printf("\n");
+    printf("");
   }
 }
 
