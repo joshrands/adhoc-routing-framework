@@ -19,4 +19,6 @@ using namespace std;
 
 int sendBuffer(char* buffer, int length, IP_ADDR dest, int port);
 IP_ADDR getLastSource();
+void setLastSource(IP_ADDR lastSource);
 uint32_t getGlobalPacketCount();
+void incrementGlobalPacketCount();

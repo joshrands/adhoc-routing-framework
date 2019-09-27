@@ -48,12 +48,26 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 		{
 			cout << "Node " << getStringFromIp(this->getIp()) << " received packet: " << endl;
 
-			// output the contents of this packet 
 			for (int i = 5; i < length; i++)
 			{
 				cout << packet[i];
 			}			
 			cout << endl;
+		}
+		// output the contents of this packet 
+		if (AODV_LOG_OUTPUT)
+		{
+			ofstream logFile;
+			logFile.open("./logs/" + getStringFromIp(this->getIp()) + "-packet-log.txt", ios::out);
+
+			for (int i = 5; i < length; i++)
+			{
+				logFile << packet[i];
+			}			
+
+			logFile.close();
+
+			while (logFile.is_open());
 		}
 
 		return;
@@ -63,6 +77,9 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 		// send the packet to final destination - will check routing table
 		sendPacket(packet, length, finalDestination);
 	}
+
+	if (AODV_LOG_OUTPUT)
+		logRoutingTable();
 }
 
 void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
@@ -237,7 +254,7 @@ void AODV::handleRERR(char* buffer, int length, IP_ADDR source)
 void AODV::logRoutingTable()
 {
 	ofstream logFile;
-	logFile.open("./logs/" + getStringFromIp(this->getIp()) + "-log.txt", ios::out);
+	logFile.open("./logs/" + getStringFromIp(this->getIp()) + "-rtable.txt", ios::out);
 
 	if (logFile.is_open())
 		logFile << "AODV Log for node " << this->getIp() << endl;
