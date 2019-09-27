@@ -14,7 +14,6 @@
 #include <iostream>
 
 #define DEBUG    0 
-#define PHYSICAL_TESTBED       0 
 
 using namespace std;
 
