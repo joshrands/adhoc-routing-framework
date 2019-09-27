@@ -15,6 +15,15 @@
 #include "aodv_rrep.h"
 #include "aodv_rerr.h"
 
+// socket code for physical testbed
+
+/*#include "send_packet.h"
+#if (PHYSICAL_TESTBED)
+	#include "../socket_src/endpoint.h"
+	#include "../socket_src/udp_socket.h"
+#endif
+*/
+
 #include <vector>
 
 class AODV : public RoutingProtocol

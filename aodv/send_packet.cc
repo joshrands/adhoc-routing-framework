@@ -5,11 +5,32 @@ uint32_t globalPacketCount = 0;
 
 extern void sendBuffer(char* buffer, int length, IP_ADDR source, IP_ADDR dest)
 {
-    if (DEBUG)
-        cout << "Sending buffer from " << getStringFromIp(source) << " to " << getStringFromIp(dest) << endl;
+    #if (PHYSICAL_TESTBED)
+    {
 
-    lastSource = source;
-    globalPacketCount++;
+    }
+    #else 
+    {
+        if (DEBUG)
+            cout << "Sending buffer from " << getStringFromIp(source) << " to " << getStringFromIp(dest) << endl;
+
+        lastSource = source;
+        globalPacketCount++;
+    }
+    #endif
+}
+
+extern bool receivePacket(char* buffer, int length, IP_ADDR source, int port)
+{
+    #if (PHYSICAL_TESTBED)
+    {
+        // check receiving threads 
+    }
+    #else 
+    {
+
+    }
+    #endif
 }
 
 IP_ADDR getLastSource()
