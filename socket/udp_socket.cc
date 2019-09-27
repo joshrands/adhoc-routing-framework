@@ -77,6 +77,12 @@ int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
                 sizeof(remote.remoteHost));
 }
 
+int UDPSocket::sendTo(char* buffer, int length, uint32_t dest, int port){
+  Endpoint remote;
+  remote.setAddress(dest, port);
+  sendTo(remote, buffer, length);
+}
+
 // -1 if unsuccessful, else number of bytes received
 int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {
   if (sockfd < 0)

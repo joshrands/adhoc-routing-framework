@@ -58,7 +58,7 @@ public:
 	// cast table to AODVRoutingTable
 	AODVRoutingTable* getTable() { return (AODVRoutingTable*)(this->table);}
 
-	std::function<void(char* buffer, int length, IP_ADDR source, IP_ADDR dest)> socketSendPacket;
+	std::function<int(char* buffer, int length, IP_ADDR dest, int port)> socketSendPacket;
 
 private:
 	// node sequence number. MUST increment on a route discovery

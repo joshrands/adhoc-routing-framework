@@ -198,7 +198,6 @@ int main() {
 
   // Test broadcasting
   {
-
   }
 
   return 0;

@@ -73,6 +73,16 @@ public:
    */
   int sendTo(Endpoint &remote, const char *packet, int length);
 
+  /*!
+   * Send a packet to an IP address and port
+   * 
+   * @param buffer 
+   * @param length 
+   * @param dest 
+   * @return int 
+   */
+  int sendTo(char* buffer, int length, uint32_t dest, int port);
+
   /*! Receive a packet from a remote endpoint
    *  @param remote The remote endpoint
    *  @param buffer The buffer for storing the incoming packet data. If a packet
