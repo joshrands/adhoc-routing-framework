@@ -38,7 +38,7 @@ void Socket::setBlocking(bool blocking, unsigned int timeout) {
 
 bool Socket::initSocket(int type) {
   if (sockfd != -1) {
-    perror("Socket already created\n");
+    perror("socket already created\n");
     return false;
   }
 
