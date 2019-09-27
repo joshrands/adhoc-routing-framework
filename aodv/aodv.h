@@ -16,6 +16,7 @@
 #include "aodv_rerr.h"
 
 #include <vector>
+#include <functional>
 
 class AODV : public RoutingProtocol
 {
@@ -56,6 +57,8 @@ public:
 
 	// cast table to AODVRoutingTable
 	AODVRoutingTable* getTable() { return (AODVRoutingTable*)(this->table);}
+
+	std::function<void(char* buffer, int length, IP_ADDR source, IP_ADDR dest)> socketSendPacket;
 
 private:
 	// node sequence number. MUST increment on a route discovery

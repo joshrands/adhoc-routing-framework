@@ -24,6 +24,9 @@ AODV::AODV(IP_ADDR ip)
 	this->rerrHelper.setIp(ip);
 	this->rerrHelper.setRoutingTable(this->getTable());
 	this->rerrHelper.setSequenceNum(&(this->sequenceNum));
+
+	// default assign socket send data
+	socketSendPacket = &sendBuffer;
 }
 
 AODV::~AODV()
@@ -91,7 +94,7 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 	// reset packet 
 	buffer-=5;
 
-	sendBuffer(buffer, length+5, this->getIp(), nextHop);
+	socketSendPacket(buffer, length+5, this->getIp(), nextHop);
 
 	delete buffer;
 }
@@ -99,7 +102,7 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 void AODV::broadcastRREQBuffer(rreqPacket rreq)
 {
 	char* rreqBuffer = RREQHelper::createRREQBuffer(rreq);
-	sendBuffer(rreqBuffer, sizeof(rreq), this->getIp(), getIpFromString(BROADCAST));
+	socketSendPacket(rreqBuffer, sizeof(rreq), this->getIp(), getIpFromString(BROADCAST));
 
 	delete rreqBuffer;
 }
@@ -171,7 +174,7 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		char* buffer;
 		buffer = RREPHelper::createRREPBuffer(rrep);
 
-		sendBuffer(buffer, sizeof(rrep), this->getIp(), rrep.origIP);
+		socketSendPacket(buffer, sizeof(rrep), this->getIp(), rrep.origIP);
 
 		delete buffer;
 
@@ -215,7 +218,7 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 
         IP_ADDR nextHopIp = this->getTable()->getNextHop(forwardRREP.origIP);
         char* buffer = RREPHelper::createRREPBuffer(forwardRREP);
-		sendBuffer(buffer, sizeof(forwardRREP), this->getIp(), nextHopIp);
+		socketSendPacket(buffer, sizeof(forwardRREP), this->getIp(), nextHopIp);
 
 		delete buffer;
     }
