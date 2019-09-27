@@ -90,6 +90,26 @@ void sendMessageBetweenThreadedSockets(UDPSocket* socket1, UDPSocket* socket2,
   } while (socket1->getMessage(message2to1) || socket2->getMessage(message1to2));
 }
 
+/*!
+ * @brief Create a Threaded Socket object
+ * 
+ * @param returnThread the thread which the socket will be on
+ * @param port the port to bind to
+ * @return UDPSocket* the socket
+ */
+UDPSocket* createThreadedSocket(thread& returnThread, int port){
+  UDPSocket *threadedSocket = new UDPSocket();
+  if (!threadedSocket->bindToPort(port)) {
+      fprintf(stderr, "Could not bind the receiver socket to port:%d\n", port);
+      exit(-1);
+    }
+    // Thread a recvfrom call
+    returnThread = thread(&UDPSocket::receiveFromPortThread, threadedSocket);
+    returnThread.detach();
+    return threadedSocket;
+}
+
+
 int main() {
   // Test initialization and ports
   {
@@ -127,16 +147,10 @@ int main() {
   // Test messages can be sent
   {
     // Create receiving socket
-    UDPSocket *receiver = new UDPSocket();
     int port = 8080;
     // Bind to 8080
-    if (!receiver->bindToPort(port)) {
-      fprintf(stderr, "Could not bind the receiver socket to port:%d\n", port);
-      exit(-1);
-    }
-    // Thread a recvfrom call
-    thread receiving(&UDPSocket::receiveFromPortThread, receiver);
-    receiving.detach();
+    thread receiving;
+    UDPSocket* receiver = createThreadedSocket(receiving, port);
     // Create sending socket
     UDPSocket sender;
     sender.init();
@@ -190,6 +204,15 @@ int main() {
     sendMessageBetweenThreadedSockets(socket1, socket2, socket2End, "Hello socket 2 how are you today?", "Doing well socket 1, doing well.");
     sendMessageBetweenThreadedSockets(socket1, socket2, socket2End, "Play us a song your the piano man", "Sing us a song tonight");
     sendMessageBetweenThreadedSockets(socket1, socket2, socket2End, "Well were all in the mood for a melody", "And you got us feeling all right");
+
+    // Kill the threads
+    socket1ing.~thread();
+    socket2ing.~thread();
+  }
+
+  // Test broadcasting
+  {
+
   }
 
   return 0;
