@@ -6,8 +6,8 @@
 
 #include "aodv/aodv.h"
 #include "aodv/defines.h"
-#include "socket_src/endpoint.h"
-#include "socket_src/udp_socket.h"
+#include "socket/endpoint.h"
+#include "socket/udp_socket.h"
 
 using namespace std;
 
