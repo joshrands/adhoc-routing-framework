@@ -38,7 +38,7 @@ int main()
     }
 
     // add function call to send data on aodv socket 
-//    aodv.socketSendPacket = &(receiver->sendTo);
+//    aodv.socketSendPacket = receiver->sendTo;
 
     thread receiving(&UDPSocket::receiveFromPortThread, receiver);
     receiving.detach();

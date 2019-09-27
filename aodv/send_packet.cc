@@ -10,6 +10,8 @@ int sendBuffer(char* buffer, int length, IP_ADDR dest, int port)
 
 //    lastSource = source;
     incrementGlobalPacketCount();
+
+		return length;
 }
 
 IP_ADDR getLastSource()

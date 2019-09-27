@@ -30,7 +30,9 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
         // yes, copy this sequence number in
         // increment this node sequence number if equal to orig sequence number 
         if (*(this->m_pSequenceNum) == rreq.destSeqNum)
-            *(this->m_pSequenceNum)++;
+				{
+        		*(this->m_pSequenceNum) = *(this->m_pSequenceNum) + 1;
+				}
 
         rrep.destSeqNum = *(this->m_pSequenceNum);
         rrep.hopCount = 0x00; // this is weird... what is the point of rreq hops?  

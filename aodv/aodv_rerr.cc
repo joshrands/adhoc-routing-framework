@@ -14,19 +14,21 @@ RERRHelper::RERRHelper(IP_ADDR ip, AODVRoutingTable* table, uint32_t* seqNum)
 bool RERRHelper::shouldGenerateRERRFromBrokenLink(IP_ADDR brokenLink)
 {
 
-    false;
+    return false;
 }
 
 bool RERRHelper::attemptLocalRepair(IP_ADDR brokenLink)
 {
 
-    false;
+    return false;
 }
 
 rerrPacket RERRHelper::createRERR(const IP_ADDR dest)
 {
 
     rerrPacket packet;
+
+		return packet;
 }
 
 void RERRHelper::forwardRERR(const rerrPacket receivedRERR)
@@ -36,7 +38,7 @@ void RERRHelper::forwardRERR(const rerrPacket receivedRERR)
 
 char* RERRHelper::createRERRBuffer(const rerrPacket rerr)
 {
-    char* buffer;
+    char* buffer = (char*)(malloc(sizeof(rerr)));
 
     return buffer;
 }
