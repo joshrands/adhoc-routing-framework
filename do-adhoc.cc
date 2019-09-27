@@ -41,17 +41,40 @@ int main()
 //    aodv.socketSendPacket = &(receiver->sendTo);
 
     thread receiving(&UDPSocket::receiveFromPortThread, receiver);
+    receiving.detach();
+
+    cout << getIpFromString("127.0.0.1") << endl;
 
     while (true) {
-        Message message;
-        if (receiver->getMessage(message)) {
-//        printf("Received message from %s at port %d: %s\n", message.first.getAddress(), message.first.getPort(),
-//                message.second);
+        cout << "Choose an option: " << endl << "1. Check received message queue" << endl << "2. Send a packet" << endl;
 
-            // pass packet to aodv 
-            aodv.receivePacket(message.getData(), message.getLength(), message.getIPAddress());
+        int opt;
+        cin >> opt;
+        Message message;
+       
+        switch (opt) {
+            case 1: 
+                if (receiver->getMessage(message)) {
+                    // pass packet to aodv 
+                    aodv.receivePacket(message.getData(), message.getLength(), message.getIPAddress());
+                }
+                else 
+                    cout << "No packets." << endl;
+                break;
+            case 2:
+                string ip;
+                cout << "Enter ip address to send to: ";
+                cin >> ip;
+                char* packet = "Hello world! From node 0";
+            	int length = sizeof("Hello world! From node 0");
+                aodv.sendPacket(packet, length, getIpFromString(ip));
+
+                cout << "Packet sent!" << endl;
+                break;
         }
+        cout << endl;
     }
+
     receiving.join();
 
     return 0;
