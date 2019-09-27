@@ -17,7 +17,7 @@ LDFLAGS = -g -pthread
 #
 TARGET = test
 OBJ_FILES = ${TARGET}.o endpoint.o socket.o udp_socket.o 
-INC_FILES = endpoint.h safe_queue.h socket.h udp_socket.h 
+INC_FILES = endpoint.h safe_queue.h socket.h udp_socket.h message.h 
 
 #
 # Any libraries we might need.

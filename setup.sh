@@ -1,10 +1,16 @@
+rm libaodv.a
+rm libsocket.a
+rm do-aodv.o
+
 cd aodv
 make clean
 make
+rm test.o
 
 cd ../socket
 make clean
 make
+rm test.o
 
 cd ../
 

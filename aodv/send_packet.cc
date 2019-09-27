@@ -3,12 +3,12 @@
 IP_ADDR lastSource;
 uint32_t globalPacketCount = 0;
 
-extern void sendBuffer(char* buffer, int length, IP_ADDR source, IP_ADDR dest)
+int sendBuffer(char* buffer, int length, IP_ADDR dest, int port)
 {
     if (DEBUG)
-        cout << "Sending buffer from " << getStringFromIp(source) << " to " << getStringFromIp(dest) << endl;
+        cout << "Sending buffer from " << getStringFromIp(port) << " to " << getStringFromIp(dest) << endl;
 
-    lastSource = source;
+//    lastSource = source;
     globalPacketCount++;
 }
 
