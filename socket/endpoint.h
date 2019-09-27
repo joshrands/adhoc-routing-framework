@@ -56,6 +56,7 @@ public:
   that will be resolved with DNS). \param port The endpoint port \return 0 on
   success, -1 on failure (when an hostname cannot be resolved by DNS).
   */
+
   /*! Set the address of this endpoint
    *  @param host The endpoint IP address
    *  @param port The endpoint port
@@ -63,10 +64,22 @@ public:
    */
   bool setAddress(const char *host, const int port);
 
+  /*! Set the address of this endpoint
+   *  @param host The endpoint IP address
+   *  @param port The endpoint port
+   *  @return true on success or false on failure
+   */
+  bool setAddress(const uint32_t host, const int port);
+
   /*! Get the IP address of this endpoint
    *  @return the IP address of this point
    */
   char *getAddress(void);
+
+  /*! Get the IP address of this endpoint
+   *  @return the integer IP address of this point
+   */
+  uint32_t getIntAddress(void) const;
 
   /*! Get the port of this endpoint
    *  @return the port of this point

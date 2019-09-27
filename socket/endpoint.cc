@@ -50,10 +50,33 @@ bool Endpoint::setAddress(const char *host, const int port) {
   return true;
 }
 
+bool Endpoint::setAddress(const uint32_t host, const int port){
+  resetAddress();
+  // Set ip address
+  in_addr host_in;
+  host_in.s_addr = host;
+  *ipAddress = *inet_ntoa(host_in);
+  remoteHost.sin_addr.s_addr = host;
+
+  // Address family
+  remoteHost.sin_family = AF_INET;
+
+  // Set port
+  remoteHost.sin_port = htons(port);
+
+  return true;
+}
+
 char *Endpoint::getAddress() {
   if ((ipAddress[0] == '\0') && (remoteHost.sin_addr.s_addr != 0))
     return inet_ntoa(remoteHost.sin_addr);
   return ipAddress;
+}
+
+uint32_t Endpoint::getIntAddress(void) const{
+  if ((ipAddress[0] == '\0') && (remoteHost.sin_addr.s_addr != 0))
+    return remoteHost.sin_addr.s_addr;
+  return inet_addr(ipAddress);
 }
 
 int Endpoint::getPort() const { return ntohs(remoteHost.sin_port); }

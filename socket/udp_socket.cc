@@ -102,10 +102,10 @@ void UDPSocket::receiveFromPortThread() {
       continue;
     }
     buffer[n] = '\0';
-    messages.push(pair<Endpoint, char *>(client, buffer));
+    messages.push(Message(client, buffer, n));
     // Need to find out why this is neccesary
     printf("");
   }
 }
 
-bool UDPSocket::getMessage(pair<Endpoint, char *> &message) { return messages.pop(message); }
+bool UDPSocket::getMessage(Message &message) { return messages.pop(message); }

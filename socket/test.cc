@@ -25,7 +25,7 @@ void test(bool condition, string message) {
 void sendMessageToThreadedServerTest(UDPSocket *server, UDPSocket &sender,
                                      Endpoint &serverEnd, string data) {
   // Continue to send data until received
-  pair<Endpoint, char *> message;
+  Message message;
   int count = 0;
   const int MAX_ATTEMPTS = 2;
   do {
@@ -40,7 +40,7 @@ void sendMessageToThreadedServerTest(UDPSocket *server, UDPSocket &sender,
           MAX_ATTEMPTS);
   test(count < MAX_ATTEMPTS, &maxAttemptsMessage[0]);
   string messageSentMessage = "Can send '" + data + "' to threaded socket";
-  test(strcmp(message.second, &data[0]) == 0, messageSentMessage);
+  test(strcmp(message.getData(), &data[0]) == 0, messageSentMessage);
 
   // Clear the servers queue
   do {
@@ -51,7 +51,7 @@ void sendMessageToThreadedServerTest(UDPSocket *server, UDPSocket &sender,
 void sendMessageBetweenThreadedSockets(UDPSocket* socket1, UDPSocket* socket2,
                                      Endpoint &socket2End, string data1, string data2) {
   // Send data from 1 to 2
-  pair<Endpoint, char *> message1to2;
+  Message message1to2;
   int count = 0;
   const int MAX_ATTEMPTS = 2;
   do {
@@ -66,14 +66,14 @@ void sendMessageBetweenThreadedSockets(UDPSocket* socket1, UDPSocket* socket2,
           MAX_ATTEMPTS);
   test(count < MAX_ATTEMPTS, &maxAttemptsMessage[0]);
   string messageSentMessage = "Socket 1 sent '" + data1 + "' to socket 2";
-  test(strcmp(message1to2.second, &data1[0]) == 0, messageSentMessage);
+  test(strcmp(message1to2.getData(), &data1[0]) == 0, messageSentMessage);
   
   // Send data from 2 to 1
-  pair<Endpoint, char *> message2to1;
+  Message message2to1;
   count = 0;
   do {
     count++;
-    socket2->sendTo(message1to2.first, &data2[0], data2.length());
+    socket2->sendTo(message1to2.getEndpoint(), &data2[0], data2.length());
     sleep(1);
   } while ((!socket1->getMessage(message2to1) && count < MAX_ATTEMPTS)); 
   // Check if test was successful
@@ -82,7 +82,7 @@ void sendMessageBetweenThreadedSockets(UDPSocket* socket1, UDPSocket* socket2,
           MAX_ATTEMPTS);
   test(count < MAX_ATTEMPTS, &maxAttemptsMessage[0]);
   messageSentMessage = "Socket 2 sent '" + data2 + "' to socket 1";
-  test(strcmp(message2to1.second, &data2[0]) == 0, messageSentMessage);
+  test(strcmp(message2to1.getData(), &data2[0]) == 0, messageSentMessage);
 
   // Clear both sockets
   do {
@@ -173,28 +173,14 @@ int main() {
   // Test communication between sockets
   {
     // Create socket 1
-    UDPSocket *socket1 = new UDPSocket();
     int port1 = 8080;
-    // Bind to 8080
-    if (!socket1->bindToPort(port1)) {
-      fprintf(stderr, "Could not bind the receiver socket to port:%d\n", port1);
-      exit(-1);
-    }
-    // Thread a recvfrom call
-    thread socket1ing(&UDPSocket::receiveFromPortThread, socket1);
-    socket1ing.detach();
+    thread socket1ing;
+    UDPSocket* socket1 = createThreadedSocket(socket1ing, port1);
 
     // Create socket 2
-    UDPSocket *socket2 = new UDPSocket();
     int port2 = 8060;
-    // Bind to 8080
-    if (!socket2->bindToPort(port2)) {
-      fprintf(stderr, "Could not bind the receiver socket to port:%d\n", port2);
-      exit(-1);
-    }
-    // Thread a recvfrom call
-    thread socket2ing(&UDPSocket::receiveFromPortThread, socket2);
-    socket2ing.detach();
+    thread socket2ing;
+    UDPSocket* socket2 = createThreadedSocket(socket2ing, port2);
 
     // Create endpoint for socket1
     Endpoint socket2End;

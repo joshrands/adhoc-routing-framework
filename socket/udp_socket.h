@@ -26,6 +26,7 @@
 #include "endpoint.h"
 #include "safe_queue.h"
 #include "socket.h"
+#include "message.h"
 #include <iostream>
 #include <utility>
 using namespace std;
@@ -88,11 +89,11 @@ public:
 
   /*! TODO: FIX DESCRIPTION
    */
-  bool getMessage(pair<Endpoint, char *> &message);
+  bool getMessage(Message &message);
 
 private:
   // To hold threaded messages
-  SafeQueue<pair<Endpoint, char *>> messages;
+  SafeQueue<Message> messages;
 };
 
 #endif
