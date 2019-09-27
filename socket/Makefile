@@ -22,7 +22,7 @@ INC_FILES = endpoint.h safe_queue.h socket.h udp_socket.h message.h
 #
 # Any libraries we might need.
 #
-LIBRARYS = -lboost_log_setup -lboost_log -lboost_thread -lboost_system -lpthread
+LIBRARYS = -lpthread
 
 
 ${TARGET}: ${OBJ_FILES}

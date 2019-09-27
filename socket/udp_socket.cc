@@ -63,7 +63,7 @@ int UDPSocket::setBroadcasting(bool broadcast) {
 }
 
 // -1 if unsuccessful, else number of bytes written
-int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
+int UDPSocket::_sendTo(Endpoint &remote, const char *packet, int length) {
   if (sockfd < 0) {
     return -1;
   }
@@ -80,7 +80,7 @@ int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
 int UDPSocket::sendTo(char* buffer, int length, uint32_t dest, int port){
   Endpoint remote;
   remote.setAddress(dest, port);
-  sendTo(remote, buffer, length);
+  _sendTo(remote, buffer, length);
 }
 
 // -1 if unsuccessful, else number of bytes received
