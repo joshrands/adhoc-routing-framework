@@ -16,8 +16,8 @@ LDFLAGS = -g -pthread
 # You should be able to add object files here without changing anything else
 #
 TARGET = test
-OBJ_FILES = ${TARGET}.o RoutingProtocol.o aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o send_packet.o 
-INC_FILES = ${TARGET}.h RoutingProtocol.h aodv.h aodv_rreq.h aodv_rrep.h aodv_rerr.h aodv_routing_table.h send_packet.h
+OBJ_FILES = ${TARGET}.o RoutingProtocol.o aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o send_packet.o aodv_sim.o 
+INC_FILES = ${TARGET}.h RoutingProtocol.h aodv.h aodv_rreq.h aodv_rrep.h aodv_rerr.h aodv_routing_table.h send_packet.h aodv_sim.h
 
 #
 # Any libraries we might need.

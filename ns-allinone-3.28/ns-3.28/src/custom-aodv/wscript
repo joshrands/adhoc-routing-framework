@@ -25,7 +25,14 @@ def build(bld):
     headers = bld(features='ns3header')
     headers.module = 'custom-aodv'
     headers.source = [
-
+				'model/aodv.h',
+				'model/aodv_routing_table.h',
+				'model/RoutingProtocol.h',
+				'model/defines.h',
+				'model/aodv_packets.h',
+				'model/aodv_rreq.h',
+				'model/aodv_rrep.h',
+				'model/aodv_rerr.h',
         ]
 
     if bld.env.ENABLE_EXAMPLES:

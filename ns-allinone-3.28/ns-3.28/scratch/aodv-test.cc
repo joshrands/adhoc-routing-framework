@@ -17,6 +17,9 @@
   *
   */
 
+// custom aodv implementation
+#include "ns3/aodv.h"
+
 #define TRANS_POWER       10
 #define RX_GAIN           10
 
@@ -25,10 +28,17 @@
 #define xSize_m           300
 #define ySize_m           300
 
+#define NUM_NODES         5
+
+AODV* aodvArray[NUM_NODES];
+
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/wifi-module.h"
 #include "ns3/internet-module.h"
+#include "ns3/packet.h"
+
+#include <iostream>
 
 using namespace ns3;
 
@@ -36,10 +46,41 @@ NS_LOG_COMPONENT_DEFINE ("AODVTest");
 
 void ReceivePacket (Ptr<Socket> socket)
 {
-  while (socket->Recv ())
+  Ptr<Packet> packet;
+  while (packet = socket->Recv ())
     {
-      NS_LOG_UNCOND ("Received one packet!");
+//      NS_LOG_UNCOND ("Received one packet!");
+      uint32_t length = packet->GetSerializedSize();
+      uint8_t* packetBuffer = (uint8_t*)(malloc(length));
+      packet->Serialize(packetBuffer, length);
+
+      Ptr<Ipv4> ipv4 = socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
+      Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal ();  
+      // add aodv object 
+      uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
+      addr.Serialize(ipBuf);
+
+      // TODO: Do this the right way
+      uint8_t temp;
+      temp = *ipBuf;
+      ipBuf[0] = ipBuf[3];
+      ipBuf[3] = temp;
+      temp = ipBuf[1];
+      ipBuf[1] = ipBuf[2];
+      ipBuf[2] = temp;
+
+      IP_ADDR source;
+      memcpy(&(source),(ipBuf),4);
+
+      aodvArray[socket->GetNode()->GetId()]->decodeReceivedPacketBuffer((char*)(packetBuffer), length, source);
     }
+}
+
+int aodvSocketSendPacket(char* buffer, int length, IP_ADDR dest, int port);
+
+void SendHello(Ptr<Node> source, Ipv4Address dest)
+{
+  Ptr<Socket> socket = Socket::CreateSocket(source, UdpSocketFactory::GetTypeId());
 }
 
 void GenerateTraffic (NodeContainer c, uint32_t pktSize,
@@ -63,7 +104,7 @@ int main (int argc, char *argv[])
 {
   std::string phyMode ("DsssRate1Mbps");
   double rss = -80;  // -dBm
-  uint16_t numNodes = 5;
+  uint16_t numNodes = NUM_NODES;
 
   uint32_t packetSize = 20; // bytes
   uint32_t numPackets = 10;
@@ -168,6 +209,26 @@ int main (int argc, char *argv[])
     InetSocketAddress local = InetSocketAddress (Ipv4Address::GetAny (), 654);
     recvSink->Bind (local);
     recvSink->SetRecvCallback (MakeCallback (&ReceivePacket));
+
+    Ptr<Ipv4> ipv4 = c.Get(i)->GetObject<Ipv4> (); // Get Ipv4 instance of the node
+    Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal ();  
+    // add aodv object 
+    uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
+    addr.Serialize(ipBuf);
+
+    // TODO: Do this the right way
+    uint8_t temp;
+    temp = *ipBuf;
+    ipBuf[0] = ipBuf[3];
+    ipBuf[3] = temp;
+    temp = ipBuf[1];
+    ipBuf[1] = ipBuf[2];
+    ipBuf[2] = temp;
+
+    IP_ADDR ip;
+    memcpy(&(ip),(ipBuf),4);
+
+    aodvArray[i] = new AODV(ip);
   }
 
   // Tracing
