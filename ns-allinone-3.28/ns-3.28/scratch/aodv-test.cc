@@ -49,10 +49,16 @@ void ReceivePacket (Ptr<Socket> socket)
   Ptr<Packet> packet;
   while (packet = socket->Recv ())
     {
-//      NS_LOG_UNCOND ("Received one packet!");
-      uint32_t length = packet->GetSerializedSize();
+      NS_LOG_UNCOND ("Received one packet! On Node " + to_string(socket->GetNode()->GetId()));
+      UdpHeader header;
+      packet->RemoveHeader(header);
+
+      uint32_t length = packet->GetSize();
       uint8_t* packetBuffer = (uint8_t*)(malloc(length));
-      packet->Serialize(packetBuffer, length);
+
+      packet->CopyData(packetBuffer, length);
+//      for (uint32_t i = 0; i < length; i++)
+//        cout << packetBuffer[i];
 
       Ptr<Ipv4> ipv4 = socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
       Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal ();  
@@ -76,17 +82,60 @@ void ReceivePacket (Ptr<Socket> socket)
     }
 }
 
-int aodvSocketSendPacket(char* buffer, int length, IP_ADDR dest, int port);
-
 void SendHello(Ptr<Node> source, Ipv4Address dest)
 {
   Ptr<Socket> socket = Socket::CreateSocket(source, UdpSocketFactory::GetTypeId());
+  InetSocketAddress remote = InetSocketAddress(dest, 654);
+  socket->SetAllowBroadcast(false);
+  socket->Connect(remote);
+
+  string msg = "Hello world";
+  char* data = (char*)(malloc(msg.length() + 5));
+  uint8_t temp = 0x00;
+
+   // add aodv object 
+  uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
+  dest.Serialize(ipBuf);
+
+  // TODO: Do this the right way
+  temp = *ipBuf;
+  ipBuf[0] = ipBuf[3];
+  ipBuf[3] = temp;
+  temp = ipBuf[1];
+  ipBuf[1] = ipBuf[2];
+  ipBuf[2] = temp;
+
+  IP_ADDR destIp;
+  memcpy(&(destIp),(ipBuf),4);
+
+  temp = 0x00;
+  memcpy(data, &temp, 1);
+  data++;
+  memcpy(data, &destIp, 4);
+  data--;
+
+  for (uint32_t i = 0; i < msg.length(); i++)
+    data[i+5] = msg.at(i);
+
+  Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (data), msg.length()+5);
+  UdpHeader header;
+  // fill header
+  packet->AddHeader(header);
+
+  socket->Send(packet);
 }
 
 void GenerateTraffic (NodeContainer c, uint32_t pktSize,
                              uint32_t pktCount, Time pktInterval )
 {
-
+  for (uint32_t i = 0; i < c.GetN(); i++)
+  {
+    Ptr<Ipv4> ipv4 = c.Get(i)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
+    Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal();  
+    Simulator::Schedule(Seconds(i), &SendHello, c.Get(0), addr);
+    NS_LOG_UNCOND("Node 0 to Node " + to_string(i));
+  }
+/*
   if (pktCount > 0)
   {
     Ptr<Socket> socket = Socket::CreateSocket (c.Get (rand()%c.GetN()), UdpSocketFactory::GetTypeId ());
@@ -98,6 +147,7 @@ void GenerateTraffic (NodeContainer c, uint32_t pktSize,
     Simulator::Schedule (pktInterval, &GenerateTraffic,
                          c, pktSize, pktCount - 1, pktInterval);
   }
+*/
 }
 
 int main (int argc, char *argv[])
@@ -209,6 +259,7 @@ int main (int argc, char *argv[])
     InetSocketAddress local = InetSocketAddress (Ipv4Address::GetAny (), 654);
     recvSink->Bind (local);
     recvSink->SetRecvCallback (MakeCallback (&ReceivePacket));
+//    c.Get(i)->SetAttribute("id", IntegerValue(i));
 
     Ptr<Ipv4> ipv4 = c.Get(i)->GetObject<Ipv4> (); // Get Ipv4 instance of the node
     Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal ();  
