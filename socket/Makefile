@@ -4,6 +4,7 @@
 #
 #  Created by Phillip Romig on 4/3/12.
 #  Modified by Josh Rands on 9/2/19
+#  Modified by Zachary Smeton on 10/1/19
 #  Copyright 2012 Colorado School of Mines. All rights reserved.
 #
 
@@ -25,7 +26,7 @@ INC_FILES = endpoint.h safe_queue.h socket.h udp_socket.h message.h
 LIBRARYS = -lpthread
 
 
-${TARGET}: ${OBJ_FILES}
+${TARGET}.a : ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
 
 %.o : %.cc ${INC_FILES}

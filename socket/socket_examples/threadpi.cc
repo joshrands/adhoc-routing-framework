@@ -18,10 +18,10 @@ int main() {
   thread receiving(&UDPSocket::receiveFromPortThread, receiver);
 
   while (true) {
-    pair<Endpoint, char *> message;
+    Message message;
     if (receiver->getMessage(message)) {
-      printf("Received message from %s at port %d: %s\n", message.first.getAddress(), message.first.getPort(),
-             message.second);
+      printf("Received message from %s at port %d: %s\n", message.getAddressC(), message.getPort(),
+             message.getData());
     }
   }
   receiving.join();
