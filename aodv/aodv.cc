@@ -197,7 +197,7 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		char* buffer;
 		buffer = RREPHelper::createRREPBuffer(rrep);
 
-		IP_ADDR nextHopIp = getTable()->getNextHop(rrep.destIP);
+		IP_ADDR nextHopIp = getTable()->getNextHop(rrep.origIP);
 
 		if (AODV_DEBUG)
 			cout << "Next hop for rrep: " << getStringFromIp(nextHopIp) << " from " << getStringFromIp(this->getIp()) << endl;
@@ -231,7 +231,7 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 	rrepPacket rrep = rrepHelper.readRREPBuffer(buffer);
 
 	// 2. are with the original ip? was this our route request reply? 
-    if (this->getIp() == rrep.destIP)
+    if (this->getIp() == rrep.origIP)
     {
         // packet made it back! 
         if (AODV_DEBUG)
@@ -244,7 +244,7 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
         // forward this packet 
 		rrepPacket forwardRREP = this->rrepHelper.createForwardRREP(rrep, source);
 
-        IP_ADDR nextHopIp = this->getTable()->getNextHop(forwardRREP.destIP);
+        IP_ADDR nextHopIp = this->getTable()->getNextHop(forwardRREP.origIP);
 
 		if (RREP_DEBUG)
 			cout << "Forward rrep from " << getStringFromIp(getIp()) << " to "<< getStringFromIp(nextHopIp) << endl;

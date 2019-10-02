@@ -23,7 +23,7 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
 
     // populate fields of rrep
     rrep.type = 0x02;
-    rrep.destIP = rreq.origIP;
+    rrep.destIP = rreq.destIP;
     // is this node the destination? 
     if (rrep.destIP == this->m_ip)
     {
@@ -46,8 +46,7 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
         rrep.hopCount = this->m_pTable->getDestHopCount(rreq.destIP);
     }
 
-    // TODO: double check this
-    rrep.origIP = this->m_ip; //rreq.origIP;
+    rrep.origIP = rreq.origIP;
     rrep.lifetime = MY_ROUTE_TIMEOUT_MS;
 
     // update the routing table from the original rreq message
