@@ -114,15 +114,18 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 	// reset packet 
 	buffer-=5;
 
-	socketSendPacket(buffer, length+5, this->getIp(), nextHop);
+	socketSendPacket(buffer, length+5, nextHop, AODV_PORT);
 
 	delete buffer;
 }
 
 void AODV::broadcastRREQBuffer(rreqPacket rreq)
 {
+	if (AODV_DEBUG)
+		cout << "Broadcasting Route Request from node " << getStringFromIp(getIp()) << endl;
+
 	char* rreqBuffer = RREQHelper::createRREQBuffer(rreq);
-	socketSendPacket(rreqBuffer, sizeof(rreq), this->getIp(), getIpFromString(BROADCAST));
+	socketSendPacket(rreqBuffer, sizeof(rreq), getIpFromString(BROADCAST), AODV_PORT);
 
 	delete rreqBuffer;
 }
@@ -194,7 +197,12 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		char* buffer;
 		buffer = RREPHelper::createRREPBuffer(rrep);
 
-		socketSendPacket(buffer, sizeof(rrep), this->getIp(), rrep.origIP);
+		IP_ADDR nextHopIp = getTable()->getNextHop(rrep.destIP);
+
+		if (AODV_DEBUG)
+			cout << "Next hop for rrep: " << getStringFromIp(nextHopIp) << " from " << getStringFromIp(this->getIp()) << endl;
+
+		socketSendPacket(buffer, sizeof(rrep), nextHopIp, AODV_PORT);
 
 		delete buffer;
 
@@ -238,7 +246,7 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 
         IP_ADDR nextHopIp = this->getTable()->getNextHop(forwardRREP.origIP);
         char* buffer = RREPHelper::createRREPBuffer(forwardRREP);
-		socketSendPacket(buffer, sizeof(forwardRREP), this->getIp(), nextHopIp);
+		socketSendPacket(buffer, sizeof(forwardRREP), nextHopIp, AODV_PORT);
 
 		delete buffer;
     }

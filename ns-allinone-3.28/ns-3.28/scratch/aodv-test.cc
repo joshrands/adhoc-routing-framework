@@ -85,23 +85,42 @@ int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
   int index = int(ipString.at(ipString.length()-1)-'0');
   Ptr<Node> sourceNode = c.Get(index);
   ipString = getStringFromIp(dest);
-  index = int(ipString.at(ipString.length()-1)-'0');
 
-  Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
-  Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
-  Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
-  InetSocketAddress remote = InetSocketAddress(destAddr, 654);
-  socket->SetAllowBroadcast(false);
-  socket->Connect(remote);  // Test sending from node 1 to node 3
- 
-  Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
-  UdpHeader header;
-  // fill header
-  packet->AddHeader(header);
+  if (getStringFromIp(dest).substr(ipString.length()-3) == "255")
+  {
+    Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
+    Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
+    Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
+    InetSocketAddress remote = InetSocketAddress(destAddr, 654);
+    socket->SetAllowBroadcast(true);
+    socket->Connect(remote);  // Test sending from node 1 to node 3
+    Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
+    UdpHeader header;
+    // fill header
+    packet->AddHeader(header);
 
-  socket->Send(packet);
+    socket->Send(packet);
+  }
+  else 
+  {
+    ipString = getStringFromIp(dest);
+    index = int(ipString.at(ipString.length()-1)-'0');
 
-  return 0;
+    Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
+    Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
+    Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
+    InetSocketAddress remote = InetSocketAddress(destAddr, 654);
+    socket->SetAllowBroadcast(false);
+    socket->Connect(remote);  // Test sending from node 1 to node 3
+    Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
+    UdpHeader header;
+    // fill header
+    packet->AddHeader(header);
+
+    socket->Send(packet);
+  }
+  
+   return 0;
 }
 
 void ReceivePacket (Ptr<Socket> socket)
