@@ -21,8 +21,6 @@
  * Date: 9/23/2019
  ********************************/
 
-#define RERR_DEBUG      1
-
 #include "defines.h"
 #include "aodv_packets.h"
 #include "aodv_routing_table.h"

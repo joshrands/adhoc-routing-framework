@@ -7,9 +7,6 @@
  * Date: 9/4/2019
  ********************************/
 
-#define AODV_DEBUG		1
-#define AODV_LOG_OUTPUT	1
-
 /* aodv includes */
 #include "aodv_routing_table.h"
 #include "aodv_rreq.h"
