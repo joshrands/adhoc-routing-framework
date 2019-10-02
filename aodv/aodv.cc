@@ -47,7 +47,7 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 	{
 		// packet has reached its final destination! 
 		// TODO: Now what? 
-		if (AODV_DEBUG)
+		if (AODV_PRINT_PACKET)
 		{
 			cout << "Node " << getStringFromIp(this->getIp()) << " received packet: " << endl;
 
@@ -231,7 +231,7 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 	rrepPacket rrep = rrepHelper.readRREPBuffer(buffer);
 
 	// 2. are with the original ip? was this our route request reply? 
-    if (this->getIp() == rrep.origIP)
+    if (this->getIp() == rrep.destIP)
     {
         // packet made it back! 
         if (AODV_DEBUG)
@@ -244,7 +244,11 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
         // forward this packet 
 		rrepPacket forwardRREP = this->rrepHelper.createForwardRREP(rrep, source);
 
-        IP_ADDR nextHopIp = this->getTable()->getNextHop(forwardRREP.origIP);
+        IP_ADDR nextHopIp = this->getTable()->getNextHop(forwardRREP.destIP);
+
+		if (RREP_DEBUG)
+			cout << "Forward rrep from " << getStringFromIp(getIp()) << " to "<< getStringFromIp(nextHopIp) << endl;
+
         char* buffer = RREPHelper::createRREPBuffer(forwardRREP);
 		socketSendPacket(buffer, sizeof(forwardRREP), nextHopIp, AODV_PORT);
 
@@ -294,3 +298,47 @@ void AODV::logRoutingTable()
 	while (logFile.is_open());
 }
 
+int AODVTest::globalPacketCount = 0;
+IP_ADDR AODVTest::lastNode = 0; 
+
+int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port)
+{
+	for (int i = 0; i < m_neighbors.size(); i++)
+	{
+		if (dest == m_neighbors.at(i)->getIp() || dest == getIpFromString(BROADCAST))
+		{
+			// send packet to this node
+			m_neighbors.at(i)->decodeReceivedPacketBuffer(buffer, length, getIp());
+			AODVTest::lastNode = getIp();
+			AODVTest::globalPacketCount++;
+		}
+	}
+}
+
+void AODVTest::addNeighbor(AODVTest* node)
+{
+	this->m_neighbors.push_back(node);
+}
+
+void AODVTest::removeNeighbor(AODVTest node)
+{
+	for (int i = 0; i < m_neighbors.size(); i++)
+	{
+		if (node.getIp() == m_neighbors.at(i)->getIp())
+		{
+			m_neighbors.erase(m_neighbors.begin() + i);
+		}
+	}
+
+}
+
+bool AODVTest::isNeighbor(AODVTest node)
+{
+	for (int i = 0; i < m_neighbors.size(); i++)
+	{
+		if (node.getIp() == m_neighbors.at(i)->getIp())
+			return true;
+	}
+
+	return false;
+}

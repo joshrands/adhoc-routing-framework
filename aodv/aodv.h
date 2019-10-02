@@ -70,9 +70,25 @@ protected:
 	std::vector<IP_ADDR> m_neighbors;
 };
 
+/* AODVTest class
+ * For testing AODV with unit tests. */
 class AODVTest : public AODV
 {
 public: 	
+	// debugging values 
+	static int globalPacketCount;
+	static IP_ADDR lastNode; 
+
 	AODVTest(IP_ADDR ip) : AODV(ip) {}
-	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) { return sendBuffer(buffer, length, dest, port); }
+	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);// { return sendBuffer(buffer, length, dest, port); }
+
+	// add/remove node to neighbor list
+	void addNeighbor(AODVTest* node);
+	void removeNeighbor(AODVTest node);
+
+	// return true if node is neighbor
+	bool isNeighbor(AODVTest node);
+
+private:
+	vector<AODVTest*> m_neighbors;
 };

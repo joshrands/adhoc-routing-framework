@@ -28,6 +28,7 @@ void test_test()
 {
 	// this test tests tests
 	assert(true == true);
+	cout << "Test test complete." << endl;
 }
 
 void test_routing_table()
@@ -51,6 +52,8 @@ void test_routing_table()
 	// test that the table entry changed 
 	assert(nextHop == table.getNextHop(dest));
 	assert(getIpFromString("192.168.0.22") != table.getNextHop(dest));
+
+	cout << "Test routing table complete." << endl;
 }
 
 void test_aodv()
@@ -86,6 +89,8 @@ void test_aodv_rreq_simple()
 	assert(rreq.destIP == dest);
 	assert(rreq.origIP == aodv.getIp());
 	assert(rreq.origSeqNum == 2);	
+
+	cout << "Test aodv rreq simple complete." << endl;
 }
 
 void test_aodv_rreq_forwarding()
@@ -121,6 +126,8 @@ void test_aodv_rreq_forwarding()
 	// for node3 to send packet to node0, go through node2
 	assert(node3.getTable()->getNextHop(node0.getIp()) == node2.getIp());
 	assert(node3.getTable()->getNextHop(node0.getIp()) != node1.getIp());
+
+	cout << "Test aodv rreq forwarding complete." << endl;
 }
 
 void test_aodv_rreq_buffer()
@@ -139,7 +146,8 @@ void test_aodv_rreq_buffer()
 
 	assert(receivedRREQ.type == rreq.type);
 	assert(receivedRREQ.origIP == rreq.origIP);
-//	cout << receivedRREQ.destIP << endl;
+
+	cout << "Test aodv rreq buffer complete." << endl;
 }
 
 void test_aodv_rreq_to_rrep()
@@ -151,71 +159,37 @@ void test_aodv_rreq_to_rrep()
 	AODVTest node2(getIpFromString("192.168.1.2"));
 	AODVTest node3(getIpFromString("192.168.1.3"));
 
-	// generate a rreq from node 0 to node 3
-	rreqPacket rreq = node0.rreqHelper.createRREQ(node3.getIp());
+	// set up neighbors
+	node0.addNeighbor(&node1);
 
-	// node 0 broadcasts rreq, which is received by node 1
-	sendBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node0.getIp(), getIpFromString(BROADCAST));
-	node1.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node0.getIp());
+	node1.addNeighbor(&node2);
+	node1.addNeighbor(&node0);
 
-	// node1 ip and packet count = 2 because node 0 sent one and then node 1 should have handled it and broadcasted
-//	assert(getLastSource() == node1.getIp());
-	assert(getGlobalPacketCount() == 2);
+	node2.addNeighbor(&node3);
+	node2.addNeighbor(&node1);
 
-	// node1 broadcasted a forward packet it received from node0, which should be received by node0 and node2
-	rreq = node1.rreqHelper.createForwardRREQ(rreq, node0.getIp());
-	node0.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node1.getIp());
-	node2.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node1.getIp());
+	node3.addNeighbor(&node2);
 
-	// node 0 should have discarded the duplicate, but node 2 should have generated a forward rreq
-//	assert(getLastSource() == node2.getIp());
-	assert(getGlobalPacketCount() == 3);
+	// send a packet from node 0 to node 3
+	string msg = "Hello node 3! From node 0";
+	int length = msg.length();
+	char* buffer = (char*)(malloc(length));
+	for (int i = 0; i < length; i++)
+		buffer[i] = msg.at(i);
 
-	// node 2 broadcasted a forward packet it received from node1, and it was received by node 1 and 3
-	rreq = node2.rreqHelper.createForwardRREQ(rreq, node1.getIp());
-	node1.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node2.getIp());
-	node3.decodeReceivedPacketBuffer(RREQHelper::createRREQBuffer(rreq), sizeof(rreq), node2.getIp());
+	node0.sendPacket(buffer, length, node3.getIp());	
 
-	// node 1 and 3 should have both received the packet, but neither should have generated a forward rreq. 
-	// node 1 should have discarded the duplicate, and node 3 should have generated and sent a rrep back to node0 
-//	assert(getLastSource() == node3.getIp());
-	assert(getGlobalPacketCount() == 4);	
-
-	// node 3 generate a rrep from the rreq from node 2 and unicasted back to node 2
-	rrepPacket rrep = node3.rrepHelper.createRREPFromRREQ(rreq, node2.getIp());
-	node2.decodeReceivedPacketBuffer(RREPHelper::createRREPBuffer(rrep), sizeof(rrep), node3.getIp());
-
-	// node 2 received rrep and forwarded to node 1
-//	assert(getLastSource() == node2.getIp());
-	rrep = node2.rrepHelper.createForwardRREP(rrep, node3.getIp());
-	node1.decodeReceivedPacketBuffer(RREPHelper::createRREPBuffer(rrep), sizeof(rrep), node2.getIp());
-	// node 1 received rrep and forwarded to node 0 who completed the route!
-//	assert(getLastSource() == node1.getIp());
-	rrep = node1.rrepHelper.createForwardRREP(rrep, node2.getIp());
-	node0.decodeReceivedPacketBuffer(RREPHelper::createRREPBuffer(rrep), sizeof(rrep), node1.getIp());
-
-	// nodes should have routing entries to get to node0 and node3. Test these 
-	char* packet = "Hello world! From node 0";
-	int length = sizeof("Hello world! From node 0");
-	node0.sendPacket(packet, length, node1.getIp());
-	// add aodv header to buffer 
-	char* buffer = (char*)(malloc(5 + length));
-	uint8_t zero = 0x00;
-	memcpy(buffer, &(zero), 1);
-	buffer++;
-	IP_ADDR finalDest = node1.getIp();
-	memcpy(buffer, &finalDest, 4);
-	buffer+=4;
-	memcpy(buffer, packet, length);
-	buffer-=5;	
-	node1.decodeReceivedPacketBuffer(buffer, length+5, node0.getIp());
-
+	node0.sendPacket(buffer, length, node3.getIp());	
 	delete buffer;
 
+	cout << getStringFromIp(AODVTest::lastNode) << endl;
+	
 	node0.logRoutingTable();
 	node1.logRoutingTable();
 	node2.logRoutingTable();
 	node3.logRoutingTable();
+
+	cout << "Test aodv rreq to rrep complete." << endl;
 }
 
 void test_aodv_rreq()
