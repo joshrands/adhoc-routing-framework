@@ -10,6 +10,7 @@ void test_test();
 void test_routing_table();
 void test_aodv();
 void test_aodv_rreq();
+void test_aodv_loop_prevention();
 
 int main (int argc, char *argv[]) 
 {	
@@ -59,6 +60,7 @@ void test_routing_table()
 void test_aodv()
 {
 	test_aodv_rreq();
+	test_aodv_loop_prevention();
 }
 
 void test_aodv_rreq_simple()
@@ -190,6 +192,46 @@ void test_aodv_rreq_to_rrep()
 	node3.logRoutingTable();
 
 	cout << "Test aodv rreq to rrep complete." << endl;
+}
+
+void test_aodv_loop_prevention()
+{
+	AODVTest node0(getIpFromString("192.168.1.0"));
+	AODVTest node1(getIpFromString("192.168.1.1"));
+	AODVTest node2(getIpFromString("192.168.1.2"));
+	AODVTest node3(getIpFromString("192.168.1.3"));
+	AODVTest node4(getIpFromString("192.168.1.4"));
+
+	// assign neighbors, creating a loop
+	node0.addNeighbor(&node1);
+	node0.addNeighbor(&node2);
+
+	node1.addNeighbor(&node0);
+	node1.addNeighbor(&node2);
+
+	node2.addNeighbor(&node0);
+	node2.addNeighbor(&node1);
+	node2.addNeighbor(&node3);
+	node2.addNeighbor(&node4);
+
+	node3.addNeighbor(&node2);
+	node3.addNeighbor(&node4);
+
+	node4.addNeighbor(&node2);
+	node4.addNeighbor(&node3);
+
+	// send a packet from node 0 to node 3
+	string msg = "Hello node 3! From node 0";
+	int length = msg.length();
+	char* buffer = (char*)(malloc(length));
+	for (int i = 0; i < length; i++)
+		buffer[i] = msg.at(i);
+
+	node0.sendPacket(buffer, length, node4.getIp());
+
+	node0.sendPacket(buffer, length, node4.getIp());
+
+	cout << "Test aodv loop prevention passed" << endl;
 }
 
 void test_aodv_rreq()

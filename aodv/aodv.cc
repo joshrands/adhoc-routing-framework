@@ -303,7 +303,7 @@ IP_ADDR AODVTest::lastNode = 0;
 
 int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port)
 {
-	for (int i = 0; i < m_neighbors.size(); i++)
+	for (uint32_t i = 0; i < m_neighbors.size(); i++)
 	{
 		if (dest == m_neighbors.at(i)->getIp() || dest == getIpFromString(BROADCAST))
 		{
@@ -313,6 +313,8 @@ int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port)
 			AODVTest::globalPacketCount++;
 		}
 	}
+
+	return 0;
 }
 
 void AODVTest::addNeighbor(AODVTest* node)
@@ -322,7 +324,7 @@ void AODVTest::addNeighbor(AODVTest* node)
 
 void AODVTest::removeNeighbor(AODVTest node)
 {
-	for (int i = 0; i < m_neighbors.size(); i++)
+	for (uint32_t i = 0; i < m_neighbors.size(); i++)
 	{
 		if (node.getIp() == m_neighbors.at(i)->getIp())
 		{
@@ -334,7 +336,7 @@ void AODVTest::removeNeighbor(AODVTest node)
 
 bool AODVTest::isNeighbor(AODVTest node)
 {
-	for (int i = 0; i < m_neighbors.size(); i++)
+	for (uint32_t i = 0; i < m_neighbors.size(); i++)
 	{
 		if (node.getIp() == m_neighbors.at(i)->getIp())
 			return true;

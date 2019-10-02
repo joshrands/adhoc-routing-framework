@@ -47,33 +47,12 @@ void testAodv()
 {
   // Test sending from node 1 to node 3
   string msg = "Hello world";
-  char* buffer = (char*)(malloc(msg.length() + 5));
-  uint8_t temp = 0x00;
+  uint32_t length = msg.length();
+  char* buffer = (char*)(malloc(length));
+  for (uint32_t i = 0; i < length; i++)
+    buffer[i] = msg.at(i);
 
-  Ptr<Ipv4> nodeIpv4 = c.Get(1)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
-  Ipv4Address dest = nodeIpv4->GetAddress (1, 0).GetLocal(); 
-   // add aodv object 
-  uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
-  dest.Serialize(ipBuf);
-
-  // TODO: Do this the right way
-  temp = *ipBuf;
-  ipBuf[0] = ipBuf[3];
-  ipBuf[3] = temp;
-  temp = ipBuf[1];
-  ipBuf[1] = ipBuf[2];
-  ipBuf[2] = temp;
-
-  IP_ADDR destIp;
-  memcpy(&(destIp),(ipBuf),4);
-
-  temp = 0x00;
-  memcpy(buffer, &temp, 1);
-  buffer++;
-  memcpy(buffer, &destIp, 4);
-  buffer--;
-
-  aodvArray[1]->sendPacket(buffer, msg.length() + 5, aodvArray[3]->getIp());// aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
+  aodvArray[1]->sendPacket(buffer, msg.length(), aodvArray[3]->getIp());// aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
 }
 
 int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
@@ -82,29 +61,42 @@ int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
 
   // TODO: do this right.
   string ipString = getStringFromIp(source);
-  int index = int(ipString.at(ipString.length()-1)-'0');
+  int index = int(ipString.at(ipString.length()-1)-'1');
   Ptr<Node> sourceNode = c.Get(index);
   ipString = getStringFromIp(dest);
+//  index = int(ipString.at(ipString.length()-1)-'1');
 
-  if (getStringFromIp(dest).substr(ipString.length()-3) == "255")
+  if (dest == getIpFromString(BROADCAST))
   {
+    cout << "Broadcast." << endl;
     Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
-    Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
+    Ipv4Address destAddr;// = destIpv4->GetAddress (1, 0).GetLocal();  
+    destAddr.Set(getIpFromString(BROADCAST));
+
     Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
     InetSocketAddress remote = InetSocketAddress(destAddr, 654);
     socket->SetAllowBroadcast(true);
     socket->Connect(remote);  // Test sending from node 1 to node 3
     Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
-    UdpHeader header;
+    Ipv4Header header;
     // fill header
+    header.SetSource(sourceNode->GetObject<Ipv4>()->GetAddress(1,0).GetLocal());
+    NS_LOG_UNCOND("Source header before: ");
+    NS_LOG_UNCOND(header.GetSource());
     packet->AddHeader(header);
 
+    cout << "Broadcasting packet." << endl;
     socket->Send(packet);
   }
-  else 
+  else
+  {
+      cout << "Not sending packet." << endl;
+  }
+  
+/*  else 
   {
     ipString = getStringFromIp(dest);
-    index = int(ipString.at(ipString.length()-1)-'0');
+    index = int(ipString.at(ipString.length()-1)-'1');
 
     Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
     Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
@@ -113,14 +105,17 @@ int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
     socket->SetAllowBroadcast(false);
     socket->Connect(remote);  // Test sending from node 1 to node 3
     Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
-    UdpHeader header;
+    Ipv4Header header;
+    header.SetSource(sourceNode->GetObject<Ipv4>()->GetAddress(1,0).GetLocal());
+    NS_LOG_UNCOND("Source header before: ");
+    NS_LOG_UNCOND(header.GetSource());
     // fill header
     packet->AddHeader(header);
 
     socket->Send(packet);
   }
-  
-   return 0;
+*/
+  return 0;
 }
 
 void ReceivePacket (Ptr<Socket> socket)
@@ -129,8 +124,10 @@ void ReceivePacket (Ptr<Socket> socket)
   while (packet = socket->Recv ())
     {
       NS_LOG_UNCOND ("Received one packet! On Node " + to_string(socket->GetNode()->GetId()));
-      UdpHeader header;
+      Ipv4Header header;
       packet->RemoveHeader(header);
+      NS_LOG_UNCOND("Source:");
+      NS_LOG_UNCOND(header.GetSource());
 
       uint32_t length = packet->GetSize();
       uint8_t* packetBuffer = (uint8_t*)(malloc(length));
@@ -138,9 +135,12 @@ void ReceivePacket (Ptr<Socket> socket)
       packet->CopyData(packetBuffer, length);
 //      for (uint32_t i = 0; i < length; i++)
 //        cout << packetBuffer[i];
-
-      Ptr<Ipv4> ipv4 = socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
-      Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal ();  
+      
+      Ptr<Ipv4> ipv4 =  socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
+      NS_LOG_UNCOND("This node:");
+      NS_LOG_UNCOND(ipv4->GetAddress(1,0).GetLocal());
+      Ipv4Address addr = header.GetSource();// ipv4->GetAddress (1, 0).GetLocal ();  
+      
       // add aodv object 
       uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
       addr.Serialize(ipBuf);
@@ -156,6 +156,7 @@ void ReceivePacket (Ptr<Socket> socket)
 
       IP_ADDR source;
       memcpy(&(source),(ipBuf),4);
+//      cout << "SOURCE: " << getStringFromIp(source) << endl;
 
       aodvArray[socket->GetNode()->GetId()]->decodeReceivedPacketBuffer((char*)(packetBuffer), length, source);
     }
@@ -197,8 +198,8 @@ void SendHello(Ptr<Node> source, Ipv4Address dest)
     data[i+5] = msg.at(i);
 
   Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (data), msg.length()+5);
-  UdpHeader header;
-  // fill header
+  Ipv4Header header;
+//  headerIp.SetSource(socket->)
   packet->AddHeader(header);
 
   socket->Send(packet);
