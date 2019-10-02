@@ -74,12 +74,12 @@ public:
   /*! Get the IP address of this endpoint
    *  @return the IP address of this point
    */
-  char *getAddress(void);
+  char *getAddressC(void);
 
   /*! Get the IP address of this endpoint
    *  @return the integer IP address of this point
    */
-  uint32_t getIntAddress(void) const;
+  uint32_t getAddressI(void) const;
 
   /*! Get the port of this endpoint
    *  @return the port of this point

@@ -97,7 +97,12 @@ public:
    */
   void receiveFromPortThread();
 
-  /*! TODO: FIX DESCRIPTION
+  /*!
+   * @brief Get one message from the socket
+   * 
+   * @param message the first message on the queue
+   * @return true a message was received
+   * @return false no messages
    */
   bool getMessage(Message &message);
 

@@ -17,8 +17,17 @@ public:
      * 
      * @return uint32_t 
      */
-    uint32_t getIPAddress(void){
-        return end.getIntAddress();
+    uint32_t getAddressI(void) const{
+        return end.getAddressI();
+    }
+
+    /*!
+     * @brief Returns the IP address of the message sender
+     * 
+     * @return char array
+     */
+    char *getAddressC(void){
+        return end.getAddressC();
     }
 
     /*!
