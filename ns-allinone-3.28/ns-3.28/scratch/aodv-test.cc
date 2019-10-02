@@ -30,8 +30,6 @@
 
 #define NUM_NODES         5
 
-AODVns3* aodvArray[NUM_NODES];
-
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
 #include "ns3/wifi-module.h"
@@ -42,9 +40,66 @@ AODVns3* aodvArray[NUM_NODES];
 
 using namespace ns3;
 
+NodeContainer c;
+AODVns3* aodvArray[NUM_NODES];
+
+void testAodv()
+{
+  // Test sending from node 1 to node 3
+  string msg = "Hello world";
+  char* buffer = (char*)(malloc(msg.length() + 5));
+  uint8_t temp = 0x00;
+
+  Ptr<Ipv4> nodeIpv4 = c.Get(1)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
+  Ipv4Address dest = nodeIpv4->GetAddress (1, 0).GetLocal(); 
+   // add aodv object 
+  uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
+  dest.Serialize(ipBuf);
+
+  // TODO: Do this the right way
+  temp = *ipBuf;
+  ipBuf[0] = ipBuf[3];
+  ipBuf[3] = temp;
+  temp = ipBuf[1];
+  ipBuf[1] = ipBuf[2];
+  ipBuf[2] = temp;
+
+  IP_ADDR destIp;
+  memcpy(&(destIp),(ipBuf),4);
+
+  temp = 0x00;
+  memcpy(buffer, &temp, 1);
+  buffer++;
+  memcpy(buffer, &destIp, 4);
+  buffer--;
+
+  aodvArray[1]->sendPacket(buffer, msg.length() + 5, aodvArray[3]->getIp());// aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
+}
+
 int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
 {
   cout << "Sending a packet from " << getStringFromIp(source) << " to " << getStringFromIp(dest) << endl;
+
+  // TODO: do this right.
+  string ipString = getStringFromIp(source);
+  int index = int(ipString.at(ipString.length()-1)-'0');
+  Ptr<Node> sourceNode = c.Get(index);
+  ipString = getStringFromIp(dest);
+  index = int(ipString.at(ipString.length()-1)-'0');
+
+  Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
+  Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
+  Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
+  InetSocketAddress remote = InetSocketAddress(destAddr, 654);
+  socket->SetAllowBroadcast(false);
+  socket->Connect(remote);  // Test sending from node 1 to node 3
+ 
+  Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
+  UdpHeader header;
+  // fill header
+  packet->AddHeader(header);
+
+  socket->Send(packet);
 
   return 0;
 }
@@ -148,9 +203,6 @@ int main (int argc, char *argv[])
   double rss = -80;  // -dBm
   uint16_t numNodes = NUM_NODES;
 
-  uint32_t packetSize = 20; // bytes
-  uint32_t numPackets = 10;
-  bool verbose = false;
   double duration = 60.00;
 
   CommandLine cmd;
@@ -160,7 +212,6 @@ int main (int argc, char *argv[])
 //  cmd.AddValue ("packetSize", "size of application packet sent", packetSize);
 //  cmd.AddValue ("numPackets", "number of packets generated", numPackets);
 //  cmd.AddValue ("interval", "interval (seconds) between packets", interval);
-  cmd.AddValue ("verbose", "turn on all WifiNetDevice log components", verbose);
  
   cmd.Parse (argc, argv);
   // Convert to time object
@@ -174,15 +225,15 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::WifiRemoteStationManager::NonUnicastMode",
                       StringValue (phyMode));
 
-  NodeContainer c;
   c.Create (numNodes);
 
   // The below set of helpers will help us to put together the wifi NICs we want
   WifiHelper wifi;
-  if (verbose)
+/*  if (verbose)
     {
       wifi.EnableLogComponents ();  // Turn on all Wifi logging
     }
+*/
   wifi.SetStandard (WIFI_PHY_STANDARD_80211b);
 
   YansWifiPhyHelper wifiPhy =  YansWifiPhyHelper::Default ();
@@ -277,8 +328,10 @@ int main (int argc, char *argv[])
   // Tracing
 //  wifiPhy.EnablePcap ("wifi-simple-adhoc", devices);
 
-  Simulator::Schedule (Seconds (1.0), &GenerateTraffic,
-                       c, packetSize, numPackets, Seconds(1));
+//  Simulator::Schedule (Seconds (1.0), &GenerateTraffic,
+//                       c, packetSize, numPackets, Seconds(1));
+
+  Simulator::Schedule(Seconds(1.0), &testAodv);// &(aodvArray[1]->socketSendPacket), buffer, msg.length() + 5, aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
 
   Simulator::Stop (Seconds (duration + 10.0));
   Simulator::Run ();
