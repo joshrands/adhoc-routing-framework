@@ -9,7 +9,7 @@
 
 #include "aodv.h"
 
-class AODVns3 : AODV
+class AODVns3 : public AODV
 {
 public:
     // constructors 

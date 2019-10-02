@@ -18,7 +18,7 @@
   */
 
 // custom aodv implementation
-#include "ns3/aodv.h"
+#include "ns3/aodv_sim.h"
 
 #define TRANS_POWER       10
 #define RX_GAIN           10
@@ -30,7 +30,7 @@
 
 #define NUM_NODES         5
 
-AODV* aodvArray[NUM_NODES];
+AODVns3* aodvArray[NUM_NODES];
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
@@ -42,7 +42,12 @@ AODV* aodvArray[NUM_NODES];
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("AODVTest");
+int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
+{
+  cout << "Sending a packet from " << getStringFromIp(source) << " to " << getStringFromIp(dest) << endl;
+
+  return 0;
+}
 
 void ReceivePacket (Ptr<Socket> socket)
 {
@@ -135,19 +140,6 @@ void GenerateTraffic (NodeContainer c, uint32_t pktSize,
     Simulator::Schedule(Seconds(i), &SendHello, c.Get(0), addr);
     NS_LOG_UNCOND("Node 0 to Node " + to_string(i));
   }
-/*
-  if (pktCount > 0)
-  {
-    Ptr<Socket> socket = Socket::CreateSocket (c.Get (rand()%c.GetN()), UdpSocketFactory::GetTypeId ());
-    InetSocketAddress remote = InetSocketAddress (Ipv4Address ("255.255.255.255"), 654);
-    socket->SetAllowBroadcast (true);
-    socket->Connect (remote);
-    socket->Send (Create<Packet> (pktSize));
-    socket->Close();
-    Simulator::Schedule (pktInterval, &GenerateTraffic,
-                         c, pktSize, pktCount - 1, pktInterval);
-  }
-*/
 }
 
 int main (int argc, char *argv[])
@@ -250,7 +242,6 @@ int main (int argc, char *argv[])
   internet.Install (c);
 
   Ipv4AddressHelper ipv4;
-  NS_LOG_INFO ("Assign IP Addresses.");
   ipv4.SetBase ("192.168.1.0", "255.255.255.0");
   ipv4.Assign (devices);
 
@@ -279,7 +270,8 @@ int main (int argc, char *argv[])
     IP_ADDR ip;
     memcpy(&(ip),(ipBuf),4);
 
-    aodvArray[i] = new AODV(ip);
+    aodvArray[i] = new AODVns3(ip);
+    aodvArray[i]->ns3SocketSendPacket = &SendPacket;
   }
 
   // Tracing

@@ -77,5 +77,5 @@ class AODVTest : public AODV
 {
 public: 	
 	AODVTest(IP_ADDR ip) : AODV(ip) {}
-	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) { sendBuffer(buffer, length, dest, port); }
+	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) { return sendBuffer(buffer, length, dest, port); }
 };
