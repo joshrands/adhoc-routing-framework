@@ -24,9 +24,6 @@ AODV::AODV(IP_ADDR ip)
 	this->rerrHelper.setIp(ip);
 	this->rerrHelper.setRoutingTable(this->getTable());
 	this->rerrHelper.setSequenceNum(&(this->sequenceNum));
-
-	// default assign socket send data
-	socketSendPacket = &sendBuffer;
 }
 
 AODV::~AODV()
