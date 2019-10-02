@@ -4,6 +4,12 @@
 #include <fstream>
 #include <stdio.h>
 
+AODV::AODV()
+{
+	if (AODV_DEBUG)
+		cout << "Warning: Must update aodv ip address.";
+}
+
 AODV::AODV(IP_ADDR ip)
 {
 	if (AODV_DEBUG)

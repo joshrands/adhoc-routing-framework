@@ -61,7 +61,7 @@ void test_aodv()
 void test_aodv_rreq_simple()
 {
 	// create an aodv routing object for ip .20
-	AODV aodv(getIpFromString("192.168.0.20"));
+	AODVTest aodv(getIpFromString("192.168.0.20"));
 
 	// test simple rreq 
 	IP_ADDR dest = getIpFromString("192.168.0.21");
@@ -95,11 +95,11 @@ void test_aodv_rreq_forwarding()
 
 	// 0 - 1 - 2 - 3 - 4
 
-	AODV node0 = AODV(getIpFromString("192.168.0.0"));
-	AODV node1 = AODV(getIpFromString("192.168.0.1"));
-	AODV node2 = AODV(getIpFromString("192.168.0.2"));
-	AODV node3 = AODV(getIpFromString("192.168.0.3"));
-	AODV node4 = AODV(getIpFromString("192.168.0.4"));
+	AODVTest node0 = AODVTest(getIpFromString("192.168.0.0"));
+	AODVTest node1 = AODVTest(getIpFromString("192.168.0.1"));
+	AODVTest node2 = AODVTest(getIpFromString("192.168.0.2"));
+	AODVTest node3 = AODVTest(getIpFromString("192.168.0.3"));
+	AODVTest node4 = AODVTest(getIpFromString("192.168.0.4"));
 
 	// create a rreq from node 0 to node 4
 	rreqPacket rreq = node0.rreqHelper.createRREQ(node4.getIp());
@@ -128,7 +128,7 @@ void test_aodv_rreq_buffer()
 	IP_ADDR orig = getIpFromString("192.168.0.11");
 	IP_ADDR dest = getIpFromString("192.168.0.21");
 
-	AODV aodv(orig);
+	AODVTest aodv(orig);
 
 	rreqPacket rreq = aodv.rreqHelper.createRREQ(dest);
 	char* buffer = (char*)(malloc(sizeof(rreq))); 
@@ -146,10 +146,10 @@ void test_aodv_rreq_to_rrep()
 {
 	// simple test to prevent a simple loop 
 	// 0 <---> 1 <---> 2 ---> 3
-	AODV node0(getIpFromString("192.168.1.0"));
-	AODV node1(getIpFromString("192.168.1.1"));
-	AODV node2(getIpFromString("192.168.1.2"));
-	AODV node3(getIpFromString("192.168.1.3"));
+	AODVTest node0(getIpFromString("192.168.1.0"));
+	AODVTest node1(getIpFromString("192.168.1.1"));
+	AODVTest node2(getIpFromString("192.168.1.2"));
+	AODVTest node3(getIpFromString("192.168.1.3"));
 
 	// generate a rreq from node 0 to node 3
 	rreqPacket rreq = node0.rreqHelper.createRREQ(node3.getIp());

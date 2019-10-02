@@ -16,6 +16,8 @@
 #include "aodv_rrep.h"
 #include "aodv_rerr.h"
 
+#include "send_packet.h"
+
 #include <vector>
 #include <functional>
 
@@ -62,7 +64,7 @@ public:
 //	std::function<int(char* buffer, int length, IP_ADDR dest, int port)> socketSendPacket;
 	virtual int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
 
-private:
+protected:
 	// node sequence number. MUST increment on a route discovery
 	uint32_t sequenceNum;
 	// node rreq id. Incremented by one during route discovery
@@ -71,3 +73,9 @@ private:
 	std::vector<IP_ADDR> m_neighbors;
 };
 
+class AODVTest : public AODV
+{
+public: 	
+	AODVTest(IP_ADDR ip) : AODV(ip) {}
+	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) { sendBuffer(buffer, length, dest, port); }
+};
