@@ -235,6 +235,12 @@ void test_aodv_loop_prevention()
 
 	node0.sendPacket(buffer, length, node4.getIp());
 
+	node0.logRoutingTable();
+	node1.logRoutingTable();
+	node2.logRoutingTable();
+	node3.logRoutingTable();
+	node4.logRoutingTable();
+
 	cout << "Test aodv loop prevention passed" << endl;
 
 	delete buffer;

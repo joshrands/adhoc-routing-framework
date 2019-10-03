@@ -43,6 +43,20 @@ using namespace ns3;
 NodeContainer c;
 AODVns3* aodvArray[NUM_NODES];
 
+bool mutex = false;
+
+void lock()
+{
+  while (mutex);
+
+  mutex = true;
+}
+
+void unlock()
+{
+  mutex = false;
+}
+
 void testAodv()
 {
   // Test sending from node 1 to node 3
@@ -53,6 +67,8 @@ void testAodv()
     buffer[i] = msg.at(i);
 
   aodvArray[1]->sendPacket(buffer, msg.length(), aodvArray[3]->getIp());// aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
+
+  Simulator::Schedule(Seconds(2.0), &testAodv);
 }
 
 int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
@@ -69,6 +85,7 @@ int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
   if (dest == getIpFromString(BROADCAST))
   {
     cout << "Broadcast." << endl;
+    // set destination to this node and broadcast
     Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
     Ipv4Address destAddr;// = destIpv4->GetAddress (1, 0).GetLocal();  
     destAddr.Set(getIpFromString(BROADCAST));
@@ -88,9 +105,28 @@ int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
     cout << "Broadcasting packet." << endl;
     socket->Send(packet);
   }
-  else
+  else if (dest != 0)
   {
-      cout << "Not sending packet." << endl;
+    cout << "Creating point to point socket." << endl;
+    cout << ipString << endl;
+    index = int(ipString.at(ipString.length()-1)-'1');
+    // set destination to this node and broadcast
+    Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
+    Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
+
+    Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
+    InetSocketAddress remote = InetSocketAddress(destAddr, 654);
+    socket->SetAllowBroadcast(false);
+    socket->Connect(remote);  // Test sending from node 1 to node 3
+    Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
+    Ipv4Header header;
+    // fill header
+    header.SetSource(sourceNode->GetObject<Ipv4>()->GetAddress(1,0).GetLocal());
+    NS_LOG_UNCOND("Source header before: ");
+    NS_LOG_UNCOND(header.GetSource());
+    packet->AddHeader(header);
+
+    socket->Send(packet);
   }
   
 /*  else 
