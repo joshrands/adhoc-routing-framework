@@ -25,10 +25,10 @@
 
 #define minSpeed_mpers    2
 #define maxSpeed_mpers    4
-#define xSize_m           300
-#define ySize_m           300
+#define xSize_m           400
+#define ySize_m           400
 
-#define NUM_NODES         9
+#define NUM_NODES         6
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
@@ -67,7 +67,7 @@ void testAodv()
     buffer[i] = msg.at(i);
 
 //  aodvArray[6]->sendPacket(buffer, msg.length(), aodvArray[8]->getIp());
-  aodvArray[8]->sendPacket(buffer, msg.length(), aodvArray[6]->getIp());
+  aodvArray[0]->sendPacket(buffer, msg.length(), aodvArray[NUM_NODES-1]->getIp());
 
   Simulator::Schedule(Seconds(2.0), &testAodv);
 }

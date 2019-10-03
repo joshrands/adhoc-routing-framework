@@ -92,6 +92,8 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 	IP_ADDR nextHop = this->getTable()->getNextHop(finalDestination);
 	if (0 == nextHop)
 	{
+		if (AODV_DEBUG)
+			cout << "No existing route, creating RREQ message." << endl;
 		// start a thread for an rreq and wait for a response 
 		rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
 
@@ -99,6 +101,9 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 		// TODO: Put this packet in a buffer/queue to be sent when the rrep is received 
 		return;
 	}
+
+	if (AODV_DEBUG)
+		cout << "Route exists. Routing from " << getStringFromIp(getIp()) << " to " << getStringFromIp(finalDestination) << endl;
 	// TODO: Check if there was a broken link and generate rerr 
 	
 	// add aodv header to buffer 

@@ -7,7 +7,7 @@
 
 #define AODV_DEBUG		    1
 #define AODV_PRINT_PACKET   1
-#define AODV_LOG_OUTPUT	    1
+#define AODV_LOG_OUTPUT	    0
 
 #define RREQ_DEBUG		    1
 #define RREP_DEBUG		    1
