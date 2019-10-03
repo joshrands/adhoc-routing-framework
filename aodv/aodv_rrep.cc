@@ -19,6 +19,9 @@ RREPHelper::RREPHelper(IP_ADDR ip, AODVRoutingTable* table, uint32_t* seqNum)
 
 rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
 {
+    // update the routing table from the original rreq message
+    this->m_pTable->updateAODVRoutingTableFromRREQ(&(rreq), source);
+
 	rrepPacket rrep;    
 
     // populate fields of rrep
@@ -48,9 +51,6 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
 
     rrep.origIP = rreq.origIP;
     rrep.lifetime = MY_ROUTE_TIMEOUT_MS;
-
-    // update the routing table from the original rreq message
-    this->m_pTable->updateAODVRoutingTableFromRREQ(&(rreq), source);
 
     return rrep;
 }

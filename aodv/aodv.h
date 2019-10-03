@@ -56,7 +56,7 @@ public:
 	void logRoutingTable();
 
 	// cast table to AODVRoutingTable
-	AODVRoutingTable* getTable() { return (AODVRoutingTable*)(this->table);}
+	AODVRoutingTable* getTable() { return m_aodvTable; } 
 
 //	std::function<int(char* buffer, int length, IP_ADDR dest, int port)> socketSendPacket;
 	virtual int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
@@ -68,6 +68,8 @@ protected:
 	uint32_t rreqID;
 	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
 	std::vector<IP_ADDR> m_neighbors;
+	// aodv routing table
+	AODVRoutingTable* m_aodvTable;
 };
 
 /* AODVTest class

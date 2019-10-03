@@ -51,7 +51,7 @@ public:
 	IP_ADDR getNextHop(const IP_ADDR dest);
 
 	// adds an element to the table 
-	void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
+	virtual void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
 
 	// get the map 
 	map<IP_ADDR, TableInfo> getInternalTable() { return this->table; }

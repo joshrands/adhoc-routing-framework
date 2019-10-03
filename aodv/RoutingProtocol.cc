@@ -46,6 +46,14 @@ RoutingTable::RoutingTable()
 
 RoutingTable::~RoutingTable()
 {
+/*	map<IP_ADDR, TableInfo*>::iterator it;
+
+	for ( it = this->table.begin(); it != this->table.end(); it++ )
+	{
+		cout << "Found allocated memory" << endl;
+		delete (it->second);
+	}
+*/
 	this->table.empty();
 }
 
@@ -79,7 +87,8 @@ void RoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop)
 	else
 	{
 		// no entry, create new 
-		TableInfo info; 
+		cout << "Creating new entry" << endl;
+		TableInfo info;
 		info.dest = dest;
 		info.nextHop = nextHop;
 		info.ttl = DEFAULT_TTL;

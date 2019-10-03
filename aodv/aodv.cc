@@ -17,7 +17,7 @@ AODV::AODV(IP_ADDR ip)
 
 	this->ipAddress = ip;
 	this->sequenceNum = 0;
-	this->table = new AODVRoutingTable();
+	this->m_aodvTable = new AODVRoutingTable();
 
 	this->rreqHelper.setRoutingTable(this->getTable());
 	this->rreqHelper.setIp(ip);
@@ -34,7 +34,7 @@ AODV::AODV(IP_ADDR ip)
 
 AODV::~AODV()
 {
-	delete this->table;
+	delete this->m_aodvTable;
 }
 
 void AODV::receivePacket(char* packet, int length, IP_ADDR source)
@@ -275,17 +275,17 @@ void AODV::logRoutingTable()
 		logFile << "AODV Log for node " << this->getIp() << endl;
 
 	// check if there are any entries 
-	if (this->getTable()->getInternalTable().size() == 0)
+	if (this->getTable()->getInternalAODVTable().size() == 0)
 	{
 		logFile << "Routing table empty." << endl;
 		return;
 	}
 
-	map<IP_ADDR, TableInfo>::iterator it;
+	map<IP_ADDR, AODVInfo>::iterator it;
 
 	logFile << "DESTINATION IP : NEXT HOP" << endl;
 
-	for ( it = this->getTable()->getInternalTable().begin(); it != this->getTable()->getInternalTable().end(); it++ )
+	for ( it = this->getTable()->getInternalAODVTable().begin(); it != this->getTable()->getInternalAODVTable().end(); it++ )
 	{
 		logFile << getStringFromIp(it->first)
 				<< " : "

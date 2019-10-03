@@ -20,17 +20,32 @@ class AODVInfo : public TableInfo
 public:
 	uint32_t destSequenceNumber;
 	uint8_t hopCount;
+	uint32_t lastRREQId;
 };
 
-
-class AODVRoutingTable : public RoutingTable
+class AODVRoutingTable
 {
 public:
+	AODVRoutingTable();
+	~AODVRoutingTable();
+
+	const uint16_t DEFAULT_TTL = 1800; // 1800 seconds = 30 minutes 
+
 	void updateAODVRoutingTableFromRREQ(rreqPacket* receivedRREQ, IP_ADDR sourceIP);
 	void updateAODVRoutingTableFromRREP(rrepPacket* receivedRREP, IP_ADDR sourceIP);
 
+	IP_ADDR getNextHop(const IP_ADDR dest);
 	uint32_t getDestSequenceNumber(const IP_ADDR dest);
 	uint8_t getDestHopCount(const IP_ADDR dest);
+	uint32_t getLastRREQId(const IP_ADDR dest);
 	void setDestSequenceNumber(const IP_ADDR dest, uint32_t destSeqNum);
 	void setHopCount(const IP_ADDR dest, uint8_t hopCount);
+	void setLastRREQId(const IP_ADDR dest, uint32_t lastRREQId);
+
+	void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
+
+	map<IP_ADDR, AODVInfo> getInternalAODVTable() { return m_aodvTable; }
+
+private:
+	map<IP_ADDR, AODVInfo> m_aodvTable;
 };

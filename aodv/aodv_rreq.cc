@@ -44,12 +44,14 @@ bool RREQHelper::isDuplicateRREQ(rreqPacket receivedRREQ)
 	// if the origIP exists in the routing table AND the sequence number matches 
 	uint32_t packetSeqNum = receivedRREQ.origSeqNum;
 	uint32_t tableSeqNum = this->m_pTable->getDestSequenceNumber(receivedRREQ.origIP);
+	// or if the last rreq message id matched this one...
+	uint32_t tableLastId = this->m_pTable->getLastRREQId(receivedRREQ.origIP);
 
 	// special case that this rreq is originally from this node
 	if (receivedRREQ.origIP == this->m_ip)
 		return true;
 
-	if (packetSeqNum == tableSeqNum)
+	if (packetSeqNum == tableSeqNum || tableLastId == receivedRREQ.rreqID)
 		return true;
 	else
 		return false;

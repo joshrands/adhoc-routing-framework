@@ -111,6 +111,8 @@ void test_aodv_rreq_forwarding()
 	// create a rreq from node 0 to node 4
 	rreqPacket rreq = node0.rreqHelper.createRREQ(node4.getIp());
 
+	cout << "Created packet." << endl;
+
 	// rreq received by node1 from node0 
 	rreq = node1.rreqHelper.createForwardRREQ(rreq, node0.getIp());
 	// rreq received by node2 from node1
@@ -150,6 +152,8 @@ void test_aodv_rreq_buffer()
 	assert(receivedRREQ.origIP == rreq.origIP);
 
 	cout << "Test aodv rreq buffer complete." << endl;
+
+	delete buffer;
 }
 
 void test_aodv_rreq_to_rrep()
@@ -232,6 +236,8 @@ void test_aodv_loop_prevention()
 	node0.sendPacket(buffer, length, node4.getIp());
 
 	cout << "Test aodv loop prevention passed" << endl;
+
+	delete buffer;
 }
 
 void test_aodv_rreq()
