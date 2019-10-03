@@ -28,7 +28,7 @@
 #define xSize_m           300
 #define ySize_m           300
 
-#define NUM_NODES         5
+#define NUM_NODES         9
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
@@ -66,13 +66,15 @@ void testAodv()
   for (uint32_t i = 0; i < length; i++)
     buffer[i] = msg.at(i);
 
-  aodvArray[1]->sendPacket(buffer, msg.length(), aodvArray[3]->getIp());// aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
+//  aodvArray[6]->sendPacket(buffer, msg.length(), aodvArray[8]->getIp());
+  aodvArray[8]->sendPacket(buffer, msg.length(), aodvArray[6]->getIp());
 
   Simulator::Schedule(Seconds(2.0), &testAodv);
 }
 
 int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
 {
+  lock();
   cout << "Sending a packet from " << getStringFromIp(source) << " to " << getStringFromIp(dest) << endl;
 
   // TODO: do this right.
@@ -128,7 +130,7 @@ int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
 
     socket->Send(packet);
   }
-  
+  unlock(); 
 /*  else 
   {
     ipString = getStringFromIp(dest);

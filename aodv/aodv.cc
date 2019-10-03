@@ -97,10 +97,10 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 
 		broadcastRREQBuffer(rreq);
 		// TODO: Put this packet in a buffer/queue to be sent when the rrep is received 
+		return;
 	}
 	// TODO: Check if there was a broken link and generate rerr 
 	
-
 	// add aodv header to buffer 
 	char* buffer = (char*)(malloc(5 + length));
 	uint8_t zero = 0x00;
@@ -178,7 +178,7 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 	// 2. is this a duplicate rreq? 
 	if (rreqHelper.isDuplicateRREQ(rreq))
 	{
-		if (AODV_DEBUG)
+		if (RREQ_DEBUG)
 			cout << "Duplicate RREQ message received." << endl;
 
 		return;
