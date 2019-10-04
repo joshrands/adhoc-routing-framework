@@ -9,30 +9,27 @@
 
 CXX = g++
 LD = g++
+LIB = ar
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK
 LDFLAGS = -g -pthread
+LIBFLAGS = -cvq
 
 #
 # You should be able to add object files here without changing anything else
 #
 TARGET = test
-OBJ_FILES = ${TARGET}.o RoutingProtocol.o aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o send_packet.o aodv_sim.o 
+LIB_NAME = libaodv.a
+OBJ_LIB_FILES = RoutingProtocol.o aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o send_packet.o aodv_sim.o 
+
+OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
 INC_FILES = ${TARGET}.h RoutingProtocol.h aodv.h aodv_rreq.h aodv_rrep.h aodv_rerr.h aodv_routing_table.h send_packet.h aodv_sim.h
-
-#
-# Any libraries we might need.
-#
-LIBRARYS = -lboost_log_setup -lboost_log -lboost_thread -lboost_system -lpthread
-
 
 ${TARGET}: ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
+	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES}
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $<
 
-#
-# Please remember not to submit objects or binarys.
-#
 clean:
-	rm -f core ${TARGET} ${OBJ_FILES}
+	rm -f core ${TARGET} ${OBJ_FILES} ${LIB_NAME}
