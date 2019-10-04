@@ -36,7 +36,6 @@ HardwareAODV::~HardwareAODV(){
 }
 
 // Override functions
-// TODO: Look at broadcasting...
 int HardwareAODV::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port){
     if(port == AODV_PORT){
         aodvSocket->sendTo(buffer, length, dest, port);
@@ -49,6 +48,7 @@ int HardwareAODV::socketSendPacket(char *buffer, int length, IP_ADDR dest, int p
 void HardwareAODV::handleReceivedPackets(){
     Message message;
     while(aodvSocket->getMessage(message)){
+        printf("Received: %s", message);
         decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI());
     }
 }

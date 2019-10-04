@@ -9,12 +9,7 @@
 
 CXX = g++
 LD = g++
-<<<<<<< HEAD
-LIB = ar
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK
-=======
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK 
->>>>>>> 04221e5e53f5196cf2bf92ea1562bb05f0e0349b
 LDFLAGS = -g -pthread
 LIBFLAGS = -cvq
 
