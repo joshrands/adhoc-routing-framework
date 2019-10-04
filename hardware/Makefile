@@ -18,10 +18,11 @@ LDFLAGS = -g -pthread -I../socket/ -Wall
 # You should be able to add object files here without changing anything else
 #
 TARGET = test
-LIB_NAME = libhardware
+LIB_NAME = libhardware.a
 OBJ_LIB_FILES = hardware_aodv.o 
+STATIC_LIBRARIES = ../aodv/libaodv.a ../socket/libsocket.a
 
-OBJ_FILES = ${TARGET}.o #endpoint.o socket.o udp_socket.o 
+OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} #endpoint.o socket.o udp_socket.o 
 INC_FILES = hardware_aodv.h #endpoint.h safe_queue.h socket.h udp_socket.h message.h 
 
 #
@@ -30,7 +31,7 @@ INC_FILES = hardware_aodv.h #endpoint.h safe_queue.h socket.h udp_socket.h messa
 LIBRARYS = -lpthread
 
 ${TARGET} : ${OBJ_FILES}
-	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
+	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS} ${STATIC_LIBRARIES} 
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $<
