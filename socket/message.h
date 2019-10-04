@@ -6,65 +6,49 @@
 class Message{
 public:
     Message(){};
-    Message(Endpoint end, char* data, int length){
-        this->end = end;
-        this->data = data;
-        this->length = length;
-    }
+    Message(Endpoint end, char* data, int length);
 
     /*!
      * @brief Returns the IP address of the message sender
      * 
      * @return uint32_t 
      */
-    uint32_t getAddressI(void) const{
-        return end.getAddressI();
-    }
+    uint32_t getAddressI(void) const;
 
     /*!
      * @brief Returns the IP address of the message sender
      * 
      * @return char array
      */
-    char *getAddressC(void){
-        return end.getAddressC();
-    }
+    char *getAddressC(void);
 
     /*!
      * @brief Get the Length of the message
      * 
      * @return int 
      */
-    int getLength(void) const{
-        return length;
-    }
+    int getLength(void) const;
 
     /*!
      * @brief Get the Data of the message
      * 
      * @return char* 
      */
-    char* getData(void){
-        return data;
-    }
+    char* getData(void);
 
     /*!
      * @brief Get the Port object
      * 
      * @return int 
      */
-    int getPort(void){
-        return end.getPort();
-    }
+    int getPort(void);
 
     /*!
      * @brief Get the Endpoint object
      * 
      * @return Endpoint 
      */
-    Endpoint& getEndpoint(void){
-        return end;
-    }
+    Endpoint& getEndpoint(void);
 
 private:
     Endpoint end;
