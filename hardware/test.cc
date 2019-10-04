@@ -26,7 +26,7 @@ void test(bool condition, string message) {
 int main() {
   // Test initialization and ports
   {
-    HardwareAODV haodv('127.0.0.1');
+    HardwareAODV haodv(getIpFromString("127.0.0.1"));
   }
   printf("________________________________\n\n");
   // Test messages can be sent

@@ -28,7 +28,7 @@
 #define xSize_m           400
 #define ySize_m           400
 
-#define NUM_NODES         6
+#define NUM_NODES         9
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"

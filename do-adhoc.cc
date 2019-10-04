@@ -27,7 +27,7 @@ int main()
     getConfig(&cfg);
 
     // create an AODV object for this device 
-    AODV aodv(cfg.deviceIP);
+//    AODV aodv(cfg.deviceIP);
 
     // Create UDP socket
     UDPSocket *receiver = new UDPSocket();
@@ -56,7 +56,7 @@ int main()
             case 1: 
                 if (receiver->getMessage(message)) {
                     // pass packet to aodv 
-                    aodv.receivePacket(message.getData(), message.getLength(), message.getIPAddress());
+//                    aodv.receivePacket(message.getData(), message.getLength(), message.getIPAddress());
                 }
                 else 
                     cout << "No packets." << endl;
@@ -67,7 +67,7 @@ int main()
                 cin >> ip;
                 char* packet = "Hello world! From node 0";
             	int length = sizeof("Hello world! From node 0");
-                aodv.sendPacket(packet, length, getIpFromString(ip));
+//                aodv.sendPacket(packet, length, getIpFromString(ip));
 
                 cout << "Packet sent!" << endl;
                 break;
