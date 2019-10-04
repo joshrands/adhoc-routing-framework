@@ -34,6 +34,7 @@ LIBRARYS = -lpthread
 
 ${TARGET} : ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS} ${STATIC_LIBRARIES} 
+	rm test.o
 	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES} 
 
 %.o : %.cc ${INC_FILES}

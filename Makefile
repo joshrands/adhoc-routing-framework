@@ -3,7 +3,7 @@
 # SmallSat Routing Protocol 
 #
 #  Created by Phillip Romig on 4/3/12.
-#  Modified by Josh Rands on 9/2/19
+#  Modified by Josh Rands on 10/4/19
 #  Copyright 2012 Colorado School of Mines. All rights reserved.
 #
 
@@ -14,23 +14,26 @@ CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK
 LDFLAGS = -g -pthread
 LIBFLAGS = -cvq
 
-#
 # You should be able to add object files here without changing anything else
-#
-TARGET = test
-LIB_NAME = libaodv.a
-OBJ_LIB_FILES = RoutingProtocol.o aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o send_packet.o aodv_sim.o 
+TARGET = do-adhoc
+OBJ_LIB_FILES = hardware/hardware_aodv.o $(socket/*.o)
+STATIC_LIBRARIES = socket/libsocket.a aodv/libaodv.a hardware/libhardware.a 
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = ${TARGET}.h RoutingProtocol.h aodv.h aodv_rreq.h aodv_rrep.h aodv_rerr.h aodv_routing_table.h send_packet.h aodv_sim.h
+INC_FILES = 
+
+SUBDIRS = aodv hardware socket
 
 ${TARGET}: ${OBJ_FILES}
-	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
-	rm test.o
-	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES}
+	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${STATIC_LIBRARIES}
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $<
 
+all:
+	for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir; \
+	done
+
 clean:
-	rm -f core ${TARGET} ${OBJ_FILES} ${LIB_NAME}
+	rm -f core ${TARGET} ${OBJ_FILES}
