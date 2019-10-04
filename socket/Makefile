@@ -9,7 +9,7 @@
 
 CXX = g++
 LD = g++
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK
+CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK 
 LDFLAGS = -g -pthread
 
 #
