@@ -20,10 +20,11 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libhardware.a
-OBJ_LIB_FILES = hardware_aodv.o 
+OBJ_LIB_FILES = hardware_aodv.o ../socket/endpoint.o ../socket/socket.o ../socket/udp_socket.o ../socket/message.o 
+
 STATIC_LIBRARIES = ../aodv/libaodv.a ../socket/libsocket.a
 
-OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} #endpoint.o socket.o udp_socket.o 
+OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
 INC_FILES = hardware_aodv.h #endpoint.h safe_queue.h socket.h udp_socket.h message.h 
 
 #
@@ -33,7 +34,7 @@ LIBRARYS = -lpthread
 
 ${TARGET} : ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS} ${STATIC_LIBRARIES} 
-	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES} ${STATIC_LIBRARIES}
+	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES} 
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $<

@@ -12,9 +12,11 @@ make clean
 make
 rm test.o
 
+cd ../hardware
+make clean
+make
+rm test.o
+
 cd ../
 
-ar -cvq libaodv.a aodv/*.o
-ar -cvq libsocket.a socket/*.o
-
-g++ -o do-adhoc -std=c++11 -pthread do-adhoc.cc libaodv.a libsocket.a
+g++ -o do-adhoc -std=c++11 -pthread do-adhoc.cc aodv/libaodv.a socket/libsocket.a hardware/libhardware.a
