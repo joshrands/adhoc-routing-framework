@@ -31,7 +31,9 @@ public:
 	// try to send data to a destination - the next hop is determined from the routing table  
 	void sendPacket(char* packet, int length, IP_ADDR finalDestination);
 
-	static const int AODV_PORT = 654;
+	static const int AODV_PORT = 8060;
+	static const int DATA_PORT = 8080;
+
 	// decode a received packet buffer from UPD port 654
 	void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source);
 

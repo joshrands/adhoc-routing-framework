@@ -119,7 +119,7 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 	// reset packet 
 	buffer-=5;
 
-	socketSendPacket(buffer, length+5, nextHop, AODV_PORT);
+	socketSendPacket(buffer, length+5, nextHop, DATA_PORT);
 
 	delete buffer;
 }
