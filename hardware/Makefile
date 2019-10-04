@@ -13,6 +13,7 @@ LD = g++
 LIB = ar
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK -Wall
 LDFLAGS = -g -pthread -I../socket/ -Wall
+LIBFLAGS = -cvq 
 
 #
 # You should be able to add object files here without changing anything else
@@ -32,6 +33,7 @@ LIBRARYS = -lpthread
 
 ${TARGET} : ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS} ${STATIC_LIBRARIES} 
+	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES} ${STATIC_LIBRARIES}
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $<
@@ -40,4 +42,4 @@ ${TARGET} : ${OBJ_FILES}
 # Please remember not to submit objects or binarys.
 #
 clean:
-	rm -f core ${TARGET} ${OBJ_FILES}
+	rm -f core ${TARGET} ${OBJ_FILES} ${LIB_NAME}
