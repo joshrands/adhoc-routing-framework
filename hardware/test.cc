@@ -28,6 +28,7 @@ int main() {
   {
     HardwareAODV haodv(getIpFromString("127.0.0.1"));
   }
+
   printf("________________________________\n\n");
   // Test messages can be sent
   {

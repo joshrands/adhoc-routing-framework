@@ -26,8 +26,8 @@ HardwareAODV::HardwareAODV(){
     _hardwareAODV();
 }
 
-HardwareAODV::HardwareAODV(uint32_t ip){
-    setIp(ip);
+HardwareAODV::HardwareAODV(uint32_t ip) : AODV(ip) {
+//    setIp(ip);
     _hardwareAODV();
 }
 

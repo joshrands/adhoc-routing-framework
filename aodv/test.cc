@@ -11,6 +11,7 @@ void test_routing_table();
 void test_aodv();
 void test_aodv_rreq();
 void test_aodv_loop_prevention();
+void test_aodv_do_nothing();
 
 int main (int argc, char *argv[]) 
 {	
@@ -61,6 +62,7 @@ void test_aodv()
 {
 	test_aodv_rreq();
 	test_aodv_loop_prevention();
+	test_aodv_do_nothing();
 }
 
 void test_aodv_rreq_simple()
@@ -132,6 +134,11 @@ void test_aodv_rreq_forwarding()
 	assert(node3.getTable()->getNextHop(node0.getIp()) != node1.getIp());
 
 	cout << "Test aodv rreq forwarding complete." << endl;
+}
+
+void test_aodv_do_nothing()
+{
+	AODVTest aodv();
 }
 
 void test_aodv_rreq_buffer()
