@@ -18,19 +18,17 @@
   */
 
 // custom aodv implementation
-#include "ns3/aodv.h"
+#include "ns3/aodv_sim.h"
 
 #define TRANS_POWER       10
 #define RX_GAIN           10
 
 #define minSpeed_mpers    2
 #define maxSpeed_mpers    4
-#define xSize_m           300
-#define ySize_m           300
+#define xSize_m           400
+#define ySize_m           400
 
-#define NUM_NODES         5
-
-AODV* aodvArray[NUM_NODES];
+#define NUM_NODES         6
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
@@ -42,7 +40,121 @@ AODV* aodvArray[NUM_NODES];
 
 using namespace ns3;
 
-NS_LOG_COMPONENT_DEFINE ("AODVTest");
+NodeContainer c;
+AODVns3* aodvArray[NUM_NODES];
+
+bool mutex = false;
+
+void lock()
+{
+  while (mutex);
+
+  mutex = true;
+}
+
+void unlock()
+{
+  mutex = false;
+}
+
+void testAodv()
+{
+  // Test sending from node 1 to node 3
+  string msg = "Hello world";
+  uint32_t length = msg.length();
+  char* buffer = (char*)(malloc(length));
+  for (uint32_t i = 0; i < length; i++)
+    buffer[i] = msg.at(i);
+
+//  aodvArray[6]->sendPacket(buffer, msg.length(), aodvArray[8]->getIp());
+  aodvArray[0]->sendPacket(buffer, msg.length(), aodvArray[NUM_NODES-1]->getIp());
+
+  Simulator::Schedule(Seconds(2.0), &testAodv);
+}
+
+int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
+{
+  lock();
+  cout << "Sending a packet from " << getStringFromIp(source) << " to " << getStringFromIp(dest) << endl;
+
+  // TODO: do this right.
+  string ipString = getStringFromIp(source);
+  int index = int(ipString.at(ipString.length()-1)-'1');
+  Ptr<Node> sourceNode = c.Get(index);
+  ipString = getStringFromIp(dest);
+//  index = int(ipString.at(ipString.length()-1)-'1');
+
+  if (dest == getIpFromString(BROADCAST))
+  {
+    cout << "Broadcast." << endl;
+    // set destination to this node and broadcast
+    Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
+    Ipv4Address destAddr;// = destIpv4->GetAddress (1, 0).GetLocal();  
+    destAddr.Set(getIpFromString(BROADCAST));
+
+    Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
+    InetSocketAddress remote = InetSocketAddress(destAddr, 654);
+    socket->SetAllowBroadcast(true);
+    socket->Connect(remote);  // Test sending from node 1 to node 3
+    Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
+    Ipv4Header header;
+    // fill header
+    header.SetSource(sourceNode->GetObject<Ipv4>()->GetAddress(1,0).GetLocal());
+    NS_LOG_UNCOND("Source header before: ");
+    NS_LOG_UNCOND(header.GetSource());
+    packet->AddHeader(header);
+
+    cout << "Broadcasting packet." << endl;
+    socket->Send(packet);
+  }
+  else if (dest != 0)
+  {
+    cout << "Creating point to point socket." << endl;
+    cout << ipString << endl;
+    index = int(ipString.at(ipString.length()-1)-'1');
+    // set destination to this node and broadcast
+    Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
+    Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
+
+    Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
+    InetSocketAddress remote = InetSocketAddress(destAddr, 654);
+    socket->SetAllowBroadcast(false);
+    socket->Connect(remote);  // Test sending from node 1 to node 3
+    Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
+    Ipv4Header header;
+    // fill header
+    header.SetSource(sourceNode->GetObject<Ipv4>()->GetAddress(1,0).GetLocal());
+    NS_LOG_UNCOND("Source header before: ");
+    NS_LOG_UNCOND(header.GetSource());
+    packet->AddHeader(header);
+
+    socket->Send(packet);
+  }
+  unlock(); 
+/*  else 
+  {
+    ipString = getStringFromIp(dest);
+    index = int(ipString.at(ipString.length()-1)-'1');
+
+    Ptr<Ipv4> destIpv4 = c.Get(index)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
+    Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
+    Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
+    InetSocketAddress remote = InetSocketAddress(destAddr, 654);
+    socket->SetAllowBroadcast(false);
+    socket->Connect(remote);  // Test sending from node 1 to node 3
+    Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
+    Ipv4Header header;
+    header.SetSource(sourceNode->GetObject<Ipv4>()->GetAddress(1,0).GetLocal());
+    NS_LOG_UNCOND("Source header before: ");
+    NS_LOG_UNCOND(header.GetSource());
+    // fill header
+    packet->AddHeader(header);
+
+    socket->Send(packet);
+  }
+*/
+  return 0;
+}
 
 void ReceivePacket (Ptr<Socket> socket)
 {
@@ -50,8 +162,10 @@ void ReceivePacket (Ptr<Socket> socket)
   while (packet = socket->Recv ())
     {
       NS_LOG_UNCOND ("Received one packet! On Node " + to_string(socket->GetNode()->GetId()));
-      UdpHeader header;
+      Ipv4Header header;
       packet->RemoveHeader(header);
+      NS_LOG_UNCOND("Source:");
+      NS_LOG_UNCOND(header.GetSource());
 
       uint32_t length = packet->GetSize();
       uint8_t* packetBuffer = (uint8_t*)(malloc(length));
@@ -59,9 +173,12 @@ void ReceivePacket (Ptr<Socket> socket)
       packet->CopyData(packetBuffer, length);
 //      for (uint32_t i = 0; i < length; i++)
 //        cout << packetBuffer[i];
-
-      Ptr<Ipv4> ipv4 = socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
-      Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal ();  
+      
+      Ptr<Ipv4> ipv4 =  socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
+      NS_LOG_UNCOND("This node:");
+      NS_LOG_UNCOND(ipv4->GetAddress(1,0).GetLocal());
+      Ipv4Address addr = header.GetSource();// ipv4->GetAddress (1, 0).GetLocal ();  
+      
       // add aodv object 
       uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
       addr.Serialize(ipBuf);
@@ -77,6 +194,7 @@ void ReceivePacket (Ptr<Socket> socket)
 
       IP_ADDR source;
       memcpy(&(source),(ipBuf),4);
+//      cout << "SOURCE: " << getStringFromIp(source) << endl;
 
       aodvArray[socket->GetNode()->GetId()]->decodeReceivedPacketBuffer((char*)(packetBuffer), length, source);
     }
@@ -118,8 +236,8 @@ void SendHello(Ptr<Node> source, Ipv4Address dest)
     data[i+5] = msg.at(i);
 
   Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (data), msg.length()+5);
-  UdpHeader header;
-  // fill header
+  Ipv4Header header;
+//  headerIp.SetSource(socket->)
   packet->AddHeader(header);
 
   socket->Send(packet);
@@ -135,19 +253,6 @@ void GenerateTraffic (NodeContainer c, uint32_t pktSize,
     Simulator::Schedule(Seconds(i), &SendHello, c.Get(0), addr);
     NS_LOG_UNCOND("Node 0 to Node " + to_string(i));
   }
-/*
-  if (pktCount > 0)
-  {
-    Ptr<Socket> socket = Socket::CreateSocket (c.Get (rand()%c.GetN()), UdpSocketFactory::GetTypeId ());
-    InetSocketAddress remote = InetSocketAddress (Ipv4Address ("255.255.255.255"), 654);
-    socket->SetAllowBroadcast (true);
-    socket->Connect (remote);
-    socket->Send (Create<Packet> (pktSize));
-    socket->Close();
-    Simulator::Schedule (pktInterval, &GenerateTraffic,
-                         c, pktSize, pktCount - 1, pktInterval);
-  }
-*/
 }
 
 int main (int argc, char *argv[])
@@ -156,9 +261,6 @@ int main (int argc, char *argv[])
   double rss = -80;  // -dBm
   uint16_t numNodes = NUM_NODES;
 
-  uint32_t packetSize = 20; // bytes
-  uint32_t numPackets = 10;
-  bool verbose = false;
   double duration = 60.00;
 
   CommandLine cmd;
@@ -168,7 +270,6 @@ int main (int argc, char *argv[])
 //  cmd.AddValue ("packetSize", "size of application packet sent", packetSize);
 //  cmd.AddValue ("numPackets", "number of packets generated", numPackets);
 //  cmd.AddValue ("interval", "interval (seconds) between packets", interval);
-  cmd.AddValue ("verbose", "turn on all WifiNetDevice log components", verbose);
  
   cmd.Parse (argc, argv);
   // Convert to time object
@@ -182,15 +283,15 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::WifiRemoteStationManager::NonUnicastMode",
                       StringValue (phyMode));
 
-  NodeContainer c;
   c.Create (numNodes);
 
   // The below set of helpers will help us to put together the wifi NICs we want
   WifiHelper wifi;
-  if (verbose)
+/*  if (verbose)
     {
       wifi.EnableLogComponents ();  // Turn on all Wifi logging
     }
+*/
   wifi.SetStandard (WIFI_PHY_STANDARD_80211b);
 
   YansWifiPhyHelper wifiPhy =  YansWifiPhyHelper::Default ();
@@ -250,7 +351,6 @@ int main (int argc, char *argv[])
   internet.Install (c);
 
   Ipv4AddressHelper ipv4;
-  NS_LOG_INFO ("Assign IP Addresses.");
   ipv4.SetBase ("192.168.1.0", "255.255.255.0");
   ipv4.Assign (devices);
 
@@ -279,14 +379,17 @@ int main (int argc, char *argv[])
     IP_ADDR ip;
     memcpy(&(ip),(ipBuf),4);
 
-    aodvArray[i] = new AODV(ip);
+    aodvArray[i] = new AODVns3(ip);
+    aodvArray[i]->ns3SocketSendPacket = &SendPacket;
   }
 
   // Tracing
 //  wifiPhy.EnablePcap ("wifi-simple-adhoc", devices);
 
-  Simulator::Schedule (Seconds (1.0), &GenerateTraffic,
-                       c, packetSize, numPackets, Seconds(1));
+//  Simulator::Schedule (Seconds (1.0), &GenerateTraffic,
+//                       c, packetSize, numPackets, Seconds(1));
+
+  Simulator::Schedule(Seconds(1.0), &testAodv);// &(aodvArray[1]->socketSendPacket), buffer, msg.length() + 5, aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
 
   Simulator::Stop (Seconds (duration + 10.0));
   Simulator::Run ();

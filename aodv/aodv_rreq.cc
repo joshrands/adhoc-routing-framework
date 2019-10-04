@@ -25,6 +25,8 @@ bool RREQHelper::shouldGenerateRREP(rreqPacket receivedRREQ)
 	// 2. This node has an existing route to the final destination
 	if (receivedRREQ.destIP == this->m_ip)
 	{
+		if (RREQ_DEBUG)
+			cout << "RREQ reached final destination. Generating RREP..." << endl;
 		return true;
 	}
 	else if (this->m_pTable->getNextHop(receivedRREQ.destIP) != 0)
@@ -42,12 +44,14 @@ bool RREQHelper::isDuplicateRREQ(rreqPacket receivedRREQ)
 	// if the origIP exists in the routing table AND the sequence number matches 
 	uint32_t packetSeqNum = receivedRREQ.origSeqNum;
 	uint32_t tableSeqNum = this->m_pTable->getDestSequenceNumber(receivedRREQ.origIP);
+	// or if the last rreq message id matched this one...
+	uint32_t tableLastId = this->m_pTable->getLastRREQId(receivedRREQ.origIP);
 
 	// special case that this rreq is originally from this node
 	if (receivedRREQ.origIP == this->m_ip)
 		return true;
 
-	if (packetSeqNum == tableSeqNum)
+	if (packetSeqNum == tableSeqNum || tableLastId == receivedRREQ.rreqID)
 		return true;
 	else
 		return false;
@@ -56,6 +60,8 @@ bool RREQHelper::isDuplicateRREQ(rreqPacket receivedRREQ)
 rreqPacket RREQHelper::createRREQ(const IP_ADDR destIP, const uint32_t destSeqNum)
 {
 	// Section 6.3 rfc3561
+	if (RREQ_DEBUG)
+		cout << "Creating Route Request message from " << getStringFromIp(this->m_ip) << " to " << getStringFromIp(destIP) << endl;
 
 	// there is no current path to the destination, create a RREQ 
 	rreqPacket rreq; 

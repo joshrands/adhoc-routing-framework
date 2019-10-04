@@ -19,13 +19,16 @@ RREPHelper::RREPHelper(IP_ADDR ip, AODVRoutingTable* table, uint32_t* seqNum)
 
 rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
 {
+    // update the routing table from the original rreq message
+    this->m_pTable->updateAODVRoutingTableFromRREQ(&(rreq), source);
+
 	rrepPacket rrep;    
 
     // populate fields of rrep
     rrep.type = 0x02;
     rrep.destIP = rreq.destIP;
     // is this node the destination? 
-    if (rreq.destIP == this->m_ip)
+    if (rrep.destIP == this->m_ip)
     {
         // yes, copy this sequence number in
         // increment this node sequence number if equal to orig sequence number 
@@ -48,9 +51,6 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
 
     rrep.origIP = rreq.origIP;
     rrep.lifetime = MY_ROUTE_TIMEOUT_MS;
-
-    // update the routing table from the original rreq message
-    this->m_pTable->updateAODVRoutingTableFromRREQ(&(rreq), source);
 
     return rrep;
 }

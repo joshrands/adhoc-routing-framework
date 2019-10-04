@@ -9,7 +9,7 @@
 
 #include "aodv.h"
 
-class AODVns3 : AODV
+class AODVns3 : public AODV
 {
 public:
     // constructors 
@@ -17,7 +17,5 @@ public:
     AODVns3(IP_ADDR ip);
 
     int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
-    int ns3SocketSendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source);
-//	std::function<int(char* buffer, int length, IP_ADDR dest, int port)> socketSendPacket;
-
+    function<int(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)> ns3SocketSendPacket;
 };
