@@ -16,8 +16,8 @@ LIBFLAGS = -cvq
 
 # You should be able to add object files here without changing anything else
 TARGET = do-adhoc
-OBJ_LIB_FILES = hardware/hardware_aodv.o $(socket/*.o)
-STATIC_LIBRARIES = socket/libsocket.a aodv/libaodv.a hardware/libhardware.a 
+OBJ_LIB_FILES = hardware/hardware_aodv.o #$(socket/*.o)
+STATIC_LIBRARIES = hardware/libhardware.a 
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
 INC_FILES = 
@@ -33,6 +33,13 @@ ${TARGET}: ${OBJ_FILES}
 all:
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir; \
+	done
+
+clean-all: 
+	for dir in $(SUBDIRS); do \
+		cd $$dir; \
+		rm *.o; \
+		cd ../; \
 	done
 
 clean:

@@ -18,7 +18,9 @@ void getConfig(config* config);
 int main(){
     // This might be a double negative right now...
     HardwareAODV haodv(inet_addr("138.67.194.210"));
+    HardwareAODV haodv2("138.67.194.210");
 
+    cout << getStringFromIp(haodv2.getIp()) << endl;
     cout << getStringFromIp(haodv.getIp()) << endl;
     cout << haodv.getIp() << " : " << inet_addr("138.67.194.210") << endl;
 
