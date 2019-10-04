@@ -100,7 +100,9 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 	else 
 	{
 		// send the packet to final destination - will check routing table
-		sendPacket(packet, length, finalDestination);
+		// strip header and send packet
+		packet += 5;
+		sendPacket(packet, length - 5, finalDestination);
 	}
 
 	if (AODV_LOG_OUTPUT)
