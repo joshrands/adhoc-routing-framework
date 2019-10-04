@@ -7,6 +7,7 @@ void HardwareAODV::_hardwareAODV(){
         fprintf(stderr, "Could not bind the aodv socket to port:%d\n", AODV_PORT);
         exit(-1);
     }
+    aodvSocket->setBroadcasting();
     thread aodving(&UDPSocket::receiveFromPortThread, aodvSocket);
     aodving.detach();
 
@@ -15,6 +16,7 @@ void HardwareAODV::_hardwareAODV(){
         fprintf(stderr, "Could not bind the data socket to port:%d\n", DATA_PORT);
         exit(-1);
     }
+    dataSocket->setBroadcasting();
     thread dataing(&UDPSocket::receiveFromPortThread, dataSocket);
     dataing.detach();
 }
