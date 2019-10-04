@@ -37,6 +37,7 @@ void test_test()
 
 void test_inet_addr()
 {
+	// go from string to number 
 	struct sockaddr_in sa;
 	char str[INET_ADDRSTRLEN];
 
