@@ -10,8 +10,8 @@
 
 CXX = g++
 LD = g++
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK
-LDFLAGS = -g -pthread
+CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK -Wall
+LDFLAGS = -g -pthread -I../socket/ -Wall
 
 #
 # You should be able to add object files here without changing anything else
