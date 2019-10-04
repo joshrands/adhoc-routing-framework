@@ -93,7 +93,7 @@ int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
     destAddr.Set(getIpFromString(BROADCAST));
 
     Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
-    InetSocketAddress remote = InetSocketAddress(destAddr, 654);
+    InetSocketAddress remote = InetSocketAddress(destAddr, AODVns3::AODV_PORT);
     socket->SetAllowBroadcast(true);
     socket->Connect(remote);  // Test sending from node 1 to node 3
     Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
@@ -117,7 +117,7 @@ int SendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
     Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
 
     Ptr<Socket> socket = Socket::CreateSocket(sourceNode, UdpSocketFactory::GetTypeId());
-    InetSocketAddress remote = InetSocketAddress(destAddr, 654);
+    InetSocketAddress remote = InetSocketAddress(destAddr, AODVns3::AODV_PORT);
     socket->SetAllowBroadcast(false);
     socket->Connect(remote);  // Test sending from node 1 to node 3
     Ptr<Packet> packet = Create<Packet>(reinterpret_cast<const uint8_t*> (buffer), length); 
@@ -356,7 +356,7 @@ int main (int argc, char *argv[])
 
   for(int i = 0; i < numNodes; i++){
     Ptr<Socket> recvSink = Socket::CreateSocket (c.Get (i), UdpSocketFactory::GetTypeId ());
-    InetSocketAddress local = InetSocketAddress (Ipv4Address::GetAny (), 654);
+    InetSocketAddress local = InetSocketAddress (Ipv4Address::GetAny (), AODVns3::AODV_PORT);
     recvSink->Bind (local);
     recvSink->SetRecvCallback (MakeCallback (&ReceivePacket));
 //    c.Get(i)->SetAttribute("id", IntegerValue(i));
