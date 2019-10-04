@@ -30,8 +30,8 @@ HardwareAODV::HardwareAODV(uint32_t ip) : AODV(ip) {
 }
 
 // Destructors
-//HardwareAODV::~HardwareAODV(){
-//}
+HardwareAODV::~HardwareAODV(){
+}
 
 // Override functions
 // TODO: Look at broadcasting...

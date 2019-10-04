@@ -35,7 +35,7 @@ public:
     HardwareAODV(uint32_t ip);
 
     // Destructors
-//    ~HardwareAODV();
+    ~HardwareAODV();
 
     // Override functions
     int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) override;
