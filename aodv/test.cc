@@ -58,6 +58,12 @@ void test_inet_addr()
 
 	cout << ipString1 << " : " << ipString2 << endl;
 	assert(ipString1 == ipString2);
+
+	assert(inet_addr("192.168.1.4") == getIpFromString("192.168.1.4"));
+
+	AODVTest aodv("192.168.1.4");
+	assert(inet_addr("192.168.1.4") == aodv.getIp());
+	cout << getStringFromIp(aodv.getIp()) << endl;
 }
 
 void test_routing_table()

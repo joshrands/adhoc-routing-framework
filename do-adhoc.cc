@@ -16,7 +16,12 @@ struct config
 void getConfig(config* config);
 
 int main(){
+    // This might be a double negative right now...
     HardwareAODV haodv(inet_addr("138.67.194.210"));
+
+    cout << getStringFromIp(haodv.getIp()) << endl;
+    cout << haodv.getIp() << " : " << inet_addr("138.67.194.210") << endl;
+
     char* message = "Hello world\0";
     int length = sizeof(message);
     uint32_t dest = inet_addr("138.67.78.144");

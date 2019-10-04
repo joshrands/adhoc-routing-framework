@@ -23,6 +23,7 @@ class AODV : public RoutingProtocol
 public:
 	// default constructor 
 	AODV();
+	AODV(const char* ip);
 	AODV(IP_ADDR ip);
 	~AODV();
 
@@ -84,6 +85,7 @@ public:
 	static IP_ADDR lastNode; 
 
 	AODVTest(IP_ADDR ip) : AODV(ip) {}
+	AODVTest(const char* ip) : AODV(ip) {}
 	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);// { return sendBuffer(buffer, length, dest, port); }
 
 	// add/remove node to neighbor list

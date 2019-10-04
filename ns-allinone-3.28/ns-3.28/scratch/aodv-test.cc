@@ -183,15 +183,6 @@ void ReceivePacket (Ptr<Socket> socket)
       uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
       addr.Serialize(ipBuf);
 
-      // TODO: Do this the right way
-      uint8_t temp;
-      temp = *ipBuf;
-      ipBuf[0] = ipBuf[3];
-      ipBuf[3] = temp;
-      temp = ipBuf[1];
-      ipBuf[1] = ipBuf[2];
-      ipBuf[2] = temp;
-
       IP_ADDR source;
       memcpy(&(source),(ipBuf),4);
 //      cout << "SOURCE: " << getStringFromIp(source) << endl;
@@ -214,14 +205,6 @@ void SendHello(Ptr<Node> source, Ipv4Address dest)
    // add aodv object 
   uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
   dest.Serialize(ipBuf);
-
-  // TODO: Do this the right way
-  temp = *ipBuf;
-  ipBuf[0] = ipBuf[3];
-  ipBuf[3] = temp;
-  temp = ipBuf[1];
-  ipBuf[1] = ipBuf[2];
-  ipBuf[2] = temp;
 
   IP_ADDR destIp;
   memcpy(&(destIp),(ipBuf),4);
@@ -366,15 +349,6 @@ int main (int argc, char *argv[])
     // add aodv object 
     uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
     addr.Serialize(ipBuf);
-
-    // TODO: Do this the right way
-    uint8_t temp;
-    temp = *ipBuf;
-    ipBuf[0] = ipBuf[3];
-    ipBuf[3] = temp;
-    temp = ipBuf[1];
-    ipBuf[1] = ipBuf[2];
-    ipBuf[2] = temp;
 
     IP_ADDR ip;
     memcpy(&(ip),(ipBuf),4);
