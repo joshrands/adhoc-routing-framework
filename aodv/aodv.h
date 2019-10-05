@@ -23,6 +23,7 @@ class AODV : public RoutingProtocol
 public:
 	// default constructor 
 	AODV();
+	AODV(const char* ip);
 	AODV(IP_ADDR ip);
 	~AODV();
 
@@ -31,7 +32,9 @@ public:
 	// try to send data to a destination - the next hop is determined from the routing table  
 	void sendPacket(char* packet, int length, IP_ADDR finalDestination);
 
-	static const int AODV_PORT = 654;
+	static const int AODV_PORT = 8060;
+	static const int DATA_PORT = 8080;
+
 	// decode a received packet buffer from UPD port 654
 	void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source);
 
@@ -82,6 +85,7 @@ public:
 	static IP_ADDR lastNode; 
 
 	AODVTest(IP_ADDR ip) : AODV(ip) {}
+	AODVTest(const char* ip) : AODV(ip) {}
 	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);// { return sendBuffer(buffer, length, dest, port); }
 
 	// add/remove node to neighbor list

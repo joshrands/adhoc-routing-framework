@@ -8,32 +8,22 @@ using namespace std;
 
 IP_ADDR getIpFromString(string ipStr)
 {
-	IP_ADDR ip = 0;
+	IP_ADDR ip;
 
-  istringstream iss(ipStr);
-  string num;
+	struct sockaddr_in sa;
+	inet_pton(AF_INET, ipStr.c_str(), &(sa.sin_addr));
 
-  int pow = 24;
-  while (getline(iss, num, '.'))
-  {
-    // increment ip  
-    ip += (stoi(num) << pow);
-    pow -= 8;
-  }
- 
-  //cout << ipStr << " = " << ip << endl;
-   
-  return ip;
+	ip = sa.sin_addr.s_addr;
+
+	return ip;
 }
 
 string getStringFromIp(IP_ADDR ip)
 {
-	string ipString = "";
+	char str[INET_ADDRSTRLEN];
+	inet_ntop(AF_INET, &(ip), str, INET_ADDRSTRLEN);
 
-	ipString += to_string((uint8_t)(ip>>24)) + ".";
-	ipString += to_string((uint8_t)(ip>>16)) + ".";
-	ipString += to_string((uint8_t)(ip>>8)) + ".";
-	ipString += to_string((uint8_t)ip);
+	string ipString(str);
 
 	return ipString;
 }

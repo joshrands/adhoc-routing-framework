@@ -31,6 +31,10 @@ HardwareAODV::HardwareAODV(uint32_t ip) : AODV(ip) {
     _hardwareAODV();
 }
 
+HardwareAODV::HardwareAODV(const char* ip) : AODV(ip) {
+    _hardwareAODV();
+}
+
 // Destructors
 HardwareAODV::~HardwareAODV(){
 }
@@ -38,9 +42,9 @@ HardwareAODV::~HardwareAODV(){
 // Override functions
 int HardwareAODV::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port){
     if(port == AODV_PORT){
-        aodvSocket->sendTo(buffer, length, dest, port);
+        return aodvSocket->sendTo(buffer, length, dest, port);
     }else{
-        dataSocket->sendTo(buffer, length, dest, port);
+        return dataSocket->sendTo(buffer, length, dest, port);
     }
 }
 
@@ -48,7 +52,7 @@ int HardwareAODV::socketSendPacket(char *buffer, int length, IP_ADDR dest, int p
 void HardwareAODV::handleReceivedPackets(){
     Message message;
     while(aodvSocket->getMessage(message)){
-        printf("Received: %s", message);
+        printf("Received: %s", message.getData());
         decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI());
     }
 }

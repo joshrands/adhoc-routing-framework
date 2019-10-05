@@ -10,6 +10,28 @@ AODV::AODV()
 		cout << "Warning: Must update aodv ip address.";
 }
 
+AODV::AODV(const char* ip)
+{
+	if (AODV_DEBUG)
+		cout << "Created new aodv routing protocol." << endl;
+
+	this->ipAddress = getIpFromString(ip);
+	this->sequenceNum = 0;
+	this->m_aodvTable = new AODVRoutingTable();
+
+	this->rreqHelper.setRoutingTable(this->getTable());
+	this->rreqHelper.setIp(getIp());
+	this->rreqHelper.setSequenceNumPointer(&(this->sequenceNum));
+
+	this->rrepHelper.setIp(getIp());
+	this->rrepHelper.setRoutingTable(this->getTable());
+	this->rrepHelper.setSequenceNum(&(this->sequenceNum));
+
+	this->rerrHelper.setIp(getIp());
+	this->rerrHelper.setRoutingTable(this->getTable());
+	this->rerrHelper.setSequenceNum(&(this->sequenceNum));
+}
+
 AODV::AODV(IP_ADDR ip)
 {
 	if (AODV_DEBUG)
@@ -78,7 +100,9 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 	else 
 	{
 		// send the packet to final destination - will check routing table
-		sendPacket(packet, length, finalDestination);
+		// strip header and send packet
+		packet += 5;
+		sendPacket(packet, length - 5, finalDestination);
 	}
 
 	if (AODV_LOG_OUTPUT)
@@ -119,7 +143,7 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 	// reset packet 
 	buffer-=5;
 
-	socketSendPacket(buffer, length+5, nextHop, AODV_PORT);
+	socketSendPacket(buffer, length+5, nextHop, DATA_PORT);
 
 	delete buffer;
 }

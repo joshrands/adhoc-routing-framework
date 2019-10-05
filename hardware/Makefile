@@ -12,17 +12,19 @@ CXX = g++
 LD = g++
 LIB = ar
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK -Wall
-LDFLAGS = -g -pthread -I../socket/ -Wall
+LDFLAGS = -g -pthread -I../socket/ -I../aodv/ -Wall
+LIBFLAGS = -cvq 
 
 #
 # You should be able to add object files here without changing anything else
 #
 TARGET = test
 LIB_NAME = libhardware.a
-OBJ_LIB_FILES = hardware_aodv.o 
-STATIC_LIBRARIES = ../aodv/libaodv.a ../socket/libsocket.a
+OBJ_LIB_FILES = hardware_aodv.o ../aodv/*.o ../socket/*.o #../socket/udp_socket.o ../socket/endpoint.o $(../socket/*.o) $(../aodv/*.o)
 
-OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} #endpoint.o socket.o udp_socket.o 
+STATIC_LIBRARIES = ../socket/libsocket.a ../aodv/libaodv.a
+
+OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
 INC_FILES = hardware_aodv.h #endpoint.h safe_queue.h socket.h udp_socket.h message.h 
 
 #
@@ -31,13 +33,15 @@ INC_FILES = hardware_aodv.h #endpoint.h safe_queue.h socket.h udp_socket.h messa
 LIBRARYS = -lpthread
 
 ${TARGET} : ${OBJ_FILES}
-	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS} ${STATIC_LIBRARIES} 
+	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS} 
+	rm test.o
+	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES} 
 
 %.o : %.cc ${INC_FILES}
-	${CXX} -c ${CXXFLAGS} -o $@ $<
+	${CXX} -c ${CXXFLAGS} -o $@ $< 
 
 #
 # Please remember not to submit objects or binarys.
 #
 clean:
-	rm -f core ${TARGET} ${OBJ_FILES}
+	rm -f core ${TARGET} ${OBJ_FILES} ${LIB_NAME}

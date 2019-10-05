@@ -7,6 +7,7 @@
 // Very cheap testing framework
 
 void test_test();
+void test_inet_addr();
 void test_routing_table();
 void test_aodv();
 void test_aodv_rreq();
@@ -18,6 +19,7 @@ int main (int argc, char *argv[])
 	cout << "Running tests..." << endl;	
 
 	test_test();
+	test_inet_addr();
 	test_routing_table();
 	test_aodv();
 
@@ -31,6 +33,37 @@ void test_test()
 	// this test tests tests
 	assert(true == true);
 	cout << "Test test complete." << endl;
+}
+
+void test_inet_addr()
+{
+	// go from string to number 
+	struct sockaddr_in sa;
+	char str[INET_ADDRSTRLEN];
+
+	inet_pton(AF_INET, "192.168.1.4", &(sa.sin_addr));
+
+	cout << sa.sin_addr.s_addr << endl;
+
+	IP_ADDR ip = getIpFromString("192.168.1.4");
+	cout << ip << endl;
+
+	assert(sa.sin_addr.s_addr == ip);
+
+	// go from number to string
+	inet_ntop(AF_INET, &(sa.sin_addr), str, INET_ADDRSTRLEN);
+
+	string ipString1(str);
+	string ipString2 = getStringFromIp(ip);
+
+	cout << ipString1 << " : " << ipString2 << endl;
+	assert(ipString1 == ipString2);
+
+	assert(inet_addr("192.168.1.4") == getIpFromString("192.168.1.4"));
+
+	AODVTest aodv("192.168.1.4");
+	assert(inet_addr("192.168.1.4") == aodv.getIp());
+	cout << getStringFromIp(aodv.getIp()) << endl;
 }
 
 void test_routing_table()
