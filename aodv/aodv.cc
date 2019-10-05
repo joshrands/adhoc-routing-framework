@@ -220,6 +220,7 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		// TODO: Implement this 
 		if (RREP_DEBUG)
 			cout << "Generating RREP message..." << endl;
+
 		rrepPacket rrep = rrepHelper.createRREPFromRREQ(rreq,source);
 
 		// convert packet to buffer and send 
@@ -312,13 +313,15 @@ void AODV::logRoutingTable()
 
 	map<IP_ADDR, AODVInfo>::iterator it;
 
-	logFile << "DESTINATION IP : NEXT HOP" << endl;
+	logFile << "DESTINATION IP : NEXT HOP : TOTAL HOPS" << endl;
 
 	for ( it = this->getTable()->getInternalAODVTable().begin(); it != this->getTable()->getInternalAODVTable().end(); it++ )
 	{
 		logFile << getStringFromIp(it->first)
 				<< " : "
 				<< getStringFromIp(it->second.nextHop)
+				<< " : "
+				<< to_string(it->second.hopCount)
 				<< endl;
 	}
 

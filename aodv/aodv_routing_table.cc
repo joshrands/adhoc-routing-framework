@@ -115,7 +115,11 @@ void AODVRoutingTable::setLastRREQId(const IP_ADDR dest, uint32_t lastRREQId)
 
 void AODVRoutingTable::updateAODVRoutingTableFromRREQ(rreqPacket* receivedRREQ, IP_ADDR sourceIP)
 {
-	if (receivedRREQ->origSeqNum > getDestSequenceNumber(receivedRREQ->origIP))
+	if (TABLE_DEBUG)
+		cout << "Updating routing table from RREQ packet" << endl;
+
+	if (  receivedRREQ->origSeqNum > getDestSequenceNumber(receivedRREQ->origIP)
+	   || getCostOfDest(receivedRREQ->origIP) > getCostOfRREQ(*receivedRREQ))
 	{
 		this->updateTableEntry(receivedRREQ->origIP, sourceIP);
 
@@ -127,7 +131,11 @@ void AODVRoutingTable::updateAODVRoutingTableFromRREQ(rreqPacket* receivedRREQ, 
 
 void AODVRoutingTable::updateAODVRoutingTableFromRREP(rrepPacket* receivedRREP, IP_ADDR sourceIP)
 {
-	if (receivedRREP->destSeqNum > getDestSequenceNumber(receivedRREP->destIP))
+	if (TABLE_DEBUG)
+		cout << "Updating routing table from RREP packet" << endl;
+
+	if (  receivedRREP->destSeqNum > getDestSequenceNumber(receivedRREP->destIP)
+	   || getCostOfDest(receivedRREP->destIP) > getCostOfRREP(*receivedRREP))
 	{
 		this->updateTableEntry(receivedRREP->destIP, sourceIP);
 
@@ -140,15 +148,18 @@ void AODVRoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHo
 {
 	// check if this entry exists 
 	if (this->m_aodvTable.count(dest))
-	{
+	{	
 		// entry exists, update existing 
+		if (TABLE_DEBUG)
+			cout << "Updating existing AODV entry" << endl;
 		this->m_aodvTable[dest].nextHop = nextHop;
 		this->m_aodvTable[dest].ttl = DEFAULT_TTL;
 	}
 	else
 	{
 		// no entry, create new 
-		cout << "Creating new AODV entry" << endl;
+		if (TABLE_DEBUG)
+			cout << "Creating new AODV entry" << endl;
 		AODVInfo info;
 		info.dest = dest;
 		info.nextHop = nextHop;
@@ -156,4 +167,22 @@ void AODVRoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHo
 	
 		this->m_aodvTable[dest] = info;
 	}
+}
+
+int AODVRoutingTable::getCostOfDest(const IP_ADDR dest)
+{
+	// currently using hopcount...
+	return getDestHopCount(dest);
+}
+
+int AODVRoutingTable::getCostOfRREQ(const rreqPacket rreq)
+{
+	// currently using hopcount...
+	return rreq.hopCount;
+}
+
+int AODVRoutingTable::getCostOfRREP(const rrepPacket rrep)
+{
+	// currently using hopcount...
+	return rrep.hopCount;
 }
