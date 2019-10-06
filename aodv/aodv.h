@@ -83,6 +83,7 @@ public:
 	// debugging values 
 	static int globalPacketCount;
 	static IP_ADDR lastNode; 
+	static IP_ADDR lastReceive;
 
 	AODVTest(IP_ADDR ip) : AODV(ip) {}
 	AODVTest(const char* ip) : AODV(ip) {}

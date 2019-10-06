@@ -161,6 +161,8 @@ void AODV::broadcastRREQBuffer(rreqPacket rreq)
 
 void AODV::decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source)
 {
+//	cout << "Node " << getStringFromIp(getIp()) << " received a packet. " << endl;
+
 	if (length <= 0)
 	{
 		cout << "ERROR DECODING PACKET. Length = 0." << endl;
@@ -332,6 +334,7 @@ void AODV::logRoutingTable()
 
 int AODVTest::globalPacketCount = 0;
 IP_ADDR AODVTest::lastNode = 0; 
+IP_ADDR AODVTest::lastReceive = 0;
 
 int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port)
 {
@@ -340,9 +343,11 @@ int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port)
 		if (dest == m_neighbors.at(i)->getIp() || dest == getIpFromString(BROADCAST))
 		{
 			// send packet to this node
-			m_neighbors.at(i)->decodeReceivedPacketBuffer(buffer, length, getIp());
+			AODVTest::lastReceive = m_neighbors.at(i)->getIp();
 			AODVTest::lastNode = getIp();
 			AODVTest::globalPacketCount++;
+
+			m_neighbors.at(i)->decodeReceivedPacketBuffer(buffer, length, getIp());
 		}
 	}
 
