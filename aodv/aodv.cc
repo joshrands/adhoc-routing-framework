@@ -101,6 +101,7 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 	{
 		// send the packet to final destination - will check routing table
 		// strip header and send packet
+		// TODO: Most important time to check link state. 
 		packet += 5;
 		sendPacket(packet, length - 5, finalDestination);
 	}
@@ -143,11 +144,7 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 	// reset packet 
 	buffer-=5;
 
-	// send packet if link exists
-	if (linkExists(nextHop))
-		socketSendPacket(buffer, length+5, nextHop, DATA_PORT);
-	else 
-		attemptLocalRepair(nextHop, finalDestination);
+	socketSendPacket(buffer, length+5, nextHop, DATA_PORT);
 
 	delete buffer;
 }
@@ -241,7 +238,7 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		if (linkExists(nextHopIp))
 			socketSendPacket(buffer, sizeof(rrep), nextHopIp, AODV_PORT);
 		else 
-			attemptLocalRepair(nextHopIp, rrep.origIP);
+			repairLink(nextHopIp, rrep.origIP, buffer, sizeof(rrep), nextHopIp, AODV_PORT);
 
 		delete buffer;
 
@@ -293,7 +290,7 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 		if (linkExists(nextHopIp))
 			socketSendPacket(buffer, sizeof(forwardRREP), nextHopIp, AODV_PORT);
 		else
-			attemptLocalRepair(nextHopIp, forwardRREP.origIP);		
+			repairLink(nextHopIp, forwardRREP.origIP, buffer, sizeof(forwardRREP), nextHopIp, AODV_PORT);		
 
 		delete buffer;
     }
@@ -307,6 +304,23 @@ void AODV::handleRERR(char* buffer, int length, IP_ADDR source)
 
 	// when a link breaks, mark a routing table entry as invalid 
 	// when forwarding packets, make sure the routing table entry is valid
+}
+
+void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR dest, int port)
+{
+	// first try to fix the link locally
+	if (true == attemptLocalRepair(brokenLink, finalDest))
+	{
+		if (MONITOR_DEBUG)
+			cout << "Broken link repaired locally! Sending packet..." << endl;
+
+		socketSendPacket(buffer, length, dest, port);
+	}
+	else 
+	{
+		// link is totally dead, send a RERR.
+		rerrHelper.createRERR(finalDest);
+	}
 }
 
 bool AODV::linkExists(IP_ADDR dest)

@@ -56,16 +56,17 @@ public:
 	void handleRERR(char* buffer, int length, IP_ADDR source);
 
 	// Network Monitoring
+	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR dest, int port);
 	virtual bool linkExists(IP_ADDR dest);
 	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
 
 	// output the current contents of the routing table 
 	void logRoutingTable();
 
-	// cast table to AODVRoutingTable
+	// get the routing table 
 	AODVRoutingTable* getTable() { return m_aodvTable; } 
 
-//	std::function<int(char* buffer, int length, IP_ADDR dest, int port)> socketSendPacket;
+	// abstract function to be overwritten by child class 
 	virtual int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
 
 protected:
@@ -91,10 +92,9 @@ public:
 
 	AODVTest(IP_ADDR ip) : AODV(ip) {}
 	AODVTest(const char* ip) : AODV(ip) {}
-	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);// { return sendBuffer(buffer, length, dest, port); }
+	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
 
 	// Network Monitoring 
-//	bool linkExists(IP_ADDR dest);
 
 	// add/remove node to neighbor list
 	void addNeighbor(AODVTest* node);
