@@ -10,6 +10,7 @@
 #define AODV_LOG_OUTPUT	    0
 
 #define RREQ_DEBUG		    0
-#define RREP_DEBUG		    0
-#define RERR_DEBUG          0
+#define RREP_DEBUG		    1
+#define RERR_DEBUG          1
 #define TABLE_DEBUG         0
+#define MONITOR_DEBUG       1

@@ -55,6 +55,10 @@ public:
 	// handle a received rerr message 
 	void handleRERR(char* buffer, int length, IP_ADDR source);
 
+	// Network Monitoring
+	virtual bool linkExists(IP_ADDR dest);
+	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
+
 	// output the current contents of the routing table 
 	void logRoutingTable();
 
@@ -70,7 +74,7 @@ protected:
 	// node rreq id. Incremented by one during route discovery
 	uint32_t rreqID;
 	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
-	std::vector<IP_ADDR> m_neighbors;
+	vector<IP_ADDR> m_neighbors;
 	// aodv routing table
 	AODVRoutingTable* m_aodvTable;
 };
@@ -89,6 +93,9 @@ public:
 	AODVTest(const char* ip) : AODV(ip) {}
 	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);// { return sendBuffer(buffer, length, dest, port); }
 
+	// Network Monitoring 
+//	bool linkExists(IP_ADDR dest);
+
 	// add/remove node to neighbor list
 	void addNeighbor(AODVTest* node);
 	void removeNeighbor(AODVTest node);
@@ -97,5 +104,6 @@ public:
 	bool isNeighbor(AODVTest node);
 
 private:
-	vector<AODVTest*> m_neighbors;
+	vector<AODVTest*> m_physicalNeighbors;
+
 };
