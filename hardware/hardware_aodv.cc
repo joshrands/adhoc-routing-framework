@@ -2,6 +2,7 @@
 
 // Helpers
 void HardwareAODV::_hardwareAODV(){
+    //TODO: Only set aodv socket to broadcasting
     UDPSocket *aodvSocket = new UDPSocket();
     if (!aodvSocket->bindToPort(AODV_PORT)) {
         fprintf(stderr, "Could not bind the aodv socket to port:%d\n", AODV_PORT);

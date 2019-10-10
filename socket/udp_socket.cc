@@ -3,20 +3,23 @@
  */
 /* Copyright (C) 2012 mbed.org, MIT License
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
- * and associated documentation files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy, modify, merge, publish, distribute,
- * sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
  *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
- * BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
- * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 #include "udp_socket.h"
@@ -39,7 +42,8 @@ bool UDPSocket::bindToPort(int port) {
   localHost.sin_port = htons(port);
   localHost.sin_addr.s_addr = INADDR_ANY;
 
-  if (bind(sockfd, (const struct sockaddr *)&localHost, sizeof(localHost)) < 0) {
+  if (bind(sockfd, (const struct sockaddr *)&localHost, sizeof(localHost)) <
+      0) {
     close(sockfd);
     return false;
   }
@@ -68,11 +72,12 @@ int UDPSocket::_sendTo(Endpoint &remote, const char *packet, int length) {
     return -1;
   }
 
-  return sendto(sockfd, packet, length, MSG_CONFIRM, (const struct sockaddr *)&remote.remoteHost,
+  return sendto(sockfd, packet, length, MSG_CONFIRM,
+                (const struct sockaddr *)&remote.remoteHost,
                 sizeof(remote.remoteHost));
 }
 
-int UDPSocket::sendTo(char* buffer, int length, uint32_t dest, int port){
+int UDPSocket::sendTo(char *buffer, int length, uint32_t dest, int port) {
   Endpoint remote;
   remote.setAddress(dest, port);
   return _sendTo(remote, buffer, length);
@@ -85,11 +90,13 @@ int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {
 
   remote.resetAddress();
   socklen_t remoteHostLen = sizeof(remote.remoteHost);
-  return recvfrom(sockfd, buffer, length, 0, (struct sockaddr *)&remote.remoteHost, &remoteHostLen);
+  return recvfrom(sockfd, buffer, length, 0,
+                  (struct sockaddr *)&remote.remoteHost, &remoteHostLen);
 }
 
 void UDPSocket::receiveFromPortThread() {
-  // Continually calls receiveFrom placing the returned messages on the message queue
+  // Continually calls receiveFrom placing the returned messages on the message
+  // queue
   while (true) {
     char *buffer = (char *)malloc(MAXLINE * sizeof(char));
     Endpoint client;
