@@ -13,6 +13,7 @@ void test_aodv();
 void test_aodv_rreq();
 void test_aodv_loop_prevention();
 void test_aodv_do_nothing();
+void test_aodv_link_break();
 
 int main (int argc, char *argv[]) 
 {	
@@ -96,6 +97,7 @@ void test_aodv()
 	test_aodv_rreq();
 	test_aodv_loop_prevention();
 	test_aodv_do_nothing();
+	test_aodv_link_break();
 }
 
 void test_aodv_rreq_simple()
@@ -286,10 +288,77 @@ void test_aodv_loop_prevention()
 	delete buffer;
 }
 
+void test_aodv_rreq_no_route()
+{
+	// TODO: Add this test 
+	cout << "WARNING: Aodv can NOT handle no possible route." << endl;
+}
+
 void test_aodv_rreq()
 {
 	test_aodv_rreq_simple();
 	test_aodv_rreq_forwarding();
 	test_aodv_rreq_buffer();
 	test_aodv_rreq_to_rrep();
+	test_aodv_rreq_no_route();
+}
+
+void test_aodv_link_break()
+{
+	AODVTest node0(getIpFromString("192.168.1.0"));
+	AODVTest node1(getIpFromString("192.168.1.1"));
+	AODVTest node2(getIpFromString("192.168.1.2"));
+	AODVTest node3(getIpFromString("192.168.1.3"));
+	AODVTest node4(getIpFromString("192.168.1.4"));
+
+	// assign neighbors, creating a loop
+	node0.addNeighbor(&node1);
+	node0.addNeighbor(&node2);
+
+	node1.addNeighbor(&node0);
+	node1.addNeighbor(&node2);
+	node1.addNeighbor(&node3);
+
+	node2.addNeighbor(&node0);
+	node2.addNeighbor(&node1);
+	node2.addNeighbor(&node3);
+	node2.addNeighbor(&node4);
+
+	node3.addNeighbor(&node1);
+	node3.addNeighbor(&node2);
+	node3.addNeighbor(&node4);
+
+	node4.addNeighbor(&node2);
+	node4.addNeighbor(&node3);
+
+	// send a packet from node 0 to node 4
+	string msg = "Hello node 4! From node 0";
+	int length = msg.length();
+	char* buffer = (char*)(malloc(length));
+	for (int i = 0; i < length; i++)
+		buffer[i] = msg.at(i);
+
+	node0.sendPacket(buffer, length, node4.getIp());
+	node0.sendPacket(buffer, length, node4.getIp());
+
+	assert(AODVTest::lastReceive == node4.getIp());
+
+	// break the link between 2 and 4
+	node4.removeNeighbor(node2);
+	node2.removeNeighbor(node4);
+
+	node0.sendPacket(buffer, length, node4.getIp());
+
+	cout << "Last received: " << getStringFromIp(AODVTest::lastReceive) << endl;
+	assert(AODVTest::lastReceive == node4.getIp());
+
+	node0.logRoutingTable();
+	node1.logRoutingTable();
+	node2.logRoutingTable();
+	node3.logRoutingTable();
+	node4.logRoutingTable();
+
+	cout << "Test aodv link break passed" << endl;
+
+	delete buffer;
 }

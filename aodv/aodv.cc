@@ -101,6 +101,7 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 	{
 		// send the packet to final destination - will check routing table
 		// strip header and send packet
+		// TODO: Most important time to check link state. 
 		packet += 5;
 		sendPacket(packet, length - 5, finalDestination);
 	}
@@ -161,6 +162,8 @@ void AODV::broadcastRREQBuffer(rreqPacket rreq)
 
 void AODV::decodeReceivedPacketBuffer(char* buffer, int length, IP_ADDR source)
 {
+//	cout << "Node " << getStringFromIp(getIp()) << " received a packet. " << endl;
+
 	if (length <= 0)
 	{
 		cout << "ERROR DECODING PACKET. Length = 0." << endl;
@@ -220,6 +223,7 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		// TODO: Implement this 
 		if (RREP_DEBUG)
 			cout << "Generating RREP message..." << endl;
+
 		rrepPacket rrep = rrepHelper.createRREPFromRREQ(rreq,source);
 
 		// convert packet to buffer and send 
@@ -231,7 +235,10 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		if (AODV_DEBUG)
 			cout << "Next hop for rrep: " << getStringFromIp(nextHopIp) << " from " << getStringFromIp(this->getIp()) << endl;
 
-		socketSendPacket(buffer, sizeof(rrep), nextHopIp, AODV_PORT);
+		if (linkExists(nextHopIp))
+			socketSendPacket(buffer, sizeof(rrep), nextHopIp, AODV_PORT);
+		else 
+			repairLink(nextHopIp, rrep.origIP, buffer, sizeof(rrep), nextHopIp, AODV_PORT);
 
 		delete buffer;
 
@@ -279,7 +286,11 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 			cout << "Forward rrep from " << getStringFromIp(getIp()) << " to "<< getStringFromIp(nextHopIp) << endl;
 
         char* buffer = RREPHelper::createRREPBuffer(forwardRREP);
-		socketSendPacket(buffer, sizeof(forwardRREP), nextHopIp, AODV_PORT);
+
+		if (linkExists(nextHopIp))
+			socketSendPacket(buffer, sizeof(forwardRREP), nextHopIp, AODV_PORT);
+		else
+			repairLink(nextHopIp, forwardRREP.origIP, buffer, sizeof(forwardRREP), nextHopIp, AODV_PORT);		
 
 		delete buffer;
     }
@@ -293,6 +304,43 @@ void AODV::handleRERR(char* buffer, int length, IP_ADDR source)
 
 	// when a link breaks, mark a routing table entry as invalid 
 	// when forwarding packets, make sure the routing table entry is valid
+}
+
+void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR dest, int port)
+{
+	// first try to fix the link locally
+	if (true == attemptLocalRepair(brokenLink, finalDest))
+	{
+		if (MONITOR_DEBUG)
+			cout << "Broken link repaired locally! Sending packet..." << endl;
+
+		socketSendPacket(buffer, length, dest, port);
+	}
+	else 
+	{
+		// link is totally dead, send a RERR.
+		rerrHelper.createRERR(finalDest);
+	}
+}
+
+bool AODV::linkExists(IP_ADDR dest)
+{
+	for (IP_ADDR ip : m_neighbors)
+	{
+		if (dest == ip)
+			return true;
+	}
+
+	return false;
+}
+
+bool AODV::attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest)
+{
+	if (MONITOR_DEBUG)
+		cout << "Attempting local repair from broken link " << getStringFromIp(brokenLink) << " to destination " << getStringFromIp(finalDest) << endl;
+
+	// TODO: Use network monitoring to attempt local repair
+	return false;
 }
 
 void AODV::logRoutingTable()
@@ -312,13 +360,15 @@ void AODV::logRoutingTable()
 
 	map<IP_ADDR, AODVInfo>::iterator it;
 
-	logFile << "DESTINATION IP : NEXT HOP" << endl;
+	logFile << "DESTINATION IP : NEXT HOP : TOTAL HOPS" << endl;
 
 	for ( it = this->getTable()->getInternalAODVTable().begin(); it != this->getTable()->getInternalAODVTable().end(); it++ )
 	{
 		logFile << getStringFromIp(it->first)
 				<< " : "
 				<< getStringFromIp(it->second.nextHop)
+				<< " : "
+				<< to_string(it->second.hopCount)
 				<< endl;
 	}
 
@@ -329,17 +379,20 @@ void AODV::logRoutingTable()
 
 int AODVTest::globalPacketCount = 0;
 IP_ADDR AODVTest::lastNode = 0; 
+IP_ADDR AODVTest::lastReceive = 0;
 
 int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port)
 {
-	for (uint32_t i = 0; i < m_neighbors.size(); i++)
+	for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++)
 	{
-		if (dest == m_neighbors.at(i)->getIp() || dest == getIpFromString(BROADCAST))
+		if (dest == m_physicalNeighbors.at(i)->getIp() || dest == getIpFromString(BROADCAST))
 		{
 			// send packet to this node
-			m_neighbors.at(i)->decodeReceivedPacketBuffer(buffer, length, getIp());
+			AODVTest::lastReceive = m_physicalNeighbors.at(i)->getIp();
 			AODVTest::lastNode = getIp();
 			AODVTest::globalPacketCount++;
+
+			m_physicalNeighbors.at(i)->decodeReceivedPacketBuffer(buffer, length, getIp());
 		}
 	}
 
@@ -348,16 +401,18 @@ int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port)
 
 void AODVTest::addNeighbor(AODVTest* node)
 {
-	this->m_neighbors.push_back(node);
+	this->m_neighbors.push_back(node->getIp());
+	this->m_physicalNeighbors.push_back(node);
 }
 
 void AODVTest::removeNeighbor(AODVTest node)
 {
-	for (uint32_t i = 0; i < m_neighbors.size(); i++)
+	for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++)
 	{
-		if (node.getIp() == m_neighbors.at(i)->getIp())
+		if (node.getIp() == m_physicalNeighbors.at(i)->getIp())
 		{
 			m_neighbors.erase(m_neighbors.begin() + i);
+			m_physicalNeighbors.erase(m_physicalNeighbors.begin() + i);
 		}
 	}
 
@@ -365,9 +420,9 @@ void AODVTest::removeNeighbor(AODVTest node)
 
 bool AODVTest::isNeighbor(AODVTest node)
 {
-	for (uint32_t i = 0; i < m_neighbors.size(); i++)
+	for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++)
 	{
-		if (node.getIp() == m_neighbors.at(i)->getIp())
+		if (node.getIp() == m_physicalNeighbors.at(i)->getIp())
 			return true;
 	}
 

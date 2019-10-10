@@ -55,13 +55,18 @@ public:
 	// handle a received rerr message 
 	void handleRERR(char* buffer, int length, IP_ADDR source);
 
+	// Network Monitoring
+	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR dest, int port);
+	virtual bool linkExists(IP_ADDR dest);
+	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
+
 	// output the current contents of the routing table 
 	void logRoutingTable();
 
-	// cast table to AODVRoutingTable
+	// get the routing table 
 	AODVRoutingTable* getTable() { return m_aodvTable; } 
 
-//	std::function<int(char* buffer, int length, IP_ADDR dest, int port)> socketSendPacket;
+	// abstract function to be overwritten by child class 
 	virtual int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
 
 protected:
@@ -70,7 +75,7 @@ protected:
 	// node rreq id. Incremented by one during route discovery
 	uint32_t rreqID;
 	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
-	std::vector<IP_ADDR> m_neighbors;
+	vector<IP_ADDR> m_neighbors;
 	// aodv routing table
 	AODVRoutingTable* m_aodvTable;
 };
@@ -83,10 +88,13 @@ public:
 	// debugging values 
 	static int globalPacketCount;
 	static IP_ADDR lastNode; 
+	static IP_ADDR lastReceive;
 
 	AODVTest(IP_ADDR ip) : AODV(ip) {}
 	AODVTest(const char* ip) : AODV(ip) {}
-	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);// { return sendBuffer(buffer, length, dest, port); }
+	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
+
+	// Network Monitoring 
 
 	// add/remove node to neighbor list
 	void addNeighbor(AODVTest* node);
@@ -96,5 +104,6 @@ public:
 	bool isNeighbor(AODVTest node);
 
 private:
-	vector<AODVTest*> m_neighbors;
+	vector<AODVTest*> m_physicalNeighbors;
+
 };

@@ -27,6 +27,9 @@ bool RREQHelper::shouldGenerateRREP(rreqPacket receivedRREQ)
 	{
 		if (RREQ_DEBUG)
 			cout << "RREQ reached final destination. Generating RREP..." << endl;
+
+		cout << "Final dest hop count = " << to_string(receivedRREQ.hopCount) << endl;
+
 		return true;
 	}
 	else if (this->m_pTable->getNextHop(receivedRREQ.destIP) != 0)
@@ -51,7 +54,12 @@ bool RREQHelper::isDuplicateRREQ(rreqPacket receivedRREQ)
 	if (receivedRREQ.origIP == this->m_ip)
 		return true;
 
-	if (packetSeqNum == tableSeqNum || tableLastId == receivedRREQ.rreqID)
+	// has to be a duplicate rreq AND not a better route. 
+	int currentCost = this->m_pTable->getCostOfDest(receivedRREQ.origIP);
+	int newCost = this->m_pTable->getCostOfRREQ(receivedRREQ);
+
+	if ( (packetSeqNum == tableSeqNum || tableLastId == receivedRREQ.rreqID) 
+		&& (newCost >= currentCost) ) 
 		return true;
 	else
 		return false;

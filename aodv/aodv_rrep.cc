@@ -67,7 +67,7 @@ rrepPacket RREPHelper::createForwardRREP(rrepPacket receivedRREP, IP_ADDR source
     // 3. TODO: Route is inactive? 
     // 4. Sequence numbers are the same, but the new hop count is smaller
     if  (receivedRREP.destSeqNum > this->m_pTable->getDestSequenceNumber(receivedRREP.destIP)
-     || (receivedRREP.hopCount < this->m_pTable->getDestHopCount(receivedRREP.hopCount)))
+     || (receivedRREP.hopCount < this->m_pTable->getDestHopCount(receivedRREP.destIP)))
     {
         this->m_pTable->updateAODVRoutingTableFromRREP(&receivedRREP,source);
     }
