@@ -1,4 +1,5 @@
 /aodv/test
+/*/test
 /ns-allinone-3.28
 !/ns-allinone-3.28/ns-3.28/scratch/*
 !/ns-allinone-3.28/ns-3.28/src/custom/aodv/*
