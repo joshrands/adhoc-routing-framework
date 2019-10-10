@@ -63,7 +63,7 @@ public:
   /*! Set the socket in broadcasting mode
    *  @return true on success, false on failure
    */
-  int setBroadcasting(bool broadcast = true);
+  bool setBroadcasting(bool broadcast = true);
 
   /*! Send a packet to a remote endpoint
    *  @param remote The remote endpoint

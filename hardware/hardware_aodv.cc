@@ -7,7 +7,10 @@ void HardwareAODV::_hardwareAODV(){
         fprintf(stderr, "Could not bind the aodv socket to port:%d\n", AODV_PORT);
         exit(-1);
     }
-    aodvSocket->setBroadcasting();
+    if(!aodvSocket->setBroadcasting()){
+        fprintf(stderr, "Could not set the aodv socket to broadcasting\n");
+        exit(-1);
+    }
     thread aodving(&UDPSocket::receiveFromPortThread, aodvSocket);
     aodving.detach();
 
@@ -16,7 +19,10 @@ void HardwareAODV::_hardwareAODV(){
         fprintf(stderr, "Could not bind the data socket to port:%d\n", DATA_PORT);
         exit(-1);
     }
-    dataSocket->setBroadcasting();
+    if(!dataSocket->setBroadcasting()){
+        fprintf(stderr, "Could not set the data socket to broadcasting\n");
+        exit(-1);
+    }
     thread dataing(&UDPSocket::receiveFromPortThread, dataSocket);
     dataing.detach();
 }
@@ -49,12 +55,15 @@ int HardwareAODV::socketSendPacket(char *buffer, int length, IP_ADDR dest, int p
 }
 
 // Class methods
-void HardwareAODV::handleReceivedPackets(){
+int HardwareAODV::handleReceivedPackets(){
     Message message;
+    int count = 0;
     while(aodvSocket->getMessage(message)){
         printf("Received: %s", message.getData());
         decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI());
+        count ++;
     }
+    return (count == 0) ? -1 : count;
 }
 
 bool HardwareAODV::getDataPacket(Message& message){

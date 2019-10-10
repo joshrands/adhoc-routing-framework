@@ -46,8 +46,9 @@ public:
     /*!
      * @brief Reads all messages from aodv socket and handles them accordingly
      * 
+     * @return -1 if no packets or the number of packets handled
      */
-    void handleReceivedPackets();
+    int handleReceivedPackets();
 
     /*!
      * @brief Returns one of the packets on the data socket

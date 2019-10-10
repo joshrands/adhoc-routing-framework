@@ -57,7 +57,7 @@ bool UDPSocket::joinMulticastGroup(const char *address) {
   return setOption(IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 }
 
-int UDPSocket::setBroadcasting(bool broadcast) {
+bool UDPSocket::setBroadcasting(bool broadcast) {
   int option = (broadcast) ? (1) : (0);
   return setOption(SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
 }
@@ -68,11 +68,6 @@ int UDPSocket::_sendTo(Endpoint &remote, const char *packet, int length) {
     return -1;
   }
 
-  if (!blocking) {
-    TimeInterval timeout(timeout);
-    if (waitWritable(timeout) != 0)
-      return 0;
-  }
   return sendto(sockfd, packet, length, MSG_CONFIRM, (const struct sockaddr *)&remote.remoteHost,
                 sizeof(remote.remoteHost));
 }
@@ -80,7 +75,7 @@ int UDPSocket::_sendTo(Endpoint &remote, const char *packet, int length) {
 int UDPSocket::sendTo(char* buffer, int length, uint32_t dest, int port){
   Endpoint remote;
   remote.setAddress(dest, port);
-  _sendTo(remote, buffer, length);
+  return _sendTo(remote, buffer, length);
 }
 
 // -1 if unsuccessful, else number of bytes received
@@ -88,11 +83,6 @@ int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {
   if (sockfd < 0)
     return -1;
 
-  if (!blocking) {
-    TimeInterval timeout(timeout);
-    if (waitReadable(timeout) != 0)
-      return 0;
-  }
   remote.resetAddress();
   socklen_t remoteHostLen = sizeof(remote.remoteHost);
   return recvfrom(sockfd, buffer, length, 0, (struct sockaddr *)&remote.remoteHost, &remoteHostLen);
