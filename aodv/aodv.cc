@@ -142,7 +142,8 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADD
 		if (nextHop != 0)
 		{
 			// this route is temporarily unavailable... check if actively finding a route
-			// TODO: IMPLEMENT THIS
+			// TODO: send a RERR
+
 			return;
 		}
 
@@ -369,7 +370,7 @@ void AODV::handleRERR(char* buffer, int length, IP_ADDR source)
 	if (rerr.origIP != this->getIp()) 
 	{
 		if (RERR_DEBUG)
-			cout << "Route Error response received from sender." << endl;
+			cout << "Route Error response received by sender." << endl;
 	} 
 	else if (getTable()->getIsRouteActive(rerr.origIP))
 	{

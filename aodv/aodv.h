@@ -19,6 +19,14 @@
 #include <functional>
 #include <queue>
 
+struct packet
+{
+	char* buffer;
+	uint32_t length;
+	uint32_t id;
+	uint16_t ttl;
+};
+
 class AODV : public RoutingProtocol
 {
 public:
@@ -80,8 +88,14 @@ protected:
 	vector<IP_ADDR> m_neighbors;
 	// aodv routing table
 	AODVRoutingTable* m_aodvTable;
+
 	// map of rreq ids and their corresponding packet to be sent once the route is established
 	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
+
+	// current packet id index
+	uint32_t packetIdCount;	
+	// map of destination and recently sent packets (packets will time out after a short time) 
+	map<IP_ADDR, queue<packet>> unackedPacketBuffer;
 };
 
 /* AODVTest class
