@@ -75,7 +75,7 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 		{
 			cout << "Node " << getStringFromIp(this->getIp()) << " received packet: " << endl;
 
-			for (int i = 5; i < length; i++)
+			for (int i = HEADER_SIZE; i < length; i++)
 			{
 				cout << packet[i];
 			}			
@@ -87,7 +87,7 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 			ofstream logFile;
 			logFile.open("./logs/" + getStringFromIp(this->getIp()) + "-packet-log.txt", ios::out);
 
-			for (int i = 5; i < length; i++)
+			for (int i = HEADER_SIZE; i < length; i++)
 			{
 				logFile << packet[i];
 			}			
@@ -104,7 +104,7 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 		// send the packet to final destination - will check routing table
 		// strip header and send packet
 		// TODO: Most important time to check link state. 
-		packet += 5;
+		packet += HEADER_SIZE;
 		sendPacket(packet, length, finalDestination, origIP);
 	}
 
@@ -129,13 +129,21 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADD
 		// start a thread for an rreq and wait for a response 
 		rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
 
-		broadcastRREQBuffer(rreq);
 		// Put this packet in a buffer to be sent when the rrep is received 
-		if(this->rreqPacketBuffer.count(rreq.destIP)){
-			this->rreqPacketBuffer[rreq.destIP].push(pair<char*,int>(packet, length));
-		}else{
-			this->rreqPacketBuffer[rreq.destIP] = queue<pair<char*, int>>({pair<char*,int>(packet, length)});
+		if(this->rreqPacketBuffer.count(rreq.destIP))
+		{
+			char* bufferedPacket = (char*)(malloc(length));
+			memcpy(bufferedPacket, packet, length);
+			this->rreqPacketBuffer[rreq.destIP].push(pair<char*,int>(bufferedPacket, length));
 		}
+		else
+		{
+			char* bufferedPacket = (char*)(malloc(length));
+			memcpy(bufferedPacket, packet, length);
+			this->rreqPacketBuffer[rreq.destIP] = queue<pair<char*, int>>({pair<char*,int>(bufferedPacket, length)});
+		}
+
+		broadcastRREQBuffer(rreq);
 		return;
 	}
 
@@ -143,7 +151,7 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADD
 		cout << "Route exists. Routing from " << getStringFromIp(getIp()) << " to " << getStringFromIp(finalDestination) << endl;
 
 	// add aodv header to buffer 
-	char* buffer = (char*)(malloc(5 + length));
+	char* buffer = (char*)(malloc(HEADER_SIZE + length));
 	uint8_t zero = 0x00;
 	memcpy(buffer, &(zero), 1);
 	buffer++;
@@ -155,11 +163,11 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADD
 	// copy data into packet 
 	memcpy(buffer, packet, length);
 	// reset packet 
-	buffer-=9;
+	buffer-=HEADER_SIZE;
 
 	if (linkExists(nextHop))
 	{
-		socketSendPacket(buffer, length+5, nextHop, DATA_PORT);
+		socketSendPacket(buffer, length+HEADER_SIZE, nextHop, DATA_PORT);
 	}
 	else
 	{
@@ -291,17 +299,24 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
     {
         // packet made it back! 
         if (AODV_DEBUG)
-            cout << "Route discovery complete! Sending buffered packet, if they exist." << endl;
+            cout << "Route discovery complete! Sending buffered packets, if they exist." << endl;
 
         this->getTable()->updateAODVRoutingTableFromRREP(&rrep,source);
 
 		// Send any queued packages for that destination
-		if(this->rreqPacketBuffer.count(rrep.destIP)){
+		if(this->rreqPacketBuffer.count(rrep.destIP))
+		{
+			if (AODV_DEBUG)
+				cout << "There are packets in the queue. Sending data..." << endl;
+
 			// Pull all the packets off the queue and send them
 			queue<pair<char*, int>>* packetQueue = &rreqPacketBuffer[rrep.destIP];
-			while(packetQueue->size() > 0){
+			while(packetQueue->size() > 0)
+			{
 				pair<char*, int> package = packetQueue->front();
-				sendPacket(package.first, package.second, rrep.destIP);
+				sendPacket(package.first, package.second, rrep.destIP, DATA_PORT);
+				delete package.first;
+
 				packetQueue->pop();
 			}
 		}
