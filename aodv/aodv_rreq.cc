@@ -28,8 +28,6 @@ bool RREQHelper::shouldGenerateRREP(rreqPacket receivedRREQ)
 		if (RREQ_DEBUG)
 			cout << "RREQ reached final destination. Generating RREP..." << endl;
 
-		cout << "Final dest hop count = " << to_string(receivedRREQ.hopCount) << endl;
-
 		return true;
 	}
 	else if (this->m_pTable->getNextHop(receivedRREQ.destIP) != 0)
