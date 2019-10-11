@@ -17,6 +17,7 @@
 
 #include <vector>
 #include <functional>
+#include <queue>
 
 class AODV : public RoutingProtocol
 {
@@ -79,6 +80,8 @@ protected:
 	vector<IP_ADDR> m_neighbors;
 	// aodv routing table
 	AODVRoutingTable* m_aodvTable;
+	// map of rreq ids and their corresponding packet to be sent once the route is established
+	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
 };
 
 /* AODVTest class
@@ -105,6 +108,9 @@ public:
 
 	// return true if node is neighbor
 	bool isNeighbor(AODVTest node);
+
+	// see if packet was put in queue
+	bool packetInRreqBuffer(IP_ADDR dest);
 
 private:
 	vector<AODVTest*> m_physicalNeighbors;

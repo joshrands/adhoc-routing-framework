@@ -47,13 +47,6 @@ public:
 
   ~Socket();
 
-  /*! Set blocking or non-blocking mode of the socket and a timeout on
-   *  blocking socket operations
-   *  @param blocking true for blocking mode, false for non-blocking mode
-   *  @param param timeout timeout in ms [Default: (1500)ms]
-   */
-  void setBlocking(bool blocking, unsigned int timeout = 1500);
-
   /*! Set socket options
    *  @param level stack level
    *  @param optname option ID
@@ -79,27 +72,8 @@ public:
 protected:
   int sockfd;
   bool initSocket(int type);
-
-  int waitReadable(TimeInterval &timeout);
-  int waitWritable(TimeInterval &timeout);
-
-  bool blocking;
-  unsigned int timeout;
-
-private:
-  int _select(struct timeval *timeout, bool read, bool write);
 };
 
-/*! Time interval class used to specify timeouts
- */
-class TimeInterval {
-  friend class Socket;
 
-public:
-  TimeInterval(unsigned int ms);
-
-private:
-  struct timeval time;
-};
 
 #endif

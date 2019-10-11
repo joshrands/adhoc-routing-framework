@@ -27,14 +27,9 @@
 
 using std::memset;
 
-Socket::Socket() : sockfd(-1), blocking(true), timeout(1500) {}
+Socket::Socket() : sockfd(-1) {}
 
 Socket::~Socket() { sclose(); }
-
-void Socket::setBlocking(bool blocking, unsigned int timeout) {
-  blocking = blocking;
-  timeout = timeout;
-}
 
 bool Socket::initSocket(int type) {
   if (sockfd != -1) {
@@ -49,12 +44,6 @@ bool Socket::initSocket(int type) {
   }
   sockfd = fd;
 
-  int truth = 1;
-  if (!setOption(SOL_SOCKET, SO_REUSEADDR, &truth, sizeof(int))) {
-    fprintf(stderr, "socket not set to reusable\n");
-    return false;
-  }
-
   return true;
 }
 
@@ -65,26 +54,4 @@ bool Socket::setOption(int level, int optname, const void *optval, socklen_t opt
 bool Socket::getOption(int level, int optname, void *optval, socklen_t *optlen) {
   return (getsockopt(sockfd, level, optname, optval, optlen) < 0) ? false : true;
 }
-
-int Socket::_select(struct timeval *timeout, bool read, bool write) {
-  fd_set fdSet;
-  FD_ZERO(&fdSet);
-  FD_SET(sockfd, &fdSet);
-
-  fd_set *readset = (read) ? (&fdSet) : (NULL);
-  fd_set *writeset = (write) ? (&fdSet) : (NULL);
-
-  int ret = select(FD_SETSIZE, readset, writeset, NULL, timeout);
-  return (ret <= 0 || !FD_ISSET(sockfd, &fdSet)) ? (false) : (true);
-}
-
 void Socket::sclose() { close(sockfd); }
-
-int Socket::waitReadable(TimeInterval &timeout) { return _select(&timeout.time, true, false); }
-
-int Socket::waitWritable(TimeInterval &timeout) { return _select(&timeout.time, false, true); }
-
-TimeInterval::TimeInterval(unsigned int ms) {
-  time.tv_sec = ms / 1000;
-  time.tv_usec = (ms - (time.tv_sec * 1000)) * 1000;
-}

@@ -22,6 +22,16 @@ void test(bool condition, string message) {
   cout << "PASS" << endl;
 }
 
+bool getYesNo(string message){
+  cout<<message<<"(y/n): ";
+    string response;
+    cin>> response;
+    for(auto& c : response){
+      c = tolower(c);
+    }
+  return (response == "y" || response == "yes");
+}
+
 void sendMessageToThreadedServerTest(UDPSocket *server, UDPSocket &sender,
                                      Endpoint &serverEnd, string data) {
   // Continue to send data until received
@@ -90,6 +100,39 @@ void sendMessageBetweenThreadedSockets(UDPSocket* socket1, UDPSocket* socket2,
   } while (socket1->getMessage(message2to1) || socket2->getMessage(message1to2));
 }
 
+
+/*!
+ * @brief tests wether a socket can broadcast to a group of sockets
+ * 
+ * @param broadcastingSocket 
+ */
+void broadcastMessage(UDPSocket* broadcastingSocket, Endpoint end, string sendData, string expectedResponse) {
+  // Send sendData from 1 to 2
+  Message messageReceive;
+  int count = 0;
+  const int MAX_ATTEMPTS = 4;
+  do {
+    count++;
+    broadcastingSocket->_sendTo(end, &sendData[0], sendData.length());
+    sleep(1);
+  } while(!broadcastingSocket->getMessage(messageReceive) && count < MAX_ATTEMPTS);
+
+  // Check if test was successful
+  char maxAttemptsMessage[60];
+  sprintf(&maxAttemptsMessage[0],
+          "Can broadcast to another socket with < %d attempts",
+          MAX_ATTEMPTS);
+  test(count < MAX_ATTEMPTS, &maxAttemptsMessage[0]);
+  printf("%s\n", messageReceive.getData());
+  string messageSentMessage = "Broadcasting socket received: '" + expectedResponse + "' in response from python socket";
+  test(strcmp(messageReceive.getData(), &expectedResponse[0]) == 0, messageSentMessage);
+  
+  // Clear both sockets
+  do {
+    sleep(1);
+  } while (broadcastingSocket->getMessage(messageReceive));
+}
+
 /*!
  * @brief Create a Threaded Socket object
  * 
@@ -111,6 +154,7 @@ UDPSocket* createThreadedSocket(thread& returnThread, int port){
 
 
 int main() {
+  
   // Test initialization and ports
   {
     UDPSocket nonboundSocket;
@@ -128,22 +172,8 @@ int main() {
          (string) "Cannot bind socket that is already bound to a port");
   }
 
-  // Test timeout
-  /*
-  {
-    UDPSocket timeoutSocket;
-    timeoutSocket.init();
-    timeoutSocket.setBlocking(false, 500);
-    char messageTemp [MAXLINE];
-    Endpoint endTemp;
-    time_t start = time(NULL);
-    test(timeoutSocket.receiveFrom(endTemp, &messageTemp[0], MAXLINE)==0, (string)"Nonblocking socket will time out");
-    time_t end = time(NULL);
-    test((end-start)> 1 && (end-start)< 2, (string)"Timeout socket waits the appropritate time");
-
-  }
-  */
   printf("________________________________\n\n");
+
   // Test messages can be sent
   {
     // Create receiving socket
@@ -170,15 +200,16 @@ int main() {
   }
 
   printf("________________________________\n\n");
+  
   // Test communication between sockets
   {
     // Create socket 1
-    int port1 = 8080;
+    int port1 = 8881;
     thread socket1ing;
     UDPSocket* socket1 = createThreadedSocket(socket1ing, port1);
 
     // Create socket 2
-    int port2 = 8060;
+    int port2 = 8882;
     thread socket2ing;
     UDPSocket* socket2 = createThreadedSocket(socket2ing, port2);
 
@@ -195,10 +226,27 @@ int main() {
     socket1ing.~thread();
     socket2ing.~thread();
   }
-
+  printf("________________________________\n\n");
+  
   // Test broadcasting
   {
+      system("./testing_utils/call_test_broadcast.sh");
+      sleep(3);
+
+      int port1 = 58080;
+      thread broadcasting;
+      UDPSocket* broadcastSocket = createThreadedSocket(broadcasting, port1);
+      if(!broadcastSocket->setBroadcasting()){
+        fprintf(stderr, "Could not set port to broadcasting\n");
+        exit(-1);
+      }
+
+      int port2 = 58083;
+      Endpoint end;
+      end.setAddress("255.255.255.255", port2);
+      broadcastMessage(broadcastSocket, end, "Hello World!", "Hello Broadcaster!");
   }
+  printf("________________________________\n\n");
 
   return 0;
 }

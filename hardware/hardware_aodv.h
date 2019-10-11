@@ -33,6 +33,7 @@ public:
      * @param ip the ip address of the current device
      */
     HardwareAODV(uint32_t ip);
+    HardwareAODV(uint32_t ip, int aodv_port, int data_port);
     HardwareAODV(const char* ip);
 
     // Destructors
@@ -46,8 +47,9 @@ public:
     /*!
      * @brief Reads all messages from aodv socket and handles them accordingly
      * 
+     * @return -1 if no packets or the number of packets handled
      */
-    void handleReceivedPackets();
+    int handleReceivedPackets();
 
     /*!
      * @brief Returns one of the packets on the data socket

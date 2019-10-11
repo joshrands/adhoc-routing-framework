@@ -63,7 +63,7 @@ public:
   /*! Set the socket in broadcasting mode
    *  @return true on success, false on failure
    */
-  int setBroadcasting(bool broadcast = true);
+  bool setBroadcasting(bool broadcast = true);
 
   /*! Send a packet to a remote endpoint
    *  @param remote The remote endpoint
@@ -105,6 +105,13 @@ public:
    * @return false no messages
    */
   bool getMessage(Message &message);
+
+  /*!
+   * @brief Get the sockfd object
+   * 
+   * @return int 
+   */
+  int getSockfd() const;
 
 private:
   // To hold threaded messages

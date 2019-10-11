@@ -1,4 +1,4 @@
-#ifndef MESSSAGE_H
+#ifndef MESSAGE_H
 #define MESSAGE_H
 
 #include "endpoint.h"

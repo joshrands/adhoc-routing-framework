@@ -125,11 +125,17 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADD
 	{
 		if (AODV_DEBUG)
 			cout << "No existing route, creating RREQ message." << endl;
+
 		// start a thread for an rreq and wait for a response 
 		rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
 
 		broadcastRREQBuffer(rreq);
-		// TODO: Put this packet in a buffer/queue to be sent when the rrep is received 
+		// Put this packet in a buffer to be sent when the rrep is received 
+		if(this->rreqPacketBuffer.count(rreq.destIP)){
+			this->rreqPacketBuffer[rreq.destIP].push(pair<char*,int>(packet, length));
+		}else{
+			this->rreqPacketBuffer[rreq.destIP] = queue<pair<char*, int>>({pair<char*,int>(packet, length)});
+		}
 		return;
 	}
 
@@ -280,14 +286,27 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 	// valid rreq packet, make a decision
 	rrepPacket rrep = rrepHelper.readRREPBuffer(buffer);
 
-	// 2. are with the original ip? was this our route request reply? 
+	// 2. are we the original ip? was this our route request reply? 
     if (this->getIp() == rrep.origIP)
     {
         // packet made it back! 
         if (AODV_DEBUG)
-            cout << "Route discovery complete!" << endl;
+            cout << "Route discovery complete! Sending buffered packet, if they exist." << endl;
 
         this->getTable()->updateAODVRoutingTableFromRREP(&rrep,source);
+
+		// Send any queued packages for that destination
+		if(this->rreqPacketBuffer.count(rrep.destIP)){
+			// Pull all the packets off the queue and send them
+			queue<pair<char*, int>>* packetQueue = &rreqPacketBuffer[rrep.destIP];
+			while(packetQueue->size() > 0){
+				pair<char*, int> package = packetQueue->front();
+				sendPacket(package.first, package.second, rrep.destIP);
+				packetQueue->pop();
+			}
+		}
+		this->rreqPacketBuffer.erase(rrep.destIP);
+
     }
     else 
     {
@@ -468,4 +487,8 @@ bool AODVTest::isNeighbor(AODVTest node)
 	}
 
 	return false;
+}
+
+bool AODVTest::packetInRreqBuffer(IP_ADDR dest){
+	return(rreqPacketBuffer.count(dest));
 }
