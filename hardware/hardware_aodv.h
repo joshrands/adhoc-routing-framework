@@ -33,6 +33,7 @@ public:
      * @param ip the ip address of the current device
      */
     HardwareAODV(uint32_t ip);
+    HardwareAODV(uint32_t ip, int aodv_port, int data_port);
     HardwareAODV(const char* ip);
 
     // Destructors

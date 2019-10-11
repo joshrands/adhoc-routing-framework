@@ -120,11 +120,11 @@ void broadcastMessage(UDPSocket* broadcastingSocket, Endpoint end, string sendDa
   // Check if test was successful
   char maxAttemptsMessage[60];
   sprintf(&maxAttemptsMessage[0],
-          "Can send message to another socket with < %d attempts",
+          "Can broadcast to another socket with < %d attempts",
           MAX_ATTEMPTS);
   test(count < MAX_ATTEMPTS, &maxAttemptsMessage[0]);
   printf("%s\n", messageReceive.getData());
-  string messageSentMessage = "Broadcasting socket received: '" + sendData + "' in response from python socket";
+  string messageSentMessage = "Broadcasting socket received: '" + expectedResponse + "' in response from python socket";
   test(strcmp(messageReceive.getData(), &expectedResponse[0]) == 0, messageSentMessage);
   
   // Clear both sockets
@@ -204,12 +204,12 @@ int main() {
   // Test communication between sockets
   {
     // Create socket 1
-    int port1 = 8080;
+    int port1 = 8881;
     thread socket1ing;
     UDPSocket* socket1 = createThreadedSocket(socket1ing, port1);
 
     // Create socket 2
-    int port2 = 8060;
+    int port2 = 8882;
     thread socket2ing;
     UDPSocket* socket2 = createThreadedSocket(socket2ing, port2);
 

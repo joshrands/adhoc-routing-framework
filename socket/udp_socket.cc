@@ -42,8 +42,7 @@ bool UDPSocket::bindToPort(int port) {
   localHost.sin_port = htons(port);
   localHost.sin_addr.s_addr = INADDR_ANY;
 
-  if (bind(sockfd, (const struct sockaddr *)&localHost, sizeof(localHost)) <
-      0) {
+  if (bind(sockfd, (const struct sockaddr *)&localHost, sizeof(localHost)) < 0) {
     close(sockfd);
     return false;
   }
@@ -83,8 +82,8 @@ int UDPSocket::sendTo(char *buffer, int length, uint32_t dest, int port) {
   return _sendTo(remote, buffer, length);
 }
 
-// -1 if unsuccessful, else number of bytes received
 int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {
+  // -1 if unsuccessful, else number of bytes received
   if (sockfd < 0)
     return -1;
 
@@ -112,3 +111,7 @@ void UDPSocket::receiveFromPortThread() {
 }
 
 bool UDPSocket::getMessage(Message &message) { return messages.pop(message); }
+
+int UDPSocket::getSockfd() const{
+  return sockfd;
+}

@@ -12,8 +12,8 @@ void HardwareAODV::_hardwareAODV(){
         fprintf(stderr, "Could not set the aodv socket to broadcasting\n");
         exit(-1);
     }
-    thread aodving(&UDPSocket::receiveFromPortThread, aodvSocket);
-    aodving.detach();
+    aodving = thread(&UDPSocket::receiveFromPortThread, aodvSocket);
+    
 
     UDPSocket *dataSocket = new UDPSocket();
     if (!dataSocket->bindToPort(DATA_PORT)) {
@@ -24,7 +24,9 @@ void HardwareAODV::_hardwareAODV(){
         fprintf(stderr, "Could not set the data socket to broadcasting\n");
         exit(-1);
     }
-    thread dataing(&UDPSocket::receiveFromPortThread, dataSocket);
+    dataing = thread(&UDPSocket::receiveFromPortThread, dataSocket);
+
+    aodving.detach();
     dataing.detach();
 }
 
@@ -38,12 +40,42 @@ HardwareAODV::HardwareAODV(uint32_t ip) : AODV(ip) {
     _hardwareAODV();
 }
 
+HardwareAODV::HardwareAODV(uint32_t ip, int aodv_port, int data_port) : AODV(ip){
+    UDPSocket *aodvSocket = new UDPSocket();
+    if (!aodvSocket->bindToPort(aodv_port)) {
+        fprintf(stderr, "Could not bind the aodv socket to port:%d\n", aodv_port);
+        exit(-1);
+    }
+    if(!aodvSocket->setBroadcasting()){
+        fprintf(stderr, "Could not set the aodv socket to broadcasting\n");
+        exit(-1);
+    }
+    aodving = thread(&UDPSocket::receiveFromPortThread, aodvSocket);
+    
+
+    UDPSocket *dataSocket = new UDPSocket();
+    if (!dataSocket->bindToPort(data_port)) {
+        fprintf(stderr, "Could not bind the data socket to port:%d\n", data_port);
+        exit(-1);
+    }
+    if(!dataSocket->setBroadcasting()){
+        fprintf(stderr, "Could not set the data socket to broadcasting\n");
+        exit(-1);
+    }
+    dataing = thread(&UDPSocket::receiveFromPortThread, dataSocket);
+
+    aodving.detach();
+    dataing.detach();
+}
+
 HardwareAODV::HardwareAODV(const char* ip) : AODV(ip) {
     _hardwareAODV();
 }
 
 // Destructors
 HardwareAODV::~HardwareAODV(){
+    aodving.~thread();
+    dataing.~thread();
 }
 
 // Override functions

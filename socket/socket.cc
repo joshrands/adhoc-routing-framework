@@ -44,12 +44,6 @@ bool Socket::initSocket(int type) {
   }
   sockfd = fd;
 
-  int truth = 1;
-  if (!setOption(SOL_SOCKET, SO_REUSEADDR, &truth, sizeof(int))) {
-    fprintf(stderr, "socket not set to reusable\n");
-    return false;
-  }
-
   return true;
 }
 

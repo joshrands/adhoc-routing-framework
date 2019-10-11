@@ -106,6 +106,13 @@ public:
    */
   bool getMessage(Message &message);
 
+  /*!
+   * @brief Get the sockfd object
+   * 
+   * @return int 
+   */
+  int getSockfd() const;
+
 private:
   // To hold threaded messages
   SafeQueue<Message> messages;

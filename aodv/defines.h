@@ -5,7 +5,7 @@
 #define IP_ADDR			uint32_t
 #define BROADCAST       "255.255.255.255"
 
-#define AODV_DEBUG		    0
+#define AODV_DEBUG		    1
 #define AODV_PRINT_PACKET   1
 #define AODV_LOG_OUTPUT	    0
 

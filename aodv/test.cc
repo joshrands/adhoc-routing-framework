@@ -193,6 +193,14 @@ void test_aodv_rreq_buffer()
 	assert(receivedRREQ.type == rreq.type);
 	assert(receivedRREQ.origIP == rreq.origIP);
 
+	// Send a message to an unavailable location
+	char message []="Hello World\0";
+	aodv.sendPacket(message, 13, dest);
+	assert(aodv.packetInRreqBuffer(dest));
+
+	// "Find route"
+	
+
 	cout << "Test aodv rreq buffer complete." << endl;
 
 	delete buffer;
