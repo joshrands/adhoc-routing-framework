@@ -32,6 +32,7 @@ rerrPacket RERRHelper::createRERR(const IP_ADDR destIP, const IP_ADDR origIP)
 
     // populate data from unreachable 
     // start with dest count of 1
+    rerr.type = 0x03;
     rerr.destCount = 1;
     rerr.unreachableIP = destIP;
     rerr.unreachableSeqNum = this->m_pTable->getDestSequenceNumber(destIP);

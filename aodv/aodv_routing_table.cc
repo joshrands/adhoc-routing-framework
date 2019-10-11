@@ -170,6 +170,8 @@ void AODVRoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHo
 	
 		this->m_aodvTable[dest] = info;
 	}
+
+	this->m_aodvTable[dest].active = true;
 }
 
 void AODVRoutingTable::removeTableEntry(const IP_ADDR dest)
@@ -179,9 +181,9 @@ void AODVRoutingTable::removeTableEntry(const IP_ADDR dest)
 	{	
 		// entry exists, delete entry 
 		if (TABLE_DEBUG)
-			cout << "Deleting AODV entry" << endl;
+			cout << "Setting table entry as inactive" << endl;
 
-		this->m_aodvTable.erase(dest);
+		this->m_aodvTable[dest].active = false;
 	}
 	else
 	{
@@ -207,4 +209,12 @@ int AODVRoutingTable::getCostOfRREP(const rrepPacket rrep)
 {
 	// currently using hopcount...
 	return rrep.hopCount;
+}
+
+bool AODVRoutingTable::getIsRouteActive(const IP_ADDR dest)
+{	
+	if (m_aodvTable.count(dest) > 0)
+		return m_aodvTable[dest].active;
+	else 
+		return false;
 }

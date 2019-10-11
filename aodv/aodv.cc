@@ -122,27 +122,35 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADD
 	// if entry exists in routing table, send it! 
 	// check routing table 
 	IP_ADDR nextHop = this->getTable()->getNextHop(finalDestination);
-	if (0 == nextHop)
+
+	if (false == getTable()->getIsRouteActive(finalDestination))
 	{
-		if (AODV_DEBUG)
-			cout << "No existing route, creating RREQ message." << endl;
-
-		// start a thread for an rreq and wait for a response 
-		rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
-
-		// Put this packet in a buffer to be sent when the rrep is received 
-		if(this->rreqPacketBuffer.count(rreq.destIP))
+		// Put this packet in a buffer to be sent when a route opens up  
+		if (this->rreqPacketBuffer.count(finalDestination))
 		{
 			char* bufferedPacket = (char*)(malloc(length));
 			memcpy(bufferedPacket, packet, length);
-			this->rreqPacketBuffer[rreq.destIP].push(pair<char*,int>(bufferedPacket, length));
+			this->rreqPacketBuffer[finalDestination].push(pair<char*,int>(bufferedPacket, length));
 		}
 		else
 		{
 			char* bufferedPacket = (char*)(malloc(length));
 			memcpy(bufferedPacket, packet, length);
-			this->rreqPacketBuffer[rreq.destIP] = queue<pair<char*, int>>({pair<char*,int>(bufferedPacket, length)});
+			this->rreqPacketBuffer[finalDestination] = queue<pair<char*, int>>({pair<char*,int>(bufferedPacket, length)});
 		}
+
+		if (nextHop != 0)
+		{
+			// this route is temporarily unavailable... check if actively finding a route
+			// TODO: IMPLEMENT THIS
+			return;
+		}
+
+		if (AODV_DEBUG)
+			cout << "No existing route, creating RREQ message." << endl;
+
+		// start a thread for an rreq and wait for a response 
+		rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
 
 		broadcastRREQBuffer(rreq);
 		return;
@@ -370,20 +378,26 @@ void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int l
 	{
 		// link is totally dead. Remove entry in routing table and send a RERR.
 		rerrPacket rerr = rerrHelper.createRERR(finalDest, origIP);
+		char* packet = (char*)(malloc(sizeof(rerr)));
+		memcpy(packet, &rerr, sizeof(rerr));
 
 		// remove from routing table
 		// TODO: Set to inactive?
-//		getTable()->removeTableEntry(finalDest);
+		getTable()->removeTableEntry(finalDest);
 
 		// send reverse rerr to originator 
 		IP_ADDR nextHop = getTable()->getNextHop(origIP);
+		cout << "Next hop for rerr = " << getStringFromIp(nextHop) << endl;
+
+		// TODO: ADD PACKET TO PACKET BUFFER QUEUE
+		socketSendPacket(packet, sizeof(rerr), nextHop, AODV_PORT);
 	}
 }
 
 bool AODV::linkExists(IP_ADDR dest)
 {
 	if (MONITOR_DEBUG)
-		cout << "Checking if link exists to " << getStringFromIp(dest) << endl;
+		cout << "Checking if link exists from " << getStringFromIp(getIp()) << " to " << getStringFromIp(dest) << endl;
 
 	// update current list of one hop neighbors 
 	getOneHopNeighbors();
@@ -444,8 +458,13 @@ void AODV::logRoutingTable()
 				<< " : "
 				<< getStringFromIp(it->second.nextHop)
 				<< " : "
-				<< to_string(it->second.hopCount)
-				<< endl;
+				<< to_string(it->second.hopCount);
+
+		if (getTable()->getIsRouteActive(it->first))
+			logFile << " : ACTIVE" << endl;
+		else
+			logFile << " : INACTIVE" << endl;		
+//				<< endl;
 	}
 
 	logFile.close();
