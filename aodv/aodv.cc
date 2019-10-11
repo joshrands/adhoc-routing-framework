@@ -105,7 +105,7 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 		// strip header and send packet
 		// TODO: Most important time to check link state. 
 		packet += HEADER_SIZE;
-		sendPacket(packet, length, finalDestination, origIP);
+		sendPacket(packet, length-HEADER_SIZE, finalDestination, origIP);
 	}
 
 	if (AODV_LOG_OUTPUT)
