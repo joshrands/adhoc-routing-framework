@@ -235,7 +235,6 @@ void test_aodv_rreq_to_rrep()
 
 	node0.sendPacket(buffer, length, node3.getIp());	
 
-	node0.sendPacket(buffer, length, node3.getIp());	
 	delete buffer;
 
 	cout << getStringFromIp(AODVTest::lastNode) << endl;
@@ -280,8 +279,6 @@ void test_aodv_loop_prevention()
 	char* buffer = (char*)(malloc(length));
 	for (int i = 0; i < length; i++)
 		buffer[i] = msg.at(i);
-
-	node0.sendPacket(buffer, length, node4.getIp());
 
 	node0.sendPacket(buffer, length, node4.getIp());
 
@@ -346,7 +343,6 @@ void test_aodv_link_break()
 	for (int i = 0; i < length; i++)
 		buffer[i] = msg.at(i);
 
-	node0.sendPacket(buffer, length, node4.getIp());
 	node0.sendPacket(buffer, length, node4.getIp());
 
 	assert(AODVTest::lastReceive == node4.getIp());
