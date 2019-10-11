@@ -10,11 +10,11 @@ AODV::AODV()
 		cout << "Warning: Must update aodv ip address.";
 }
 
-AODV::AODV(const char* ip)
+AODV::AODV(const char* ip) : AODV(getIpFromString(ip))
 {
 	if (AODV_DEBUG)
 		cout << "Created new aodv routing protocol." << endl;
-
+/*
 	this->ipAddress = getIpFromString(ip);
 	this->sequenceNum = 0;
 	this->m_aodvTable = new AODVRoutingTable();
@@ -30,6 +30,7 @@ AODV::AODV(const char* ip)
 	this->rerrHelper.setIp(getIp());
 	this->rerrHelper.setRoutingTable(this->getTable());
 	this->rerrHelper.setSequenceNum(&(this->sequenceNum));
+*/
 }
 
 AODV::AODV(IP_ADDR ip)
@@ -480,11 +481,11 @@ void AODVTest::addNeighbor(AODVTest* node)
 	this->m_physicalNeighbors.push_back(node);
 }
 
-void AODVTest::removeNeighbor(AODVTest node)
+void AODVTest::removeNeighbor(AODVTest* node)
 {
 	for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++)
 	{
-		if (node.getIp() == m_physicalNeighbors.at(i)->getIp())
+		if (node->getIp() == m_physicalNeighbors.at(i)->getIp())
 		{
 			m_neighbors.erase(m_neighbors.begin() + i);
 			m_physicalNeighbors.erase(m_physicalNeighbors.begin() + i);
