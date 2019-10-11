@@ -44,7 +44,7 @@ public:
 	void setDestSequenceNumber(const IP_ADDR dest, uint32_t destSeqNum);
 	void setHopCount(const IP_ADDR dest, uint8_t hopCount);
 	void setLastRREQId(const IP_ADDR dest, uint32_t lastRREQId);
-	void setIsRouteActive(const bool active);
+	void setIsRouteActive(const IP_ADDR dest, const bool active);
 
 	void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
 	void removeTableEntry(const IP_ADDR dest);

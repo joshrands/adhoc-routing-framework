@@ -114,6 +114,21 @@ void AODVRoutingTable::setLastRREQId(const IP_ADDR dest, uint32_t lastRREQId)
 	}
 }
 
+void AODVRoutingTable::setIsRouteActive(const IP_ADDR dest, bool active)
+{
+	// check if this entry exists 
+	if (this->m_aodvTable.count(dest))
+	{
+		// entry exists, update dest sequence number  
+		((AODVInfo*)&(this->m_aodvTable[dest]))->active = active; 
+	}
+	else
+	{
+		cout << "DEBUG: Error update active: Unknown table entry." << endl;
+		return;
+	}
+}
+
 void AODVRoutingTable::updateAODVRoutingTableFromRREQ(rreqPacket* receivedRREQ, IP_ADDR sourceIP)
 {
 	if (TABLE_DEBUG)

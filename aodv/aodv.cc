@@ -346,8 +346,9 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 
 		if (linkExists(nextHopIp))
 			socketSendPacket(buffer, sizeof(forwardRREP), nextHopIp, AODV_PORT);
-		else
-			repairLink(nextHopIp, forwardRREP.origIP, buffer, sizeof(forwardRREP), forwardRREP.destIP, AODV_PORT);		
+		else if (RREP_DEBUG)
+			cout << "We don't try to repair failed RREPs..." << endl;
+//			repairLink(nextHopIp, forwardRREP.origIP, buffer, sizeof(forwardRREP), forwardRREP.destIP, AODV_PORT);		
 
 		delete buffer;
     }
@@ -359,8 +360,26 @@ void AODV::handleRERR(char* buffer, int length, IP_ADDR source)
 	if (RERR_DEBUG)
 		cout << "Handling RERR message..." << endl;
 
-	// when a link breaks, mark a routing table entry as invalid 
+	rerrPacket rerr = RERRHelper::readRERRBuffer(buffer);
+
+	char* packet = (char*)(malloc(length));
+	memcpy(packet, &rerr, length);
+
 	// when forwarding packets, make sure the routing table entry is valid
+	if (rerr.origIP != this->getIp()) 
+	{
+		if (RERR_DEBUG)
+			cout << "Route Error response received from sender." << endl;
+	} 
+	else if (getTable()->getIsRouteActive(rerr.origIP))
+	{
+		// when a link breaks, mark a routing table entry as invalid 
+		getTable()->setIsRouteActive(rerr.unreachableIP, false);
+
+		// send a packet to the next hop about the error
+		IP_ADDR nextHop = getTable()->getNextHop(rerr.origIP);
+		socketSendPacket(packet, sizeof(rerr), nextHop, AODV_PORT);
+	}
 }
 
 void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port)
@@ -383,7 +402,7 @@ void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int l
 
 		// remove from routing table
 		// TODO: Set to inactive?
-		getTable()->removeTableEntry(finalDest);
+		getTable()->setIsRouteActive(finalDest, false);
 
 		// send reverse rerr to originator 
 		IP_ADDR nextHop = getTable()->getNextHop(origIP);
@@ -464,7 +483,6 @@ void AODV::logRoutingTable()
 			logFile << " : ACTIVE" << endl;
 		else
 			logFile << " : INACTIVE" << endl;		
-//				<< endl;
 	}
 
 	logFile.close();
