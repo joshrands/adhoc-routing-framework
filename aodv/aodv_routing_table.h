@@ -43,6 +43,7 @@ public:
 	void setLastRREQId(const IP_ADDR dest, uint32_t lastRREQId);
 
 	void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
+	void removeTableEntry(const IP_ADDR dest);
 
 	// get the cost to send packets to this node 
 	int getCostOfDest(const IP_ADDR dest);

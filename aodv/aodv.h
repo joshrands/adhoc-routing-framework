@@ -30,7 +30,7 @@ public:
 	// handle received data. if not in routing table, attempt local fix and then RERR 
 	void receivePacket(char* packet, int length, IP_ADDR source);
 	// try to send data to a destination - the next hop is determined from the routing table  
-	void sendPacket(char* packet, int length, IP_ADDR finalDestination);
+	void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP = -1);
 
 	static const int AODV_PORT = 8060;
 	static const int DATA_PORT = 8080;
@@ -56,9 +56,10 @@ public:
 	void handleRERR(char* buffer, int length, IP_ADDR source);
 
 	// Network Monitoring
-	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR dest, int port);
+	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port);
 	virtual bool linkExists(IP_ADDR dest);
 	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
+	virtual void getOneHopNeighbors();
 
 	// output the current contents of the routing table 
 	void logRoutingTable();

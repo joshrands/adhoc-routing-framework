@@ -64,7 +64,9 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 	// get final destination
 	IP_ADDR finalDestination;
 	memcpy(&finalDestination, &(packet[1]), 4);
-	
+	IP_ADDR origIP;
+	memcpy(&origIP, &(packet[5]), 4);
+
 	if (this->getIp() == finalDestination)
 	{
 		// packet has reached its final destination! 
@@ -103,15 +105,19 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 		// strip header and send packet
 		// TODO: Most important time to check link state. 
 		packet += 5;
-		sendPacket(packet, length - 5, finalDestination);
+		sendPacket(packet, length, finalDestination, origIP);
 	}
 
 	if (AODV_LOG_OUTPUT)
 		logRoutingTable();
 }
 
-void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
+void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP)
 {
+	// by default this node is the originator 
+	if (-1 == origIP)
+		origIP = getIp();
+
 	// if entry exists in routing table, send it! 
 	// check routing table 
 	IP_ADDR nextHop = this->getTable()->getNextHop(finalDestination);
@@ -129,8 +135,7 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 
 	if (AODV_DEBUG)
 		cout << "Route exists. Routing from " << getStringFromIp(getIp()) << " to " << getStringFromIp(finalDestination) << endl;
-	// TODO: Check if there was a broken link and generate rerr 
-	
+
 	// add aodv header to buffer 
 	char* buffer = (char*)(malloc(5 + length));
 	uint8_t zero = 0x00;
@@ -138,13 +143,22 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination)
 	buffer++;
 	memcpy(buffer, &finalDestination, 4);
 	buffer+=4;
+	memcpy(buffer, &origIP, 4);
+	buffer+=4;	
 
 	// copy data into packet 
 	memcpy(buffer, packet, length);
 	// reset packet 
-	buffer-=5;
+	buffer-=9;
 
-	socketSendPacket(buffer, length+5, nextHop, DATA_PORT);
+	if (linkExists(nextHop))
+	{
+		socketSendPacket(buffer, length+5, nextHop, DATA_PORT);
+	}
+	else
+	{
+		repairLink(nextHop, finalDestination, buffer, length, origIP, DATA_PORT);
+	}
 
 	delete buffer;
 }
@@ -238,7 +252,7 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 		if (linkExists(nextHopIp))
 			socketSendPacket(buffer, sizeof(rrep), nextHopIp, AODV_PORT);
 		else 
-			repairLink(nextHopIp, rrep.origIP, buffer, sizeof(rrep), nextHopIp, AODV_PORT);
+			repairLink(nextHopIp, rrep.origIP, buffer, sizeof(rrep), getIp(), AODV_PORT);
 
 		delete buffer;
 
@@ -290,7 +304,7 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 		if (linkExists(nextHopIp))
 			socketSendPacket(buffer, sizeof(forwardRREP), nextHopIp, AODV_PORT);
 		else
-			repairLink(nextHopIp, forwardRREP.origIP, buffer, sizeof(forwardRREP), nextHopIp, AODV_PORT);		
+			repairLink(nextHopIp, forwardRREP.origIP, buffer, sizeof(forwardRREP), forwardRREP.destIP, AODV_PORT);		
 
 		delete buffer;
     }
@@ -306,7 +320,7 @@ void AODV::handleRERR(char* buffer, int length, IP_ADDR source)
 	// when forwarding packets, make sure the routing table entry is valid
 }
 
-void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR dest, int port)
+void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port)
 {
 	// first try to fix the link locally
 	if (true == attemptLocalRepair(brokenLink, finalDest))
@@ -314,22 +328,44 @@ void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int l
 		if (MONITOR_DEBUG)
 			cout << "Broken link repaired locally! Sending packet..." << endl;
 
-		socketSendPacket(buffer, length, dest, port);
+		IP_ADDR nextHop = getTable()->getNextHop(finalDest);
+		socketSendPacket(buffer, length, nextHop, port);
 	}
 	else 
 	{
-		// link is totally dead, send a RERR.
-		rerrHelper.createRERR(finalDest);
+		// link is totally dead. Remove entry in routing table and send a RERR.
+		rerrPacket rerr = rerrHelper.createRERR(finalDest, origIP);
+
+		// remove from routing table
+		// TODO: Set to inactive?
+//		getTable()->removeTableEntry(finalDest);
+
+		// send reverse rerr to originator 
+		IP_ADDR nextHop = getTable()->getNextHop(origIP);
 	}
 }
 
 bool AODV::linkExists(IP_ADDR dest)
 {
+	if (MONITOR_DEBUG)
+		cout << "Checking if link exists to " << getStringFromIp(dest) << endl;
+
+	// update current list of one hop neighbors 
+	getOneHopNeighbors();
+
 	for (IP_ADDR ip : m_neighbors)
 	{
 		if (dest == ip)
+		{
+			if (MONITOR_DEBUG)
+				cout << "Link exists!" << endl;
+
 			return true;
+		}
 	}
+
+	if (MONITOR_DEBUG)
+		cout << "Link does not exist." << endl;
 
 	return false;
 }
@@ -341,6 +377,11 @@ bool AODV::attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest)
 
 	// TODO: Use network monitoring to attempt local repair
 	return false;
+}
+
+void AODV::getOneHopNeighbors()
+{
+
 }
 
 void AODV::logRoutingTable()

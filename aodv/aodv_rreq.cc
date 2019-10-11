@@ -35,7 +35,8 @@ bool RREQHelper::shouldGenerateRREP(rreqPacket receivedRREQ)
 	else if (this->m_pTable->getNextHop(receivedRREQ.destIP) != 0)
 	{
 		if (RREQ_DEBUG)
-			cout << "This node has a path to the final node in its routing table." << endl;
+			cout << "This node " << getStringFromIp(this->m_ip) << " has a path to the final node in its routing table." << endl;
+
 		return true;
 	}
 	else
@@ -59,7 +60,7 @@ bool RREQHelper::isDuplicateRREQ(rreqPacket receivedRREQ)
 	int newCost = this->m_pTable->getCostOfRREQ(receivedRREQ);
 
 	if ( (packetSeqNum == tableSeqNum || tableLastId == receivedRREQ.rreqID) 
-		&& (newCost >= currentCost) ) 
+		&& (newCost > currentCost) ) 
 		return true;
 	else
 		return false;
@@ -105,7 +106,7 @@ rreqPacket RREQHelper::createForwardRREQ(rreqPacket receivedRREQ, IP_ADDR source
 	forwardRREQ.hopCount++;
 
 	// 2. Update routing table for this node with orig sequence nubmer 
-	this->m_pTable->updateAODVRoutingTableFromRREQ(&receivedRREQ, sourceIP);
+	this->m_pTable->updateAODVRoutingTableFromRREQ(&forwardRREQ, sourceIP);
 
 	// 3. TODO: Set lifetime of table entry
 

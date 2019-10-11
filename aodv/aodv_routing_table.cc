@@ -2,7 +2,8 @@
 
 AODVRoutingTable::AODVRoutingTable()
 {
-	cout << "Created new aodv routing table." << endl;
+	if (TABLE_DEBUG)
+		cout << "Created new aodv routing table." << endl;
 }
 
 AODVRoutingTable::~AODVRoutingTable()
@@ -118,6 +119,9 @@ void AODVRoutingTable::updateAODVRoutingTableFromRREQ(rreqPacket* receivedRREQ, 
 	if (TABLE_DEBUG)
 		cout << "Updating routing table from RREQ packet" << endl;
 
+	if (receivedRREQ->hopCount == 0)
+		cout << "HOP COUNT IS ZERO. FROM " << getStringFromIp(sourceIP) << endl;
+
 	if (  receivedRREQ->origSeqNum > getDestSequenceNumber(receivedRREQ->origIP)
 	   || getCostOfDest(receivedRREQ->origIP) > getCostOfRREQ(*receivedRREQ))
 	{
@@ -138,7 +142,6 @@ void AODVRoutingTable::updateAODVRoutingTableFromRREP(rrepPacket* receivedRREP, 
 	   || getCostOfDest(receivedRREP->destIP) > getCostOfRREP(*receivedRREP))
 	{
 		this->updateTableEntry(receivedRREP->destIP, sourceIP);
-
 		this->setDestSequenceNumber(receivedRREP->destIP, receivedRREP->destSeqNum);
 		this->setHopCount(receivedRREP->destIP, receivedRREP->hopCount);
 	}
@@ -166,6 +169,24 @@ void AODVRoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHo
 		info.ttl = DEFAULT_TTL;
 	
 		this->m_aodvTable[dest] = info;
+	}
+}
+
+void AODVRoutingTable::removeTableEntry(const IP_ADDR dest)
+{
+	// check if this entry exists 
+	if (this->m_aodvTable.count(dest))
+	{	
+		// entry exists, delete entry 
+		if (TABLE_DEBUG)
+			cout << "Deleting AODV entry" << endl;
+		this->m_aodvTable.erase(dest);
+	}
+	else
+	{
+		// no entry, create new 
+		if (TABLE_DEBUG)
+			cout << "Error. Tried to erase non-existent table entry." << endl;
 	}
 }
 
