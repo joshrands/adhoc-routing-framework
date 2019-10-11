@@ -180,6 +180,7 @@ void AODVRoutingTable::removeTableEntry(const IP_ADDR dest)
 		// entry exists, delete entry 
 		if (TABLE_DEBUG)
 			cout << "Deleting AODV entry" << endl;
+
 		this->m_aodvTable.erase(dest);
 	}
 	else

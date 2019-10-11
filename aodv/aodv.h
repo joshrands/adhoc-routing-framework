@@ -93,6 +93,8 @@ public:
 
 	AODVTest(IP_ADDR ip) : AODV(ip) {}
 	AODVTest(const char* ip) : AODV(ip) {}
+	~AODVTest() { m_physicalNeighbors.clear(); }
+
 	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
 
 	// Network Monitoring 
