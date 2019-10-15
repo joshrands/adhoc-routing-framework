@@ -120,7 +120,8 @@ void AODVRoutingTable::setIsRouteActive(const IP_ADDR dest, bool active)
 	if (this->m_aodvTable.count(dest))
 	{
 		// entry exists, update dest sequence number  
-		((AODVInfo*)&(this->m_aodvTable[dest]))->active = active; 
+		cout << "Setting " << getStringFromIp(dest) << " to INACTIVE " << active << endl;
+		this->m_aodvTable[dest].active = active;
 	}
 	else
 	{
@@ -154,7 +155,8 @@ void AODVRoutingTable::updateAODVRoutingTableFromRREP(rrepPacket* receivedRREP, 
 		cout << "Updating routing table from RREP packet" << endl;
 
 	if (  receivedRREP->destSeqNum > getDestSequenceNumber(receivedRREP->destIP)
-	   || getCostOfDest(receivedRREP->destIP) > getCostOfRREP(*receivedRREP))
+	   || getCostOfDest(receivedRREP->destIP) > getCostOfRREP(*receivedRREP)
+	   || false == getIsRouteActive(receivedRREP->destIP))
 	{
 		this->updateTableEntry(receivedRREP->destIP, sourceIP);
 		this->setDestSequenceNumber(receivedRREP->destIP, receivedRREP->destSeqNum);

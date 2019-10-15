@@ -363,20 +363,27 @@ void AODV::handleRERR(char* buffer, int length, IP_ADDR source)
 
 	rerrPacket rerr = RERRHelper::readRERRBuffer(buffer);
 
-	char* packet = (char*)(malloc(length));
-	memcpy(packet, &rerr, length);
+	// when a link breaks, mark a routing table entry as invalid 
+	if (RERR_DEBUG)
+		cout << "Setting unreachable IP " << getStringFromIp(rerr.unreachableIP) << " to INACTIVE." << endl;
+
+	getTable()->setIsRouteActive(rerr.unreachableIP, false);
+
+	char* packet = (char*)(malloc(sizeof(rerr)));
+	memcpy(packet, &rerr, sizeof(rerr));
 
 	// when forwarding packets, make sure the routing table entry is valid
-	if (rerr.origIP != this->getIp()) 
+	if (rerr.origIP == this->getIp()) 
 	{
 		if (RERR_DEBUG)
 			cout << "Route Error response received by sender." << endl;
+
+		// generate a RREQ to the destination 
+//		rreqPacket rreq = rreqHelper.createRREQ(rerr.unreachableIP);
+//		broadcastRREQBuffer(rreq);
 	} 
 	else if (getTable()->getIsRouteActive(rerr.origIP))
 	{
-		// when a link breaks, mark a routing table entry as invalid 
-		getTable()->setIsRouteActive(rerr.unreachableIP, false);
-
 		// send a packet to the next hop about the error
 		IP_ADDR nextHop = getTable()->getNextHop(rerr.origIP);
 		socketSendPacket(packet, sizeof(rerr), nextHop, AODV_PORT);
@@ -402,7 +409,6 @@ void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int l
 		memcpy(packet, &rerr, sizeof(rerr));
 
 		// remove from routing table
-		// TODO: Set to inactive?
 		getTable()->setIsRouteActive(finalDest, false);
 
 		// send reverse rerr to originator 
@@ -470,7 +476,7 @@ void AODV::logRoutingTable()
 
 	map<IP_ADDR, AODVInfo>::iterator it;
 
-	logFile << "DESTINATION IP : NEXT HOP : TOTAL HOPS" << endl;
+	logFile << "DESTINATION IP : NEXT HOP : TOTAL HOPS : STATUS" << endl;
 
 	for ( it = this->getTable()->getInternalAODVTable().begin(); it != this->getTable()->getInternalAODVTable().end(); it++ )
 	{

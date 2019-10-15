@@ -1,4 +1,6 @@
 #include "aodv_rerr.h"
+#include <cstring>
+using namespace std;
 
 // default constructor
 RERRHelper::RERRHelper()
@@ -55,7 +57,9 @@ char* RERRHelper::createRERRBuffer(const rerrPacket rerr)
 
 rerrPacket RERRHelper::readRERRBuffer(char* buffer)
 {
-   rerrPacket rerr;
+    rerrPacket rerr;
 
-   return rerr; 
+    memcpy(&rerr, buffer, sizeof(rerr));
+
+    return rerr; 
 }
