@@ -30,7 +30,7 @@ bool RREQHelper::shouldGenerateRREP(rreqPacket receivedRREQ)
 
 		return true;
 	}
-	else if (this->m_pTable->getNextHop(receivedRREQ.destIP) != 0)
+	else if (this->m_pTable->getNextHop(receivedRREQ.destIP) != 0 && this->m_pTable->getIsRouteActive(receivedRREQ.destIP))
 	{
 		if (RREQ_DEBUG)
 			cout << "This node " << getStringFromIp(this->m_ip) << " has a path to the final node in its routing table." << endl;

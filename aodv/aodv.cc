@@ -304,14 +304,14 @@ void AODV::handleRREP(char* buffer, int length, IP_ADDR source)
 	// valid rreq packet, make a decision
 	rrepPacket rrep = rrepHelper.readRREPBuffer(buffer);
 
+    this->getTable()->updateAODVRoutingTableFromRREP(&rrep,source);
+
 	// 2. are we the original ip? was this our route request reply? 
     if (this->getIp() == rrep.origIP)
     {
         // packet made it back! 
         if (AODV_DEBUG)
             cout << "Route discovery complete! Sending buffered packets, if they exist." << endl;
-
-        this->getTable()->updateAODVRoutingTableFromRREP(&rrep,source);
 
 		// Send any queued packages for that destination
 		if(this->rreqPacketBuffer.count(rrep.destIP))
@@ -376,11 +376,11 @@ void AODV::handleRERR(char* buffer, int length, IP_ADDR source)
 	if (rerr.origIP == this->getIp()) 
 	{
 		if (RERR_DEBUG)
-			cout << "Route Error response received by sender." << endl;
+			cout << "Route Error response received by sender. Generating a new RREQ..." << endl;
 
 		// generate a RREQ to the destination 
-//		rreqPacket rreq = rreqHelper.createRREQ(rerr.unreachableIP);
-//		broadcastRREQBuffer(rreq);
+		rreqPacket rreq = rreqHelper.createRREQ(rerr.unreachableIP);
+		broadcastRREQBuffer(rreq);
 	} 
 	else if (getTable()->getIsRouteActive(rerr.origIP))
 	{
