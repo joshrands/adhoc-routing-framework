@@ -116,7 +116,7 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP)
 {
 	// by default this node is the originator 
-	if (-1 == origIP)
+	if (-1 == signed(origIP))
 		origIP = getIp();
 
 	// if entry exists in routing table, send it! 
@@ -275,8 +275,9 @@ void AODV::handleRREQ(char* buffer, int length, IP_ADDR source)
 
 		if (linkExists(nextHopIp))
 			socketSendPacket(buffer, sizeof(rrep), nextHopIp, AODV_PORT);
-		else 
-			repairLink(nextHopIp, rrep.origIP, buffer, sizeof(rrep), getIp(), AODV_PORT);
+//		else 
+//			repairLink(nextHopIp, rrep.origIP, buffer, sizeof(rrep), getIp(), AODV_PORT);
+//		we don't try to repair links for rreps...
 
 		delete buffer;
 
