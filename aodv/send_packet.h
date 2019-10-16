@@ -13,8 +13,6 @@
 
 #include <iostream>
 
-#define DEBUG    0 
-
 using namespace std;
 
 int sendBuffer(char* buffer, int length, IP_ADDR dest, int port);

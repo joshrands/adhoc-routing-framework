@@ -1,4 +1,6 @@
 #include "aodv_rerr.h"
+#include <cstring>
+using namespace std;
 
 // default constructor
 RERRHelper::RERRHelper()
@@ -23,12 +25,22 @@ bool RERRHelper::attemptLocalRepair(IP_ADDR brokenLink)
     return false;
 }
 
-rerrPacket RERRHelper::createRERR(const IP_ADDR dest)
+rerrPacket RERRHelper::createRERR(const IP_ADDR destIP, const IP_ADDR origIP)
 {
+    if (RERR_DEBUG)
+        cout << "Generating Route Error packet for destination " << getStringFromIp(destIP) << endl;
 
-    rerrPacket packet;
+    rerrPacket rerr;
 
-		return packet;
+    // populate data from unreachable 
+    // start with dest count of 1
+    rerr.type = 0x03;
+    rerr.destCount = 1;
+    rerr.unreachableIP = destIP;
+    rerr.unreachableSeqNum = this->m_pTable->getDestSequenceNumber(destIP);
+    rerr.origIP = origIP;
+
+	return rerr;
 }
 
 void RERRHelper::forwardRERR(const rerrPacket receivedRERR)
@@ -45,7 +57,9 @@ char* RERRHelper::createRERRBuffer(const rerrPacket rerr)
 
 rerrPacket RERRHelper::readRERRBuffer(char* buffer)
 {
-   rerrPacket rerr;
+    rerrPacket rerr;
 
-   return rerr; 
+    memcpy(&rerr, buffer, sizeof(rerr));
+
+    return rerr; 
 }

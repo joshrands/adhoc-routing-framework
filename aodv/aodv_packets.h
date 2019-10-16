@@ -98,4 +98,5 @@ struct rerrPacket
     uint8_t destCount;
     uint32_t unreachableIP;
     uint32_t unreachableSeqNum;
+    uint32_t origIP;
 };

@@ -20,6 +20,8 @@ RREPHelper::RREPHelper(IP_ADDR ip, AODVRoutingTable* table, uint32_t* seqNum)
 rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
 {
     // update the routing table from the original rreq message
+    // update hop count. this is correct!!!
+    rreq.hopCount++;
     this->m_pTable->updateAODVRoutingTableFromRREQ(&(rreq), source);
 
 	rrepPacket rrep;    
@@ -30,6 +32,8 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
     // is this node the destination? 
     if (rrep.destIP == this->m_ip)
     {
+        if (RREP_DEBUG)
+            cout << "Creating RREP from final destination" << endl;
         // yes, copy this sequence number in
         // increment this node sequence number if equal to orig sequence number 
         if (*(this->m_pSequenceNum) == rreq.destSeqNum)
@@ -38,10 +42,12 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
 				}
 
         rrep.destSeqNum = *(this->m_pSequenceNum);
-        rrep.hopCount = 0x00; // this is weird... what is the point of rreq hops?  
+        rrep.hopCount = 0; // this is weird... what is the point of rrep hops?  
     }
     else 
     {
+        if (RREP_DEBUG)
+            cout << "Generating RREP from intermediary hop" << endl;
         // we are an intermediary hop
         // copy known sequence number for destination into destSeq field
         rrep.destSeqNum = this->m_pTable->getDestSequenceNumber(rreq.destIP);
@@ -58,8 +64,8 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
 rrepPacket RREPHelper::createForwardRREP(rrepPacket receivedRREP, IP_ADDR source)
 {
     // TODO: Longest prefix matching? We are in the same subnet...
-
-    receivedRREP.hopCount++;
+    rrepPacket forwardRREP = receivedRREP;
+    forwardRREP.hopCount++;
 
     // update routing table for destination IF
     // 1. TODO: Sequence number in routing table is invalid?
@@ -69,10 +75,11 @@ rrepPacket RREPHelper::createForwardRREP(rrepPacket receivedRREP, IP_ADDR source
     if  (receivedRREP.destSeqNum > this->m_pTable->getDestSequenceNumber(receivedRREP.destIP)
      || (receivedRREP.hopCount < this->m_pTable->getDestHopCount(receivedRREP.destIP)))
     {
-        this->m_pTable->updateAODVRoutingTableFromRREP(&receivedRREP,source);
+        this->m_pTable->updateAODVRoutingTableFromRREP(&forwardRREP, source);
     }
 
-    return receivedRREP;
+
+    return forwardRREP;
 }
 
 char* RREPHelper::createRREPBuffer(const rrepPacket rrep)

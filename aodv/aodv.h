@@ -19,6 +19,14 @@
 #include <functional>
 #include <queue>
 
+struct packet
+{
+	char* buffer;
+	uint32_t length;
+	uint32_t id;
+	uint16_t ttl;
+};
+
 class AODV : public RoutingProtocol
 {
 public:
@@ -31,7 +39,7 @@ public:
 	// handle received data. if not in routing table, attempt local fix and then RERR 
 	void receivePacket(char* packet, int length, IP_ADDR source);
 	// try to send data to a destination - the next hop is determined from the routing table  
-	void sendPacket(char* packet, int length, IP_ADDR finalDestination);
+	void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP = -1);
 
 	static const int AODV_PORT = 8060;
 	static const int DATA_PORT = 8080;
@@ -57,9 +65,10 @@ public:
 	void handleRERR(char* buffer, int length, IP_ADDR source);
 
 	// Network Monitoring
-	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR dest, int port);
+	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port);
 	virtual bool linkExists(IP_ADDR dest);
 	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
+	virtual void getOneHopNeighbors();
 
 	// output the current contents of the routing table 
 	void logRoutingTable();
@@ -79,8 +88,14 @@ protected:
 	vector<IP_ADDR> m_neighbors;
 	// aodv routing table
 	AODVRoutingTable* m_aodvTable;
+
 	// map of rreq ids and their corresponding packet to be sent once the route is established
 	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
+
+	// current packet id index
+	uint32_t packetIdCount;	
+	// map of destination and recently sent packets (packets will time out after a short time) 
+	map<IP_ADDR, queue<packet>> unackedPacketBuffer;
 };
 
 /* AODVTest class
@@ -95,13 +110,15 @@ public:
 
 	AODVTest(IP_ADDR ip) : AODV(ip) {}
 	AODVTest(const char* ip) : AODV(ip) {}
+	~AODVTest() { m_physicalNeighbors.clear(); }
+
 	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
 
 	// Network Monitoring 
 
 	// add/remove node to neighbor list
 	void addNeighbor(AODVTest* node);
-	void removeNeighbor(AODVTest node);
+	void removeNeighbor(AODVTest* node);
 
 	// return true if node is neighbor
 	bool isNeighbor(AODVTest node);

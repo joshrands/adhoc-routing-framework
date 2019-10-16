@@ -25,12 +25,12 @@
 #define TRANS_POWER       10
 #define RX_GAIN           10
 
-#define minSpeed_mpers    2
-#define maxSpeed_mpers    4
+#define minSpeed_mpers    11
+#define maxSpeed_mpers    15
 #define xSize_m           500
 #define ySize_m           500
 
-#define NUM_NODES         20
+#define NUM_NODES         10
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
@@ -223,14 +223,13 @@ int main (int argc, char *argv[])
   Ptr<PositionAllocator> positionAllocPtr = positionModel.Create()->GetObject<PositionAllocator>();
   mobility.SetPositionAllocator(positionAllocPtr);
 
-/* Keep nodes immobile for initial tests 
+  // Keep nodes immobile for initial tests 
   std::string speedInput = "ns3::UniformRandomVariable[Min=" + std::to_string(minSpeed_mpers) + "|Max=" + std::to_string(maxSpeed_mpers) + "]";
   // set mobility model for adhoc nodes
   mobility.SetMobilityModel("ns3::RandomWaypointMobilityModel",
     "Speed", StringValue(speedInput),
     "Pause", StringValue("ns3::ConstantRandomVariable[Constant=0.5]"),
     "PositionAllocator", PointerValue(positionAllocPtr));
-*/
 
   mobility.Install (c);
 

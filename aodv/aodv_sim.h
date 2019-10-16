@@ -17,7 +17,7 @@ public:
     AODVns3(IP_ADDR ip);
 
     // TODO: implement later with network monitoring
-	bool linkExists(IP_ADDR dest);
+	void getOneHopNeighbors();
 
     int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
     function<int(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)> ns3SocketSendPacket;

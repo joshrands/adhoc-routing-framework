@@ -32,5 +32,9 @@ ${TARGET}: ${OBJ_FILES}
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $<
 
+run:
+	make 
+	./test
+
 clean:
 	rm -f core ${TARGET} ${OBJ_FILES} ${LIB_NAME}

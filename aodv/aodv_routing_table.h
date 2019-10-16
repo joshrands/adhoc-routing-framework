@@ -21,6 +21,8 @@ public:
 	uint32_t destSequenceNumber;
 	uint8_t hopCount;
 	uint32_t lastRREQId;
+
+	uint8_t active;
 };
 
 class AODVRoutingTable
@@ -38,11 +40,14 @@ public:
 	uint32_t getDestSequenceNumber(const IP_ADDR dest);
 	uint8_t getDestHopCount(const IP_ADDR dest);
 	uint32_t getLastRREQId(const IP_ADDR dest);
+	bool getIsRouteActive(const IP_ADDR dest);
 	void setDestSequenceNumber(const IP_ADDR dest, uint32_t destSeqNum);
 	void setHopCount(const IP_ADDR dest, uint8_t hopCount);
 	void setLastRREQId(const IP_ADDR dest, uint32_t lastRREQId);
+	void setIsRouteActive(const IP_ADDR dest, const bool active);
 
 	void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
+	void removeTableEntry(const IP_ADDR dest);
 
 	// get the cost to send packets to this node 
 	int getCostOfDest(const IP_ADDR dest);
