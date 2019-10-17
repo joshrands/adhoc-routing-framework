@@ -4,12 +4,16 @@ import socket
 import smtplib
 import os
 import sys
+import pwd
 
 sender_address = "smallsatteam@gmail.com"
 sender_password = "smallsatResearch"
 sender_server = 'smtp.gmail.com'
 sender_port = 587
 recipient_address = "smallsatteam@gmail.com"
+
+def get_username():
+    return pwd.getpwuid( os.getuid() )[ 0 ]
 
 def get_device_ip_address():
 
@@ -30,7 +34,8 @@ def get_device_ip_address():
             ipaddr = s.getsockname()[0]
             gateway = gw[2]
             host = socket.gethostname()
-            result = "OS:\t\tRaspbian\nIP:\t\t" + ipaddr + "\nGateway:\t" + gateway + "\nHost:\t\t" + host
+            username = get_username()
+            result = "OS:\t\tRaspbian\nIP:\t\t" + ipaddr + "\nGateway:\t" + gateway + "\nHost:\t\t" + host + "\nUsername:\t\t" + username
             return result
         
         else:
