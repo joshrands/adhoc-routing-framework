@@ -58,6 +58,20 @@ AODV::AODV(IP_ADDR ip)
 AODV::~AODV()
 {
 	delete this->m_aodvTable;
+
+	for (map<IP_ADDR, queue<pair<char*, int>>>::iterator it=rreqPacketBuffer.begin(); it!=rreqPacketBuffer.end(); ++it)
+	{
+		// remove all packets from this queue
+		queue<pair<char*, int>> packetQueue = it->second; 
+		while(packetQueue.size() > 0)
+		{
+			pair<char*, int> package = packetQueue.front();
+			delete package.first;
+
+			packetQueue.pop();
+		}
+		this->rreqPacketBuffer.erase(it->first);
+	}
 }
 
 void AODV::receivePacket(char* packet, int length, IP_ADDR source)

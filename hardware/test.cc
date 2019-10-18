@@ -30,7 +30,7 @@ int main() {
     char message [16] = "Hello World!";
     haodv.sendPacket(message, 16, getIpFromString("127.0.0.1"));
     haodv.sendPacket(message, 16, getIpFromString("127.0.0.1"));
-    haodv.~HardwareAODV();
+//    haodv.~HardwareAODV();
   }
 
   printf("________________________________\n\n");

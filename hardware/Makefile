@@ -24,8 +24,10 @@ OBJ_LIB_FILES = hardware_aodv.o ../aodv/*.o ../socket/*.o #../socket/udp_socket.
 
 STATIC_LIBRARIES = ../socket/libsocket.a ../aodv/libaodv.a
 
-OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = hardware_aodv.h #endpoint.h safe_queue.h socket.h udp_socket.h message.h 
+OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
+INC_FILES = hardware_aodv.h ../aodv/*.h ../socket/*.h #endpoint.h safe_queue.h socket.h udp_socket.h message.h 
+
+SUBDIRS = ../aodv ../socket
 
 #
 # Any libraries we might need.
@@ -33,7 +35,10 @@ INC_FILES = hardware_aodv.h #endpoint.h safe_queue.h socket.h udp_socket.h messa
 LIBRARYS = -lpthread
 
 ${TARGET} : ${OBJ_FILES}
-	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS} 
+	for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir; \
+	done
+	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
 	rm test.o
 	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES} 
 
@@ -44,4 +49,4 @@ ${TARGET} : ${OBJ_FILES}
 # Please remember not to submit objects or binarys.
 #
 clean:
-	rm -f core ${TARGET} ${OBJ_FILES} ${LIB_NAME}
+	rm -f core ${TARGET} hardware_aodv.o ${LIB_NAME}
