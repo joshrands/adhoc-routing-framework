@@ -15,6 +15,9 @@ interface = 'wlan0'
 
 
 def bash(*commands):
+    """
+    Runs entered commands in bash as sudo
+    """
     for command in commands:
         subprocess.run(f'echo {password} | sudo -S {command}', shell=True, check=True)
 
@@ -31,7 +34,6 @@ def set_wifi():
 if __name__=="__main__":
     adhoc_pin = 3
     GPIO.setup(adhoc_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
     adhoc_state = 1
 
     while True:
