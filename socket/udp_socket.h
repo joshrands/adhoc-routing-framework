@@ -26,7 +26,7 @@
 #include "endpoint.h"
 #include "socket.h"
 #include "message.h"
-#include "message_queue.h"
+#include "safe_queue.h"
 #include <iostream>
 #include <utility>
 using namespace std;
@@ -115,7 +115,7 @@ public:
 
 private:
   // To hold threaded messages
-  MessageQueue messages;
+  SafeQueue<Message> messages;
 };
 
 #endif
