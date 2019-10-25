@@ -5,6 +5,7 @@
 !/ns-allinone-3.28/ns-3.28/src/custom/aodv/*
 /ns-allinone-3.28/ns-3.28/src/custom/aodv/model/*
 /.vscode
+do-adhoc
 
 # Prerequisites
 *.d
