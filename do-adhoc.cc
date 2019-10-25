@@ -18,18 +18,18 @@ void getConfig(config* config);
 int main(){
     // This might be a double negative right now...
     AODV::AODV_PORT = 13415;
-    HardwareAODV haodv(inet_addr("138.67.76.108"));
+    HardwareAODV haodv(inet_addr("138.67.203.229"));
 //    HardwareAODV haodv2("138.67.194.210");
 
 //    cout << getStringFromIp(haodv2.getIp()) << endl;
     cout << getStringFromIp(haodv.getIp()) << endl;
-    cout << haodv.getIp() << " : " << inet_addr("138.67.76.108") << endl;
+    cout << haodv.getIp() << " : " << inet_addr("138.67.203.229") << endl;
 
-    char message [16] = "Hello World!";
+    string message = "Hello World!";
     
-    uint32_t dest = getIpFromString("138.67.78.144");
-    haodv.sendPacket(message, 16, dest);
-    haodv.sendPacket(message, 16, dest);
+    uint32_t dest = getIpFromString("127.0.0.1");
+    haodv.sendPacket(&message[0], message.length(), dest);
+    haodv.sendPacket(&message[0], message.length(), dest);
 
     while (-1 == haodv.handleReceivedPackets());
 }
