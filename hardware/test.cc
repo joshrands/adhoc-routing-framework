@@ -27,9 +27,12 @@ int main() {
   // Test initialization and ports
   {
     HardwareAODV haodv(getIpFromString("127.0.0.1"));
+    char* msg = (char*)(malloc(16));
     string message = "Hello World!";
-    haodv.sendPacket(&message[0], message.length(), getIpFromString("127.0.0.1"));
-    haodv.sendPacket(&message[0], message.length(), getIpFromString("127.0.0.1"));
+    memcpy(msg, &message, 16);
+
+    haodv.sendPacket(msg, 16, getIpFromString("127.0.0.1"));
+    haodv.sendPacket(msg, 16, getIpFromString("127.0.0.1"));
 //    haodv.~HardwareAODV();
   }
 

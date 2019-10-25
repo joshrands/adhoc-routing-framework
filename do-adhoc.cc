@@ -23,10 +23,11 @@ int main(){
 
 //    cout << getStringFromIp(haodv2.getIp()) << endl;
     cout << getStringFromIp(haodv.getIp()) << endl;
-    cout << haodv.getIp() << " : " << inet_addr("138.67.203.229") << endl;
+    cout << haodv.getIp() << " : " << inet_addr("1.1.168.192") << endl;
 
     string message = "Hello World!";
-    
+    cout << message.length() << endl;
+
     uint32_t dest = getIpFromString("127.0.0.1");
     haodv.sendPacket(&message[0], message.length(), dest);
     haodv.sendPacket(&message[0], message.length(), dest);

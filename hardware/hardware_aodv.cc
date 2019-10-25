@@ -1,4 +1,6 @@
 #include "hardware_aodv.h"
+#include <stdlib.h>
+#include <iostream>
 
 // Helpers
 void HardwareAODV::_hardwareAODV(){
@@ -6,24 +8,44 @@ void HardwareAODV::_hardwareAODV(){
     UDPSocket *aodvSocket = new UDPSocket();
     if (!aodvSocket->bindToPort(AODV_PORT)) {
         fprintf(stderr, "Could not bind the aodv socket to port:%d\n", AODV_PORT);
-        exit(-1);
+
+        std::cout << "Trying a new port..." << std::endl;
+        // try a new port
+        AODV_PORT = rand() % 10000; 
+        // clean memory
+        delete aodvSocket;
+        // try again
+        _hardwareAODV();
+
+        return;
     }
     if(!aodvSocket->setBroadcasting()){
         fprintf(stderr, "Could not set the aodv socket to broadcasting\n");
         exit(-1);
     }
-    aodving = thread(&UDPSocket::receiveFromPortThread, aodvSocket);
     
 
     UDPSocket *dataSocket = new UDPSocket();
     if (!dataSocket->bindToPort(DATA_PORT)) {
         fprintf(stderr, "Could not bind the data socket to port:%d\n", DATA_PORT);
-        exit(-1);
+
+        std::cout << "Trying a new port..." << std::endl;
+        // try a new port
+        DATA_PORT = rand() % 10000; 
+        // clean memory
+        delete aodvSocket;
+        // try again
+        _hardwareAODV();
+
+        return;
     }
     if(!dataSocket->setBroadcasting()){
         fprintf(stderr, "Could not set the data socket to broadcasting\n");
         exit(-1);
     }
+
+    // create threads 
+    aodving = thread(&UDPSocket::receiveFromPortThread, aodvSocket);
     dataing = thread(&UDPSocket::receiveFromPortThread, dataSocket);
 
     aodving.detach();
