@@ -22,7 +22,7 @@ STATIC_LIBRARIES = hardware/libhardware.a
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
 INC_FILES = 
 
-SUBDIRS = aodv hardware socket
+SUBDIRS = aodv socket hardware
 
 ${TARGET}: ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${STATIC_LIBRARIES}
@@ -38,7 +38,7 @@ all:
 clean-all: 
 	for dir in $(SUBDIRS); do \
 		cd $$dir; \
-		rm *.o; \
+		make clean; \
 		cd ../; \
 	done
 

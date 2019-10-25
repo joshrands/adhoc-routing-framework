@@ -11,9 +11,6 @@
 #include "../socket/udp_socket.h"
 #include "../aodv/aodv.h"
 
-#define AODV_PORT 8060
-#define DATA_PORT 8080
-
 class HardwareAODV : public AODV{
 private:
     UDPSocket* aodvSocket;

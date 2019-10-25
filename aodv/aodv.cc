@@ -4,6 +4,9 @@
 #include <fstream>
 #include <stdio.h>
 
+int AODV::DATA_PORT = 5555;
+int AODV::AODV_PORT = 5432;
+
 AODV::AODV()
 {
 	if (AODV_DEBUG)

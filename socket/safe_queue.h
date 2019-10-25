@@ -3,13 +3,17 @@
 #include <mutex>
 #include <queue>
 
+#include <iostream>
+
 template <typename T> class SafeQueue {
 private:
   std::queue<T> q;
   std::mutex m;
 
 public:
-  SafeQueue() {}
+  SafeQueue() {
+//      std::mutex m;
+  }
   /*! Places the data on the queue
    * @param elem the data to place
    */
