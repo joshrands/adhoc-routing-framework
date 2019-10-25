@@ -11,7 +11,7 @@ CXX = g++
 LD = g++
 LIB = ar
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK 
-LDFLAGS = -g -pthread
+LDFLAGS = -g -pthread -fsanitize=address
 LIBFLAGS = -cvq
 
 #
