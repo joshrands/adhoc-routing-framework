@@ -17,7 +17,7 @@ private:
     UDPSocket* dataSocket;
     thread aodving;
     thread dataing;
-private:
+
     void _hardwareAODV();
 public:
     // Constructors

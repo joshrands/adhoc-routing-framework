@@ -19,10 +19,10 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libsocket.a 
-OBJ_LIB_FILES = endpoint.o socket.o udp_socket.o  message.o
+OBJ_LIB_FILES = endpoint.o socket.o udp_socket.o  message.o message_queue.o
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = endpoint.h safe_queue.h socket.h udp_socket.h message.h 
+INC_FILES = endpoint.h socket.h udp_socket.h message.h message_queue.h
 
 # Any libraries we might need.
 LIBRARYS = -lpthread

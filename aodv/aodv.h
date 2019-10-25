@@ -1,3 +1,6 @@
+#ifndef AODV_H
+#define AODV_H
+
 /*********************************
  * aodv.h
  *
@@ -130,3 +133,5 @@ private:
 	vector<AODVTest*> m_physicalNeighbors;
 
 };
+
+#endif
