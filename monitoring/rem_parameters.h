@@ -25,7 +25,7 @@ enum ModelState
 class ModelParameters
 {
 public:
-  ModelParameters(); // default constructor
+  ModelParameters() { }; // default constructor
   ModelParameters(double mu, double beta, double sigma) { this->mu = mu; this->beta = beta; this->sigma = sigma; };
 
   double mu;
