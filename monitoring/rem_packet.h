@@ -2,7 +2,8 @@
  * rem_packet.h
  *
  * C++ implementation of the rem network packet  
- * 
+ * Formerly known as ModelInfoPacket***
+ *  
  * Author: Josh Rands
  * Date: 10/28/2019
  ********************************/
