@@ -1,0 +1,24 @@
+/*********************************
+ * rem_packet.h
+ *
+ * C++ implementation of the rem network packet  
+ * 
+ * Author: Josh Rands
+ * Date: 10/28/2019
+ ********************************/
+
+#include <stdint.h>
+
+using namespace std; 
+
+struct REMModelPacket
+{
+    uint8_t type;
+    uint16_t parentId;
+    uint32_t timestamp; // timestamp of packet
+    uint16_t timeToLive; // time to live of model in minutes
+
+    double mu;
+    double beta;
+    double sigma;
+}; 
