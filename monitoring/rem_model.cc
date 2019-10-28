@@ -1,11 +1,13 @@
 #include "rem_model.h"
 #include <math.h>
+#include <cmath>
 
 // Add a data point to this model and call fit model
 void PredictionModel::addDataPoint(double value, double time)
 {
     if (REM_DEBUG)
-        cout << "New data point added to model" << endl;
+        cout << "New data point added to model: "
+                << time << ", " << value << endl;
 
     this->data.push_back(value);
     this->times.push_back(time);
@@ -78,7 +80,7 @@ void PredictionModel::calculateDeviations(vector<double> times, vector<double> v
     // TODO: Check that this is windowSize iterations
     for (int i = 0; i < n; i++)
     {
-        totalDeviation += abs(long(values[i] - this->getDataPoint(times[i])));
+        totalDeviation += std::abs(float(values[i] - this->getDataPoint(times[i])));
     }
 
     // calculate sigma
@@ -93,7 +95,7 @@ bool PredictionModel::withinExpectedValueRange(double time, double value)
     // if the point lies within valid value return true
 
     double expected = this->getDataPoint(time);
-    double deviation = abs(long(value - expected));
+    double deviation = std::abs(float(value - expected));
     double threshold = model.sigma * NUM_DEVIATIONS;
 
     if (threshold < MIN_DEVIATION)
@@ -308,6 +310,10 @@ void RssModel::performRegression(vector<double> times, vector<double> values, ve
         yy += values[i]* values[i];
         xy += time * values[i];
     }
+
+    cout << xx << endl;
+    cout << yy << endl;
+    cout << xy << endl;
 
     double b = (y*xx - x*xy)/(n*xx - x*x);
     double m = (n*xy - x*y)/(n*xx - x*x);
