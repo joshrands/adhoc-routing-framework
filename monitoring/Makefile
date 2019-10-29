@@ -19,10 +19,10 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libmonitoring.a
-OBJ_LIB_FILES = rem.o rem_model.o
+OBJ_LIB_FILES = rem.o rem_model.o network_monitor.o
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h defines.h 
+INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h defines.h network_monitor.h 
 
 ${TARGET}: ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}

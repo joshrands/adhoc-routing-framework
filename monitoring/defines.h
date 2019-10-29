@@ -10,3 +10,4 @@
 #define REM_DEBUG   		DEBUG && 1
 #define BATTERY_DEBUG       DEBUG && 1
 #define RSS_DEBUG           DEBUG && 1
+#define MONITOR_DEBUG       DEBUG && 1

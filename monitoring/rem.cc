@@ -1,41 +1,21 @@
 #include "rem.h"
 #include "assert.h"
 
-NetworkMonitor::NetworkMonitor()
-{
-    if (REM_DEBUG)
-        cout << "New network monitoring service for unassigned node" << endl;
-
-    parentId = 0;
-}
-
-NetworkMonitor::NetworkMonitor(int nodeId)
-{
-    this->parentId = nodeId;
-
-    if (REM_DEBUG)
-        cout << "New monitoring service for Node " << this->parentId << endl;
-}
-
-void NetworkMonitor::initialize(int parentId)
+void REM::initialize(int parentId)
 {
     this->parentId = parentId;
 
     if (REM_DEBUG)
-        cout << "Initializing monitoring service for node " << this->parentId << endl;
+        cout << "Initializing REM monitoring service for node " << this->parentId << endl;
 
     batteryModel.HOP_COUNT = HOP_COUNT;
-    // NS3-TODO: Why is this commented out? 
-    //  rssModel.HOP_COUNT = HOP_COUNT;
-
     batteryModel.model.UPDATE_FREQUENCY = batteryModel.UPDATE_FREQUENCY;
-    //  rssModel.model.UPDATE_FREQUENCY = rssModel.UPDATE_FREQUENCY;
 
+    // initialize this node's battery model
     initializeBatteryModel();
-    initializeRssModel();
 }
 
-void NetworkMonitor::initializeBatteryModel()
+void REM::initializeBatteryModel()
 {
     if (batteryModel.getDataCount() < batteryModel.INIT_COUNT)
     {
@@ -57,14 +37,23 @@ void NetworkMonitor::initializeBatteryModel()
     }
 }
 
-void NetworkMonitor::initializeRssModel()
+void REM::initializeRssModel(int pairId)
 {
-    // this happens dynamically,when a node receives a packet from another node in the network create necessary data structures
-    cout << "Why am I here?" << endl;
-    assert(0 == -1);
+    // TODO: Do this...
 }
 
-ModelState NetworkMonitor::getBatteryModelState()
+double REM::getBatteryLevel()
+{
+    return -1.0;
+//    return batteryModel.getDataPoint()
+}
+
+double REM::getRSSBetweenNodes(int pairId)
+{
+    return -1.0;
+}
+
+ModelState REM::getBatteryModelState()
 {
     return batteryModel.getState();
 }
