@@ -43,7 +43,6 @@ bool Endpoint::setAddress(const char *host, const int port) {
 
   // Address family
   remoteHost.sin_family = AF_INET;
-
   // Set port
   remoteHost.sin_port = htons(port);
 
@@ -56,6 +55,7 @@ bool Endpoint::setAddress(const uint32_t host, const int port){
   in_addr host_in;
   host_in.s_addr = host;
   *ipAddress = *inet_ntoa(host_in);
+  
   remoteHost.sin_addr.s_addr = host;
 
   // Address family

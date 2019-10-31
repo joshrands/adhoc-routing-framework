@@ -28,6 +28,7 @@ ${TARGET}: ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
 	rm test.o
 	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES}
+	rm -f "*.o"
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $<
@@ -38,3 +39,4 @@ run:
 
 clean:
 	rm -f core ${TARGET} ${OBJ_FILES} ${LIB_NAME}
+	rm -f "*.o"

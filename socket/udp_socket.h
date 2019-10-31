@@ -23,12 +23,15 @@
 #ifndef UDPSOCKET_H
 #define UDPSOCKET_H
 
+#define UDP_DEBUG true
+
 #include "endpoint.h"
 #include "socket.h"
 #include "message.h"
 #include "safe_queue.h"
 #include <iostream>
 #include <utility>
+
 using namespace std;
 
 /*!
@@ -105,6 +108,12 @@ public:
    * @return false no messages
    */
   bool getMessage(Message &message);
+
+  /*!
+   * @brief Check if there are any messages without attempting to get the packet
+   * 
+   */
+  bool areThereMessages();
 
   /*!
    * @brief Get the sockfd object

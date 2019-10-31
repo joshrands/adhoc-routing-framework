@@ -8,6 +8,7 @@
 /ns-allinone-3.28/ns-3.28/src/custom/aodv/model/*
 /.vscode
 do-adhoc
+/hardware_testing/pi
 
 # Prerequisites
 *.d

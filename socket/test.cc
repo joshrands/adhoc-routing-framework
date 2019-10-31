@@ -8,18 +8,25 @@
 #include <thread>
 #include <utility>
 #include <time.h>
+#include <iomanip>
 using namespace std;
 
 void test(bool condition, char *message) {
-  printf("%s: ", message);
-  assert(condition);
-  cout << "PASS" << endl;
+  printf("[TEST] %s: ", message);
+  if(!condition){
+    cout << "FAIL" << endl;
+  }
+  else
+    cout << "PASS" << endl;
 }
 
 void test(bool condition, string message) {
-  cout << message << ": ";
-  assert(condition);
-  cout << "PASS" << endl;
+  cout << "[TEST]: " << message << ": ";
+  if(!condition){
+    cout << "FAIL" << endl;
+  }
+  else
+    cout << "PASS" << endl;
 }
 
 bool getYesNo(string message){
@@ -160,16 +167,14 @@ int main() {
     UDPSocket nonboundSocket;
     test(nonboundSocket.init(),
          (string) "Can initialize noninitialized socket");
-    test(!nonboundSocket.init(),
-         (string) "Cannot reinitialize previously initialized socket");
-    test(!nonboundSocket.bindToPort(8080),
-         (string) "Cannot bind previously initialized socket to a port");
+    test(nonboundSocket.bindToPort(8080),
+         (string) "Can bind previously initialized socket to a port");
     UDPSocket boundSocket;
-    test(boundSocket.bindToPort(8080), (string) "Can bind socket to port");
-    test(!nonboundSocket.init(),
-         (string) "Cannot reinitialize socket that is bound to a port");
-    test(!nonboundSocket.bindToPort(8070),
-         (string) "Cannot bind socket that is already bound to a port");
+    test(boundSocket.bindToPort(8070), (string) "Can bind socket to port");
+    test(nonboundSocket.init(),
+         (string) "Can reinitialize socket that is bound to a port");
+    test(nonboundSocket.bindToPort(8070),
+         (string) "Can bind socket that is already bound to a port");
   }
 
   printf("________________________________\n\n");

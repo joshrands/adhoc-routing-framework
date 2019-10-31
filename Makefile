@@ -26,6 +26,7 @@ SUBDIRS = aodv socket hardware
 
 ${TARGET}: ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${STATIC_LIBRARIES}
+	rm -f "*.o"
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $<
@@ -44,3 +45,4 @@ clean-all:
 
 clean:
 	rm -f core ${TARGET} ${OBJ_FILES}
+	rm -f "*.o"

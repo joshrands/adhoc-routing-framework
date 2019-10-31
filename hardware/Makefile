@@ -40,8 +40,8 @@ ${TARGET} : ${OBJ_FILES}
 	done
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
 	rm test.o
-	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES} 
-	rm "\*.o"
+	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES}
+	rm -f "*.o"
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $< 
@@ -51,3 +51,4 @@ ${TARGET} : ${OBJ_FILES}
 #
 clean:
 	rm -f core ${TARGET} hardware_aodv.o ${LIB_NAME}
+	rm -f "*.o"

@@ -11,6 +11,8 @@
 #include "../socket/udp_socket.h"
 #include "../aodv/aodv.h"
 
+#define H_DEBUG true
+
 class HardwareAODV : public AODV{
 private:
     UDPSocket* aodvSocket;
@@ -46,7 +48,7 @@ public:
      * 
      * @return -1 if no packets or the number of packets handled
      */
-    int handleReceivedPackets();
+    int handleAODVPackets();
 
     /*!
      * @brief Returns one of the packets on the data socket

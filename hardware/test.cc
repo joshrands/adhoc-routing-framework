@@ -7,17 +7,22 @@
 #include <thread>
 #include <utility>
 #include <time.h>
+
 using namespace std;
 
 void test(bool condition, char *message) {
   printf("%s: ", message);
-  assert(condition);
+  if(!condition){
+    cout << "FAIL" << endl;
+  }
   cout << "PASS" << endl;
 }
 
 void test(bool condition, string message) {
-  cout << message << ": ";
-  assert(condition);
+  cout << "[TEST]: " << message << ": ";
+  if(!condition){
+    cout << "FAIL" << endl;
+  }
   cout << "PASS" << endl;
 }
 
@@ -31,8 +36,12 @@ int main() {
     string message = "Hello World!";
     memcpy(msg, &message, 16);
 
-    haodv.sendPacket(msg, 16, getIpFromString("127.0.0.1"));
-    haodv.sendPacket(msg, 16, getIpFromString("127.0.0.1"));
+    haodv.sendPacket(msg, 16, getIpFromString("127.0.0.2"));
+    haodv.sendPacket(msg, 16, getIpFromString("127.0.0.2"));
+
+    haodv.handleAODVPackets();
+    Message temp;
+    haodv.getDataPacket(temp);
 //    haodv.~HardwareAODV();
   }
 
