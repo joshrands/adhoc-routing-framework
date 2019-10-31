@@ -2,6 +2,8 @@
 #include "../socket/message.h"
 #include <thread>
 
+//g++ -o pi pi.cc  -std=c++11 -pthread ../socket/libsocket.a 
+
 /*!
  * @brief Create a Threaded Socket object
  * 
@@ -44,8 +46,5 @@ int main(){
             printf("Have not received any messages yet\n");
         }
         sleep(1);
-    }
-
-
-    
+    }    
 }
