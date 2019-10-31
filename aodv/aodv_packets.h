@@ -1,4 +1,5 @@
-#pragma once 
+#ifndef AODVPACKETS_H
+#define AODVPACKETS_H
 
 /*********************************
  * aodv_packets.h
@@ -100,3 +101,5 @@ struct rerrPacket
     uint32_t unreachableSeqNum;
     uint32_t origIP;
 };
+
+#endif

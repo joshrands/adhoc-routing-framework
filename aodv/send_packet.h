@@ -1,4 +1,5 @@
-#pragma once 
+#ifndef SENDPACKET_H
+#define SENDPACKET_H
 
 /*********************************
  * send_packet.h
@@ -23,3 +24,4 @@ void setLastReceive(IP_ADDR lastReceive);
 uint32_t getGlobalPacketCount();
 void incrementGlobalPacketCount();
 
+#endif

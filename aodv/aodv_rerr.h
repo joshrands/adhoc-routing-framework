@@ -1,3 +1,5 @@
+#ifndef AODVRERR_H
+#define AODVRERR_H
 /*********************************
  * aodv_rerr.h
  *
@@ -55,3 +57,5 @@ private:
     AODVRoutingTable* m_pTable;
 	uint32_t* m_pSequenceNum;
 };
+
+#endif

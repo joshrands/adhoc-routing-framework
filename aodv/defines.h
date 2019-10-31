@@ -1,3 +1,6 @@
+#ifndef DEFINES_H
+#define DEFINES_H
+
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -16,3 +19,5 @@
 #define RERR_DEBUG          DEBUG && 1
 #define TABLE_DEBUG         DEBUG && 1
 #define MONITOR_DEBUG       DEBUG && 1
+
+#endif

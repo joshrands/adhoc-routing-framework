@@ -1,4 +1,5 @@
-#pragma once 
+#ifndef AODVROUTINGTABLE_H
+#define AODVROUTINGTABLE_H
 
 /*********************************
  * aodv_routing_table.h
@@ -59,3 +60,5 @@ public:
 private:
 	map<IP_ADDR, AODVInfo> m_aodvTable;
 };
+
+#endif

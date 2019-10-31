@@ -1,3 +1,6 @@
+#ifndef AODVSIM_H
+#define AODVSIM_H
+
 /*********************************
  * aodv_sim.h
  *
@@ -22,3 +25,5 @@ public:
     int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
     function<int(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)> ns3SocketSendPacket;
 };
+
+#endif

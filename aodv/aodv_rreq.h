@@ -1,3 +1,6 @@
+#ifndef AODVRREQ_H
+#define AODVRREQ_H
+
 /*********************************
  * aodv_rreq.h
  *
@@ -42,3 +45,5 @@ private:
 	uint32_t m_rreqID;
 	uint32_t* m_pSequenceNum;	
 };
+
+#endif

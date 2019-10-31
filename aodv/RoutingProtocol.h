@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ROUTINGPROTOCOL_H
+#define ROUTINGPROTOCOL_H
 
 /********************************
  * RoutingProtocol.h 
@@ -79,3 +80,4 @@ protected:
 	uint32_t ipAddress;
 };
 
+#endif

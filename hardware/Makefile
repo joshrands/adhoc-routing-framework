@@ -25,7 +25,7 @@ OBJ_LIB_FILES = hardware_aodv.o ../aodv/*.o ../socket/*.o #../socket/udp_socket.
 STATIC_LIBRARIES = ../socket/libsocket.a ../aodv/libaodv.a
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
-INC_FILES = hardware_aodv.h ../aodv/*.h ../socket/*.h #endpoint.h safe_queue.h socket.h udp_socket.h message.h 
+INC_FILES = hardware_aodv.h #../aodv/*.h ../socket/*.h #endpoint.h safe_queue.h socket.h udp_socket.h message.h 
 
 SUBDIRS = ../aodv ../socket
 
@@ -41,7 +41,7 @@ ${TARGET} : ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
 	rm test.o
 	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES} 
-	rm *.o
+	rm "\*.o"
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $< 

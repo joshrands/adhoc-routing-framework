@@ -1,3 +1,5 @@
+#ifndef AODVRREP_H
+#define AODVRREP_H
 /*********************************
  * aodv_rrep.h
  *
@@ -38,3 +40,5 @@ private:
     AODVRoutingTable* m_pTable;
 	uint32_t* m_pSequenceNum;
 };
+
+#endif
