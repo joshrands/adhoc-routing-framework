@@ -8,7 +8,7 @@ void HardwareAODV::_hardwareAODV(){
     UDPSocket *aodvSocket = new UDPSocket();
     if (!aodvSocket->bindToPort(AODV_PORT)) {
         fprintf(stderr, "Could not bind the aodv socket to port:%d\n", AODV_PORT);
-
+        /*
         std::cout << "Trying a new port..." << std::endl;
         // try a new port
         AODV_PORT = rand() % 10000; 
@@ -16,8 +16,9 @@ void HardwareAODV::_hardwareAODV(){
         delete aodvSocket;
         // try again
         _hardwareAODV();
-
         return;
+        */
+        
     }
     if(!aodvSocket->setBroadcasting()){
         fprintf(stderr, "Could not set the aodv socket to broadcasting\n");
@@ -28,7 +29,7 @@ void HardwareAODV::_hardwareAODV(){
     UDPSocket *dataSocket = new UDPSocket();
     if (!dataSocket->bindToPort(DATA_PORT)) {
         fprintf(stderr, "Could not bind the data socket to port:%d\n", DATA_PORT);
-
+        /*
         std::cout << "Trying a new port..." << std::endl;
         // try a new port
         DATA_PORT = rand() % 10000; 
@@ -36,8 +37,8 @@ void HardwareAODV::_hardwareAODV(){
         delete aodvSocket;
         // try again
         _hardwareAODV();
-
         return;
+        */
     }
     if(!dataSocket->setBroadcasting()){
         fprintf(stderr, "Could not set the data socket to broadcasting\n");
