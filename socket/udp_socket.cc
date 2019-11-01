@@ -78,7 +78,7 @@ bool UDPSocket::setBroadcasting(bool broadcast) {
 }
 
 // -1 if unsuccessful, else number of bytes written
-int UDPSocket::_sendTo(Endpoint &remote, const char *packet, int length) {
+int UDPSocket::sendTo(Endpoint &remote, char *packet, int length) {
   if(UDP_DEBUG){
     printf("[DEBUG]: Sending %s to %s via UDP\n", packet, remote.getAddressC());
   }
@@ -101,9 +101,30 @@ int UDPSocket::_sendTo(Endpoint &remote, const char *packet, int length) {
 }
 
 int UDPSocket::sendTo(char *buffer, int length, uint32_t dest, int port) {
-  Endpoint remote;
-  remote.setAddress(dest, port);
-  return _sendTo(remote, buffer, length);
+  if(UDP_DEBUG){
+    printf("[DEBUG]: Sending %s to %d via UDP\n", buffer, dest) ;
+  }
+  if (sockfd < 0) {
+    if(UDP_DEBUG){
+      printf("[DEBUG]: sockfd is in error state\n");
+    }
+    return -1;
+  }
+  in_addr dest_in;
+  dest_in.s_addr = dest;
+  sockaddr_in remote;
+  remote.sin_family = AF_INET;
+  remote.sin_addr = dest_in;
+  remote.sin_port = port;
+  int returnVal = sendto(sockfd, buffer, length, MSG_CONFIRM,
+                (const struct sockaddr *)&remote,
+                sizeof(remote));
+  if(returnVal < 0){
+    int errsv = errno;
+    printf("[ERROR] Could not send packet %s to %d\n", buffer, dest);
+    printf("[ERROR] %d\n", errsv);
+  }
+  return returnVal;
 }
 
 int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {

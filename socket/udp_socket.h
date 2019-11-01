@@ -74,7 +74,7 @@ public:
    *  @param length The length of the packet to be sent
    *  @return the number of written bytes on success (>=0) or -1 on failure
    */
-  int _sendTo(Endpoint &remote, const char *packet, int length);
+  int sendTo(Endpoint &remote, char *packet, int length);
 
   /*!
    * Send a packet to an IP address and port

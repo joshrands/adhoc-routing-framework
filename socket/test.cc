@@ -47,7 +47,7 @@ void sendMessageToThreadedServerTest(UDPSocket *server, UDPSocket &sender,
   const int MAX_ATTEMPTS = 2;
   do {
     count++;
-    sender._sendTo(serverEnd, &data[0], data.length());
+    sender.sendTo(serverEnd, &data[0], data.length());
     sleep(1);
   } while ((!server->getMessage(message) && count < MAX_ATTEMPTS));
   // Check if test was successful
@@ -73,7 +73,7 @@ void sendMessageBetweenThreadedSockets(UDPSocket* socket1, UDPSocket* socket2,
   const int MAX_ATTEMPTS = 2;
   do {
     count++;
-    socket1->_sendTo(socket2End, &data1[0], data1.length());
+    socket1->sendTo(socket2End, &data1[0], data1.length());
     sleep(1);
   } while ((!socket2->getMessage(message1to2) && count < MAX_ATTEMPTS)); 
   // Check if test was successful
@@ -90,7 +90,7 @@ void sendMessageBetweenThreadedSockets(UDPSocket* socket1, UDPSocket* socket2,
   count = 0;
   do {
     count++;
-    socket2->_sendTo(message1to2.getEndpoint(), &data2[0], data2.length());
+    socket2->sendTo(message1to2.getEndpoint(), &data2[0], data2.length());
     sleep(1);
   } while ((!socket1->getMessage(message2to1) && count < MAX_ATTEMPTS)); 
   // Check if test was successful
@@ -120,7 +120,7 @@ void broadcastMessage(UDPSocket* broadcastingSocket, Endpoint end, string sendDa
   const int MAX_ATTEMPTS = 4;
   do {
     count++;
-    broadcastingSocket->_sendTo(end, &sendData[0], sendData.length());
+    broadcastingSocket->sendTo(end, &sendData[0], sendData.length());
     sleep(1);
   } while(!broadcastingSocket->getMessage(messageReceive) && count < MAX_ATTEMPTS);
 
