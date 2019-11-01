@@ -26,7 +26,7 @@ UDPSocket* createThreadedSocket(thread& returnThread, int port){
 int main(){
     // Create socket
     int port = 50518;
-    int other_port = 50518;
+    int other_port = 50528;
     thread socketing;
     UDPSocket* socket = createThreadedSocket(socketing, port);
     socket->setBroadcasting(true);
