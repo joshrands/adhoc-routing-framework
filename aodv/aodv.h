@@ -83,6 +83,9 @@ public:
 	// abstract function to be overwritten by child class 
 	virtual int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
 
+	// map of rreq ids and their corresponding packet to be sent once the route is established
+	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
+
 protected:
 	// node sequence number. MUST increment on a route discovery
 	uint32_t sequenceNum;
@@ -92,10 +95,6 @@ protected:
 	vector<IP_ADDR> m_neighbors;
 	// aodv routing table
 	AODVRoutingTable* m_aodvTable;
-
-	// map of rreq ids and their corresponding packet to be sent once the route is established
-	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
-
 	// current packet id index
 	uint32_t packetIdCount;	
 	// map of destination and recently sent packets (packets will time out after a short time) 

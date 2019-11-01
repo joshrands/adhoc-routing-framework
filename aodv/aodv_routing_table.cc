@@ -15,7 +15,7 @@ IP_ADDR AODVRoutingTable::getNextHop(const IP_ADDR dest)
 {
 	IP_ADDR nextHop;
 
-	if (this->m_aodvTable.count(dest))
+	if (&m_aodvTable != NULL && m_aodvTable.count(dest))
 	{
 		nextHop = m_aodvTable[dest].nextHop;
 	}

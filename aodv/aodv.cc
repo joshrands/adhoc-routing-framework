@@ -62,6 +62,7 @@ AODV::AODV(IP_ADDR ip)
 AODV::~AODV()
 {
 	delete this->m_aodvTable;
+	m_aodvTable = NULL;
 
 	for (map<IP_ADDR, queue<pair<char*, int>>>::iterator it=rreqPacketBuffer.begin(); it!=rreqPacketBuffer.end(); ++it)
 	{
@@ -578,9 +579,27 @@ bool AODVTest::packetInRreqBuffer(IP_ADDR dest){
 
 void retryRouteRequestIfNoRREP(AODV* aodv, rreqPacket sendRREQ, int numberOfRetriesRemaining)
 {
+	if (RREQ_DEBUG)
+		cout << "Waiting for RREP..." << endl;
+
 	// wait net traversal time
 	this_thread::sleep_for(chrono::milliseconds(NET_TRAVERSAL_TIME_MS*2));
-	cout << "Done sleeping!" << endl;
 
-	exit(0);
+	if (RREQ_DEBUG)
+		cout << "Checking if RREP has been received for RREQ" << endl;
+
+	// check if rreq with same sequence id is contained in the packet buffer
+	if (numberOfRetriesRemaining - 1 > 0 && aodv->getTable()->getNextHop(sendRREQ.destIP) != 0) 
+	{
+		// RREQ not received... try again
+		retryRouteRequestIfNoRREP(aodv, sendRREQ, numberOfRetriesRemaining - 1);
+	}
+	else 
+	{
+		// RREQ received! exit thread 
+		if (RREQ_DEBUG)
+			cout << "No longer retrying RREQ." << endl;
+
+		exit(0);
+	}
 }
