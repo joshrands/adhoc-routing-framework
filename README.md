@@ -23,11 +23,20 @@ AODV Protocol: https://www.ietf.org/rfc/rfc3561.txt
 4. Add TTL for RREQ dissemination (section 6.4)
 5. Add AODVRoutingTable updates 
 
-### RPi
+### HARDWARE AODV
 1. Make a Daemon to accept network packets
   - https://stackoverflow.com/questions/17954432/creating-a-daemon-in-linux
 2. Use AODV object for routing table
 3. Use AODV packets
+4. Circular queue (max packets accepted)
+5. Check ip address to see if it ourselves
+6. Global debug definition
+7. Find the communication rate (use different numbers of pis)
+8. Packet sniffing
+9. AODV switch script
+10. Auto login
+11. Set up nice readme and comment alot of things
+12. 
 
 ### AODV-REM
 1. Add network monitoring 
