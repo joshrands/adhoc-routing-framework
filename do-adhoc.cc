@@ -18,21 +18,27 @@ void getConfig(config* config);
 int main(){
     // This might be a double negative right now...
     AODV::AODV_PORT = 13415;
-    HardwareAODV haodv(inet_addr("138.67.203.229"));
-//    HardwareAODV haodv2("138.67.194.210");
+    HardwareAODV haodv;
+    string message = "Hello friend";
 
-//    cout << getStringFromIp(haodv2.getIp()) << endl;
-    cout << getStringFromIp(haodv.getIp()) << endl;
-    cout << haodv.getIp() << " : " << inet_addr("1.1.168.192") << endl;
-
-    string message = "Hello World!";
-    cout << message.length() << endl;
-
-    uint32_t dest = getIpFromString("127.0.0.1");
-    haodv.sendPacket(&message[0], message.length(), dest);
-    haodv.sendPacket(&message[0], message.length(), dest);
-
-    while (-1 == haodv.handleAODVPackets());
+    while(true){
+        printf("[INFO]: Sending message\n");
+        uint32_t dest = getIpFromString("127.0.0.1");
+        haodv.sendPacket(&message[0], message.length(), dest);
+        haodv.sendPacket(&message[0], message.length(), dest);
+        
+        int aodvPackets = haodv.handleAODVPackets();
+        if(aodvPackets < 0){
+            printf("[INFO]: Have not received any AODV packages\n");
+        }else{
+            printf("[INFO]: Received %d AODV packet(s)\n", aodvPackets);
+        }
+        Message input;
+        if(haodv.getDataPacket(input)){
+            printf("[INFO]: Received %s from %d\n", input.getData(), input.getAddressI());
+        }
+        printf("_______________________________________________\n");
+    }
 }
 
 void getConfig(config* config){
