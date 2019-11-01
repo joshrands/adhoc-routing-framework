@@ -29,7 +29,7 @@ using std::memset;
 
 UDPSocket::UDPSocket() : messages() {}
 
-bool UDPSocket::init(void) { 
+bool UDPSocket::init(void){ 
   printf("[DEBUG]: Initializing udp socket\n");
   return initSocket(SOCK_DGRAM); 
 }
@@ -37,7 +37,7 @@ bool UDPSocket::init(void) {
 // Server initialization
 bool UDPSocket::bindToPort(int port) {
   printf("[DEBUG]: Binding udp socket to port %d\n", port);
-  if(sockfd < 0){
+  if(getSockfd() < 0){
     if (!initSocket(SOCK_DGRAM))
       return false;
   }
@@ -49,8 +49,8 @@ bool UDPSocket::bindToPort(int port) {
   localHost.sin_port = htons(port);
   localHost.sin_addr.s_addr = INADDR_ANY;
 
-  if (bind(sockfd, (const struct sockaddr *)&localHost, sizeof(localHost)) < 0) {
-    close(sockfd);
+  if (bind(getSockfd(), (const struct sockaddr *)&localHost, sizeof(localHost)) < 0) {
+    sclose();
     printf("[DEBUG]: Unsuccessful binding of udp socket to port %d\n", port);
     return false;
   }
@@ -82,14 +82,8 @@ int UDPSocket::sendTo(Endpoint &remote, char *packet, int length) {
   if(UDP_DEBUG){
     printf("[DEBUG]: Sending %s to %s via UDP\n", packet, remote.getAddressC());
   }
-  if (sockfd < 0) {
-    if(UDP_DEBUG){
-      printf("[DEBUG]: sockfd is in error state\n");
-    }
-    return -1;
-  }
 
-  int returnVal = sendto(sockfd, packet, length, MSG_CONFIRM,
+  int returnVal = sendto(getSockfd(), packet, length, MSG_CONFIRM,
                 (const struct sockaddr *)&remote.remoteHost,
                 sizeof(remote.remoteHost));
   if(returnVal < 0){
@@ -104,19 +98,14 @@ int UDPSocket::sendTo(char *buffer, int length, uint32_t dest, int port) {
   if(UDP_DEBUG){
     printf("[DEBUG]: Sending %s to %d via UDP\n", buffer, dest) ;
   }
-  if (sockfd < 0) {
-    if(UDP_DEBUG){
-      printf("[DEBUG]: sockfd is in error state\n");
-    }
-    return -1;
-  }
+
   in_addr dest_in;
   dest_in.s_addr = dest;
   sockaddr_in remote;
   remote.sin_family = AF_INET;
   remote.sin_addr = dest_in;
   remote.sin_port = port;
-  int returnVal = sendto(sockfd, buffer, length, MSG_CONFIRM,
+  int returnVal = sendto(getSockfd(), buffer, length, MSG_CONFIRM,
                 (const struct sockaddr *)&remote,
                 sizeof(remote));
   if(returnVal < 0){
@@ -129,17 +118,9 @@ int UDPSocket::sendTo(char *buffer, int length, uint32_t dest, int port) {
 
 int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {
   // -1 if unsuccessful, else number of bytes received
-  
-  if (sockfd < 0){
-    if(UDP_DEBUG){
-      printf("[DEBUG]: UDP socketfd is in error state while trying to receive packets\n");
-    }
-    return -1;
-  }
-  
   remote.resetAddress();
   socklen_t remoteHostLen = sizeof(remote.remoteHost);
-  return recvfrom(sockfd, buffer, length, 0,
+  return recvfrom(getSockfd(), buffer, length, 0,
                   (struct sockaddr *)&remote.remoteHost, &remoteHostLen);
 }
 
@@ -149,11 +130,14 @@ void UDPSocket::receiveFromPortThread() {
   while (true) {
     char *buffer = (char *)malloc(MAXLINE * sizeof(char));
     Endpoint client;
-    int n = receiveFrom(client, buffer, MAXLINE);
+    socklen_t remoteHostLen = sizeof(client.remoteHost);
+    int n = recvfrom(getSockfd(), buffer, MAXLINE, 0,
+                  (struct sockaddr *)&client.remoteHost, &remoteHostLen);
     
     if (n <= 0) {
       continue;
     }
+
     buffer[n] = '\0';
     messages.push(Message(client, buffer, n));
     // Need to find out why this is neccesary
@@ -167,7 +151,3 @@ bool UDPSocket::areThereMessages(){
   Message temp;
   return messages.peek(temp);
 } 
-
-int UDPSocket::getSockfd() const{
-  return sockfd;
-}

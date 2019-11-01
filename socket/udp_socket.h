@@ -44,7 +44,7 @@ public:
    */
   UDPSocket();
 
-  ~UDPSocket() { close(sockfd); }
+  ~UDPSocket() { sclose(); }
 
   /*! Init the UDP Client Socket without binding it to any specific por
    *  @return true on success, false on failure
@@ -114,13 +114,6 @@ public:
    * 
    */
   bool areThereMessages();
-
-  /*!
-   * @brief Get the sockfd object
-   * 
-   * @return int 
-   */
-  int getSockfd() const;
 
 private:
   // To hold threaded messages

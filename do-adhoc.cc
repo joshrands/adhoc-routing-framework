@@ -32,11 +32,10 @@ int main(){
     haodv.sendPacket(&message[0], message.length(), dest);
     haodv.sendPacket(&message[0], message.length(), dest);
 
-    while (-1 == haodv.handleReceivedPackets());
+    while (-1 == haodv.handleAODVPackets());
 }
 
-void getConfig(config* config)
-{
+void getConfig(config* config){
     // read config file 
     ifstream configFile;
     configFile.open("config");

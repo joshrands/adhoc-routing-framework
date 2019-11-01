@@ -34,6 +34,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <mutex>
 
 #define MAXLINE 1024
 
@@ -69,9 +70,18 @@ public:
    */
   void sclose();
 
+  /*!
+   * @brief Get the value of sockfd
+   * 
+   */
+  int getSockfd();
+
 protected:
-  int sockfd;
   bool initSocket(int type);
+
+private:
+  int sockfd;
+  std::mutex m;
 };
 
 
