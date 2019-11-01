@@ -15,6 +15,7 @@
 #include "aodv_rreq.h"
 #include "aodv_rrep.h"
 #include "aodv_rerr.h"
+#include "aodv_params.h"
 
 #include "send_packet.h"
 
@@ -133,5 +134,8 @@ private:
 	vector<AODVTest*> m_physicalNeighbors;
 
 };
+
+// retry the route request message if you don't receive one
+void retryRouteRequestIfNoRREP(AODV* aodv, rreqPacket sendRREQ, int numberOfRetriesRemaining);
 
 #endif
