@@ -5,7 +5,7 @@
 // Helpers
 void HardwareAODV::_hardwareAODV(){
     //TODO: Only set aodv socket to broadcasting
-    UDPSocket *aodvSocket = new UDPSocket();
+    aodvSocket = new UDPSocket();
     int reuseVal = 1;
     if(!aodvSocket->init()){
         fprintf(stderr, "Could not initialize the aodv socket\n");
@@ -21,7 +21,7 @@ void HardwareAODV::_hardwareAODV(){
         exit(-1);
     }
 
-    UDPSocket *dataSocket = new UDPSocket();
+    dataSocket = new UDPSocket();
     if(!aodvSocket->setOption(SOL_SOCKET, SO_REUSEPORT, &reuseVal, sizeof(reuseVal))){
         fprintf(stderr, "Could not set the data socket to reuse ports\n");
     }
