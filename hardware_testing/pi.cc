@@ -33,7 +33,7 @@ int main(){
     while(true){
         // Send a message
         string theData = "some data";
-        socket->sendTo(&theData[0], theData.length(), inet_addr("192.168.1.1"), other_port);
+        socket->sendTo(&theData[0], theData.length(), inet_addr("127.0.0.1"), other_port);
         printf("Sending data...\n");
         sleep(1);
 
