@@ -4,6 +4,7 @@
 #include <thread>
 #include <utility>
 #include <fstream>
+#include <string>
 #include "hardware/hardware_aodv.h"
 
 using namespace std;
@@ -18,15 +19,15 @@ void getConfig(config* config);
 int main(){
     // This might be a double negative right now...
     AODV::AODV_PORT = 13415;
-    HardwareAODV haodv;
+    HardwareAODV haodv(getIpFromString("192.168.1.1"));
     string message = "Hello friend";
 
     while(true){
         printf("[INFO]: Sending message\n");
-        uint32_t dest = getIpFromString("127.0.0.1");
+        uint32_t dest = getIpFromString("192.168.1.2");
         haodv.sendPacket(&message[0], message.length(), dest);
         haodv.sendPacket(&message[0], message.length(), dest);
-        
+
         int aodvPackets = haodv.handleAODVPackets();
         if(aodvPackets < 0){
             printf("[INFO]: Have not received any AODV packages\n");
@@ -38,6 +39,7 @@ int main(){
             printf("[INFO]: Received %s from %d\n", input.getData(), input.getAddressI());
         }
         printf("_______________________________________________\n");
+        sleep(1);
     }
 }
 
