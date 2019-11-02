@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <iostream>
 
+//TODO: call AODV constructor on all calls
+
 // Helpers
 void HardwareAODV::_hardwareAODV(){
     //TODO: Only set aodv socket to broadcasting
