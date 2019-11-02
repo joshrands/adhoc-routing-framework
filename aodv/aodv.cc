@@ -1,8 +1,9 @@
 #include "aodv.h"
 #include "string.h"
-#include "send_packet.h"
 #include <fstream>
 #include <stdio.h>
+#include <thread>
+#include <chrono>
 
 int AODV::DATA_PORT = 5555;
 int AODV::AODV_PORT = 5432;
@@ -61,6 +62,7 @@ AODV::AODV(IP_ADDR ip)
 AODV::~AODV()
 {
 	delete this->m_aodvTable;
+	m_aodvTable = NULL;
 
 	for (map<IP_ADDR, queue<pair<char*, int>>>::iterator it=rreqPacketBuffer.begin(); it!=rreqPacketBuffer.end(); ++it)
 	{
@@ -167,10 +169,14 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADD
 		if (AODV_DEBUG)
 			cout << "No existing route, creating RREQ message." << endl;
 
-		// start a thread for an rreq and wait for a response 
 		rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
 
+		// start a thread for THIS rreq and wait for a response 
+		thread waitForResponse(retryRouteRequestIfNoRREP, this, rreq, RREQ_RETRIES);
+		waitForResponse.detach();
+
 		broadcastRREQBuffer(rreq);
+
 		return;
 	}
 
@@ -569,4 +575,31 @@ bool AODVTest::isNeighbor(AODVTest node)
 
 bool AODVTest::packetInRreqBuffer(IP_ADDR dest){
 	return(rreqPacketBuffer.count(dest));
+}
+
+void retryRouteRequestIfNoRREP(AODV* aodv, rreqPacket sendRREQ, int numberOfRetriesRemaining)
+{
+	if (RREQ_DEBUG)
+		cout << "Waiting for RREP..." << endl;
+
+	// wait net traversal time
+	this_thread::sleep_for(chrono::milliseconds(NET_TRAVERSAL_TIME_MS*2));
+
+	if (RREQ_DEBUG)
+		cout << "Checking if RREP has been received for RREQ" << endl;
+
+	// check if rreq with same sequence id is contained in the packet buffer
+	if (numberOfRetriesRemaining - 1 > 0 && aodv->getTable()->getNextHop(sendRREQ.destIP) != 0) 
+	{
+		// RREQ not received... try again
+		retryRouteRequestIfNoRREP(aodv, sendRREQ, numberOfRetriesRemaining - 1);
+	}
+	else 
+	{
+		// RREQ received! exit thread 
+		if (RREQ_DEBUG)
+			cout << "No longer retrying RREQ." << endl;
+
+		exit(0);
+	}
 }
