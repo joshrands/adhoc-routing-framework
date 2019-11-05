@@ -10,8 +10,7 @@
 #include "../socket/endpoint.h"
 #include "../socket/udp_socket.h"
 #include "../aodv/aodv.h"
-
-#define H_DEBUG true
+#include "hardware_defines.h"
 
 class HardwareAODV : public AODV{
 private:

@@ -23,12 +23,11 @@
 #ifndef UDPSOCKET_H
 #define UDPSOCKET_H
 
-#define UDP_DEBUG true
-
 #include "endpoint.h"
 #include "socket.h"
 #include "message.h"
 #include "safe_queue.h"
+#include "socket_defines.h"
 #include <iostream>
 #include <utility>
 

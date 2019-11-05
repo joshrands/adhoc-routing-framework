@@ -33,13 +33,13 @@ Socket::~Socket() { sclose(); }
 
 bool Socket::initSocket(int type) {
   if (sockfd != -1) {
-    perror("socket already created\n");
+    perror("[ERROR]: Socket already created\n");
     return false;
   }
 
   int fd = socket(AF_INET, type, 0);
   if (fd < 0) {
-    perror("socket creation failed\n");
+    perror("[ERROR]: socket creation failed\n");
     return false;
   }
   sockfd = fd;

@@ -20,12 +20,12 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libhardware.a
-OBJ_LIB_FILES = hardware_aodv.o ../aodv/*.o ../socket/*.o #../socket/udp_socket.o ../socket/endpoint.o $(../socket/*.o) $(../aodv/*.o)
+OBJ_LIB_FILES = hardware_aodv.o ../aodv/*.o ../socket/*.o
 
 STATIC_LIBRARIES = ../socket/libsocket.a ../aodv/libaodv.a
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
-INC_FILES = hardware_aodv.h #../aodv/*.h ../socket/*.h #endpoint.h safe_queue.h socket.h udp_socket.h message.h 
+INC_FILES = hardware_aodv.h hardware_defines.h../defines.h
 
 SUBDIRS = ../aodv ../socket
 
