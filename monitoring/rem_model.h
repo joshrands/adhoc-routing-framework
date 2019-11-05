@@ -37,6 +37,9 @@ public:
     int PACKET_SIZE       = 19; // 13 bytes as of now
     int HOP_COUNT         = 2;
 
+    // set depending on battery or rss
+    int MODEL_TYPE;
+
     virtual void initialize() = 0;
 
     /**** MODEL FUNCTIONS ****/
@@ -61,7 +64,7 @@ public:
 
     // NS3-TODO: ADD THIS IN HELPER  void setParentNode(Ptr<Node> parent);
 
-    ModelParameters model;
+    ModelParameters modelParameters;
     int ownerId;
 
     // broadcast socket for this model to communicate on

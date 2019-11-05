@@ -74,6 +74,9 @@ public:
 	const uint32_t getIp() { return ipAddress; }
 	void setIp(const uint32_t ip) { ipAddress = ip; }
 
+	// abstract function to be overwritten by child class 
+	virtual int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
+
 protected:
 	RoutingTable* table;	
 

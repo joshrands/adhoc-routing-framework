@@ -11,6 +11,7 @@
 #include "network_monitor.h"
 #include "rem_model.h"
 #include "rem_packet.h"
+#include "../aodv/RoutingProtocol.h"
 
 #include <vector>
 
@@ -20,8 +21,8 @@ public:
     //  static const int INIT_COUNT = 3; // DEPRECATED. REAL INIT_COUNT IN MODEL
     static const int HOP_COUNT = 2;
 
-    REM() : NetworkMonitor() { }
-    REM(int nodeId) : NetworkMonitor(nodeId) { }
+    REM() : NetworkMonitor() { simStartTime = getCurrentTimeMS(); }
+    REM(int nodeId) : NetworkMonitor(nodeId) { simStartTime = getCurrentTimeMS(); }
 
     // NS3-TODO:  void initialize(Ptr<Node> parent, Ptr<EnergySource> battery, Ptr<Socket> socket); // initialize node 'parent' with network monitoring service
     // temp:
@@ -30,25 +31,46 @@ public:
     void initializeRssModel(int pairId);
 
     // get monitoring information 
-    double getBatteryLevel();
-    double getRSSBetweenNodes(int pairId);
+    double getBatteryLevel(int ownerId);
+    double getRSSBetweenNodes(int pairId, int ownerId);
 
-    // get state of different models
-    ModelState getBatteryModelState();
-    ModelState getRssModelState();
-    // local models: only one battery model but multiple RSS models
-    BatteryModel batteryModel;
-    vector<RssModel*> localRssModels; // different models for every node within comm range
-    // network models: models created by other nodes 
-    vector<BatteryModel> batteryModels;
-    vector<RssModel*> netRssModels;
+    // update local models with new data points 
+    void updateLocalBatteryModel(double batteryLevel);
+    void updateLocalRSSModel(int pairId, double rss);
+
+    // updating local models might result in drastic changes that need to be broadcasted...
+    void sendUpdatedModel(PredictionModel* model, IP_ADDR dest);
+
+    // update network models
+    void updateNetworkBatteryModel(int ownerId, BatteryModel model);
+    void updateNetworkRSSModel(int ownerId, int pairId, RssModel model);
+
+    // abstract function for getting current battery level
+    virtual double getCurrentBatteryLevel() = 0;
+
+    RoutingProtocol* routing;
 
 // NS3-TODO: abstractize?    Ptr<Socket> socket;
 protected:
+    // get the current time in milliseconds. abstract function for sim and hardware implementations
+    virtual uint32_t getCurrentTimeMS() = 0;
+    uint32_t simStartTime;
+
+    // local models: only one battery model but multiple RSS models
+    BatteryModel batteryModel;
+    // the owner is always this node, the int key is the pairId
+    map<int,RssModel> localRssModels; 
+
+    // network models: models created by other nodes 
+    // int key is the ownerId
+    map<int,BatteryModel> batteryModels;
+    // int key is the ownerId to a vector of pairIds with associated RssModels
+    map<int,vector<pair<int,RssModel>>> netRssModels;
 
 /* NS3-TODO:  
     Ptr<Node> parentNode; // parent node
     Ptr<EnergySource> battery;
 */
 };
+
 

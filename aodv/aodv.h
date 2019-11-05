@@ -80,9 +80,6 @@ public:
 	// get the routing table 
 	AODVRoutingTable* getTable() { return m_aodvTable; } 
 
-	// abstract function to be overwritten by child class 
-	virtual int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
-
 	// map of rreq ids and their corresponding packet to be sent once the route is established
 	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
 
