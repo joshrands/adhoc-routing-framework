@@ -52,11 +52,9 @@ public:
     /*!
      * @brief Returns one of the packets on the data socket
      * 
-     * @param message the first message on the queue
-     * @return true a message was received
-     * @return false no messages
+     * @return vector of received packets
      */
-    bool getDataPacket(Message& message);
+    vector<Message> getDataPackets();
 };
 
 /*!

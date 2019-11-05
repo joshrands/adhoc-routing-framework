@@ -89,7 +89,7 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 
 	if (this->getIp() == finalDestination){
 		// packet has reached its final destination! 
-		// TODO: Now what? 
+		receivedPackets.emplace_back(pair<char*, int>(packet,length));
 		if (AODV_PRINT_PACKET)
 		{
 			cout << "[PACKET]: Node " << getStringFromIp(this->getIp()) << " received packet: " << endl;

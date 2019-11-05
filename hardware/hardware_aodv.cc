@@ -112,6 +112,30 @@ int HardwareAODV::handlePackets(){
     return (count == 0) ? -1 : count;
 }
 
+vector<Message> HardwareAODV::getDataPackets(){
+    vector<Message> packets;
+    for(int i = 0; i < receivedPackets.size(); i++){
+        auto packetInfo = receivedPackets.at(i);
+        char* packet = (char*)(malloc(packetInfo.second-HEADER_SIZE));
+        memcpy(packet, &packetInfo.first[HEADER_SIZE-1], packetInfo.second-HEADER_SIZE);
+        
+        Endpoint end;
+        uint32_t address;
+        memcpy(&address, &packet[5], 4);
+        end.setAddress(address, DATA_PORT);
+
+        Message current(end, packet, packetInfo.second-HEADER_SIZE);
+        packets.emplace_back(current);
+
+        delete receivedPackets.at(i).first;
+    }
+    
+    // Clear received packets
+    receivedPackets.clear();
+    // return packets
+    return packets;
+}
+
 
 
 void printPacket(FILE* file, char * buffer, int length){

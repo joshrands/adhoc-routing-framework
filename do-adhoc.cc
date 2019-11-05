@@ -31,12 +31,17 @@ int main(){
             printPacket(stdout, buffer, message.length());
             printf(" to %s\n",ip);
         }
-        // Handle AODV messages
+        // Handle packets
         int handleCount = haodv.handlePackets();
         if(handleCount > 0){
             printf("Handled %d AODV packets\n", handleCount);
         }
-        // Handle data packets
+        // get data packets
+        printf("Received data:\n");
+        for(auto packet : haodv.getDataPackets()){
+            printPacket(stdout, packet.getData(), packet.getLength());
+            printf(" from %s\n", getStringFromIp(packet.getAddressI()));
+        }
         
 
     }

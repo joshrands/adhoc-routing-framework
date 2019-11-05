@@ -99,6 +99,8 @@ protected:
 	uint32_t packetIdCount;	
 	// map of destination and recently sent packets (packets will time out after a short time) 
 	map<IP_ADDR, queue<packet>> unackedPacketBuffer;
+	// store received data packets which are for this ip
+	vector<pair<char*, int>> receivedPackets;
 };
 
 /* AODVTest class
