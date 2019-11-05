@@ -33,13 +33,13 @@ def set_wifi():
     bash(("mv /etc/network/interfaces_adhoc /etc/network/interfaces",))
 
 
-def get_last_setting():
+def get_last_setting(current):
     with open(state_file, 'r') as fin:
         last = fin.readline()
         if(last == 'adhoc' or last == 'wifi'):
             adhoc_state = states_w_i[last]
         else:
-            print("[ERROR]: Could not load in last setting {}".format(last))
+            print("[ERROR]: Could not load in last setting {} using current {}".format(last, current))
 
 
 def save_setting():
@@ -49,7 +49,7 @@ def save_setting():
 if __name__=="__main__":
     adhoc_pin = 3
     GPIO.setup(adhoc_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    get_last_setting()
+    get_last_setting(states_i_w[GPIO.input(adhoc_pin)])
 
     while True:
         current_state = GPIO.input(adhoc_pin)
