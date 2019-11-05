@@ -43,11 +43,11 @@ public:
     // Class methods
     
     /*!
-     * @brief Reads all messages from aodv socket and handles them accordingly
+     * @brief Reads all messages from sockets and has AODV handle them accordingly
      * 
      * @return -1 if no packets or the number of packets handled
      */
-    int handleAODVPackets();
+    int handlePackets();
 
     /*!
      * @brief Returns one of the packets on the data socket
@@ -58,6 +58,15 @@ public:
      */
     bool getDataPacket(Message& message);
 };
+
+/*!
+ * @brief prints the data of a packet to the specified filed
+ * 
+ * @param file  where to print the packet
+ * @param buffer the packet to print
+ * @param length the length of the packet
+ */
+void printPacket(FILE* file, char * buffer, int length);
 
 
 #endif

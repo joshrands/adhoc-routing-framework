@@ -87,8 +87,7 @@ void AODV::receivePacket(char* packet, int length, IP_ADDR source)
 	IP_ADDR origIP;
 	memcpy(&origIP, &(packet[5]), 4);
 
-	if (this->getIp() == finalDestination)
-	{
+	if (this->getIp() == finalDestination){
 		// packet has reached its final destination! 
 		// TODO: Now what? 
 		if (AODV_PRINT_PACKET)
@@ -172,10 +171,12 @@ void AODV::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADD
 		rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
 
 		// start a thread for THIS rreq and wait for a response 
-		thread waitForResponse(retryRouteRequestIfNoRREP, this, rreq, RREQ_RETRIES);
-		waitForResponse.detach();
-
+		if(RREQ_RETRIES){
+			thread waitForResponse(retryRouteRequestIfNoRREP, this, rreq, RREQ_RETRIES);
+			waitForResponse.detach();
+		}
 		broadcastRREQBuffer(rreq);
+		
 
 		return;
 	}

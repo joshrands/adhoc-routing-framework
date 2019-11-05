@@ -39,9 +39,8 @@ int main() {
     haodv.sendPacket(msg, 16, getIpFromString("127.0.0.2"));
     haodv.sendPacket(msg, 16, getIpFromString("127.0.0.2"));
 
-    haodv.handleAODVPackets();
+    haodv.handlePackets();
     Message temp;
-    haodv.getDataPacket(temp);
 //    haodv.~HardwareAODV();
   }
 

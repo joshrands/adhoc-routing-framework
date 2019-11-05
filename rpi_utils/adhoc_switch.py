@@ -30,7 +30,7 @@ def set_adhoc():
 
 
 def set_wifi():
-    bash(("mv /etc/network/interfaces_adhoc /etc/network/interfaces",))
+    bash(("mv /etc/network/interfaces_wifi /etc/network/interfaces",))
 
 
 def get_last_setting(current):
