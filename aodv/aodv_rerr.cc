@@ -28,7 +28,7 @@ bool RERRHelper::attemptLocalRepair(IP_ADDR brokenLink)
 rerrPacket RERRHelper::createRERR(const IP_ADDR destIP, const IP_ADDR origIP)
 {
     if (RERR_DEBUG)
-        cout << "Generating Route Error packet for destination " << getStringFromIp(destIP) << endl;
+        cout << "[DEBUG]: Generating Route Error packet for destination " << getStringFromIp(destIP) << endl;
 
     rerrPacket rerr;
 

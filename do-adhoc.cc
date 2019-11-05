@@ -8,51 +8,41 @@
 
 using namespace std;
 
-struct config
-{
-    IP_ADDR deviceIP;
-};
-
-void getConfig(config* config);
-
 int main(){
     // This might be a double negative right now...
     AODV::AODV_PORT = 13415;
-    HardwareAODV haodv(inet_addr("138.67.203.229"));
-//    HardwareAODV haodv2("138.67.194.210");
-
-//    cout << getStringFromIp(haodv2.getIp()) << endl;
-    cout << getStringFromIp(haodv.getIp()) << endl;
-    cout << haodv.getIp() << " : " << inet_addr("1.1.168.192") << endl;
+    HardwareAODV haodv(inet_addr("192.168.1.1"));
 
     string message = "Hello World!";
-    cout << message.length() << endl;
+    char buffer[200];
+    strcpy(buffer, message.c_str());
 
-    uint32_t dest = getIpFromString("127.0.0.1");
-    haodv.sendPacket(&message[0], message.length(), dest);
-    haodv.sendPacket(&message[0], message.length(), dest);
+    vector<string> ips = { 
+        "192.168.1.2",
+        "192.168.1.3"
+        };
 
-    while (-1 == haodv.handleReceivedPackets());
-}
+    while(true){
+        // Send packets to all ips
+        for(auto ip : ips){
+            uint32_t dest = getIpFromString(ip);
+            haodv.sendPacket(buffer, message.length(), dest);
+            printf("Sent ");
+            printPacket(stdout, buffer, message.length());
+            printf(" to %s\n",ip);
+        }
+        // Handle packets
+        int handleCount = haodv.handlePackets();
+        if(handleCount > 0){
+            printf("Handled %d AODV packets\n", handleCount);
+        }
+        // get data packets
+        printf("Received data:\n");
+        for(auto packet : haodv.getDataPackets()){
+            printPacket(stdout, packet.getData(), packet.getLength());
+            printf(" from %s\n", getStringFromIp(packet.getAddressI()));
+        }
+        
 
-void getConfig(config* config)
-{
-    // read config file 
-    ifstream configFile;
-    configFile.open("config");
-
-    string line;
-    if (configFile.is_open())
-    {
-        // get ip address
-        getline(configFile, line);
-        cout << line << endl;
-        string ipString;
-        ipString = line.substr(11, line.length() - 11);
-
-        config->deviceIP = getIpFromString(ipString);
-
-        configFile.close();
     }
-
 }

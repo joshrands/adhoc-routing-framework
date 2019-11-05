@@ -17,7 +17,7 @@
 #include <sstream>
 #include <math.h>
 
-#include "defines.h"
+#include "aodv_defines.h"
 
 using namespace std;
 

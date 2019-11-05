@@ -63,39 +63,83 @@ HardwareAODV::~HardwareAODV(){
 // Override functions
 int HardwareAODV::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port){
     if(port == AODV_PORT){
-        if(H_DEBUG){
-            printf("[DEBUG]: sending packet %s through AODV\n", buffer);
+        if(HARDWARE_DEBUG){
+            printf("[DEBUG]: sending packet ");
+            printPacket(stdout, buffer, length);
+            printf(" through AODV\n");
         }
         return aodvSocket->sendTo(buffer, length, dest, port);
     }else{
-        if(H_DEBUG){
-            printf("[DEBUG]: sending packet %s through DATA\n", buffer);
+        if(HARDWARE_DEBUG){
+            printf("[DEBUG]: sending packet ");
+            printPacket(stdout, buffer, length);
+            printf(" through DATA\n");
         }
         return dataSocket->sendTo(buffer, length, dest, port);
     }
 }
 
 // Class methods
-int HardwareAODV::handleAODVPackets(){
+int HardwareAODV::handlePackets(){
     Message message;
     int count = 0;
-    if(H_DEBUG){
-        printf("[DEBUG]: Handling received packets from AODV\n");
-    }
+    int count_data = 0;
+    if(HARDWARE_DEBUG) printf("[DEBUG]: Handling received packets from AODV\n");
     while(aodvSocket->getMessage(message)){
-        printf("Received: %s", message.getData());
+        if(HARDWARE_DEBUG){
+            printf("[DEBUG]: Received: %s", message.getData());
+            printPacket(stdout, message.getData(), message.getLength());
+            printf("\n");
+        }
         decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI());
         count ++;
     }
-    if(H_DEBUG){
-        printf("[DEBUG]: Handled %d packets from AODV\n", count);
+    if(HARDWARE_DEBUG) printf("[DEBUG]: Handled %d packets from AODV\n", count);
+    
+    if(HARDWARE_DEBUG) printf("[DEBUG]: Handling received packets from DATA\n");
+    while(dataSocket->getMessage(message)){
+        if(HARDWARE_DEBUG){
+            printf("[DEBUG]: Received: %s", message.getData());
+            printPacket(stdout, message.getData(), message.getLength());
+            printf("\n");
+        }
+        decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI());
+        count ++;
+        count_data ++;
     }
+    if(HARDWARE_DEBUG) printf("[DEBUG]: Handled %d packets from DATA\n", count_data);
+
     return (count == 0) ? -1 : count;
 }
 
-bool HardwareAODV::getDataPacket(Message& message){
-    if(H_DEBUG){
-        printf("[DEBUG]: Checking data socket for messages and returning them\n");
+vector<Message> HardwareAODV::getDataPackets(){
+    vector<Message> packets;
+    for(int i = 0; i < receivedPackets.size(); i++){
+        auto packetInfo = receivedPackets.at(i);
+        char* packet = (char*)(malloc(packetInfo.second-HEADER_SIZE));
+        memcpy(packet, &packetInfo.first[HEADER_SIZE-1], packetInfo.second-HEADER_SIZE);
+        
+        Endpoint end;
+        uint32_t address;
+        memcpy(&address, &packet[5], 4);
+        end.setAddress(address, DATA_PORT);
+
+        Message current(end, packet, packetInfo.second-HEADER_SIZE);
+        packets.emplace_back(current);
+
+        delete receivedPackets.at(i).first;
     }
-    return dataSocket->getMessage(message);
+    
+    // Clear received packets
+    receivedPackets.clear();
+    // return packets
+    return packets;
+}
+
+
+
+void printPacket(FILE* file, char * buffer, int length){
+    for(int i = 0; i < length; i++){
+        fprintf(file, "%c", buffer[i]);
+    }
 }

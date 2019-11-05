@@ -1,15 +1,14 @@
-#ifndef DEFINES_H
-#define DEFINES_H
+#ifndef AODV_DEFINES_H
+#define AODV_DEFINES_H
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include "../defines.h"
 
 #define IP_ADDR			    uint32_t
 #define BROADCAST           "255.255.255.255"
 #define HEADER_SIZE         9
-
-#define DEBUG               0
 
 #define AODV_PRINT_PACKET   1
 #define AODV_LOG_OUTPUT	    1

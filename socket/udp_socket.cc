@@ -30,13 +30,17 @@ using std::memset;
 UDPSocket::UDPSocket() : messages() {}
 
 bool UDPSocket::init(void) { 
-  printf("[DEBUG]: Initializing udp socket\n");
+  if(UDP_DEBUG){
+    printf("[DEBUG]: Initializing udp socket\n");
+  }
   return initSocket(SOCK_DGRAM); 
 }
 
 // Server initialization
 bool UDPSocket::bindToPort(int port) {
-  printf("[DEBUG]: Binding udp socket to port %d\n", port);
+  if(UDP_DEBUG){
+    printf("[DEBUG]: Binding udp socket to port %d\n", port);
+  }
   if(sockfd < 0){
     if (!initSocket(SOCK_DGRAM))
       return false;
@@ -51,10 +55,14 @@ bool UDPSocket::bindToPort(int port) {
 
   if (bind(sockfd, (const struct sockaddr *)&localHost, sizeof(localHost)) < 0) {
     close(sockfd);
-    printf("[DEBUG]: Unsuccessful binding of udp socket to port %d\n", port);
+    if(UDP_DEBUG){
+      printf("[DEBUG]: Unsuccessful binding of udp socket to port %d\n", port);
+    }
     return false;
   }
-  printf("[DEBUG]: Successful binding of udp socket to port %d\n", port);
+  if(UDP_DEBUG){
+    printf("[DEBUG]: Successful binding of udp socket to port %d\n", port);
+  }
   return true;
 }
 
@@ -129,7 +137,6 @@ void UDPSocket::receiveFromPortThread() {
     char *buffer = (char *)malloc(MAXLINE * sizeof(char));
     Endpoint client;
     int n = receiveFrom(client, buffer, MAXLINE);
-    
     if (n <= 0) {
       continue;
     }

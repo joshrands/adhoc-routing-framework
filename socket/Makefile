@@ -22,7 +22,7 @@ LIB_NAME = libsocket.a
 OBJ_LIB_FILES = endpoint.o socket.o udp_socket.o  message.o 
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = endpoint.h socket.h udp_socket.h message.h safe_queue.h
+INC_FILES = endpoint.h socket.h udp_socket.h message.h safe_queue.h ../defines.h socket_defines.h
 
 # Any libraries we might need.
 LIBRARYS = -lpthread

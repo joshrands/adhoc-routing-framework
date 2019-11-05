@@ -6,7 +6,6 @@ Message::Message(Endpoint end, char* data, int length){
     this->length = length;
 }
 
-
 uint32_t  Message::getAddressI(void) const{
     return end.getAddressI();
 }

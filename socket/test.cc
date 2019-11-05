@@ -171,10 +171,10 @@ int main() {
          (string) "Can bind previously initialized socket to a port");
     UDPSocket boundSocket;
     test(boundSocket.bindToPort(8070), (string) "Can bind socket to port");
-    test(nonboundSocket.init(),
-         (string) "Can reinitialize socket that is bound to a port");
-    test(nonboundSocket.bindToPort(8070),
-         (string) "Can bind socket that is already bound to a port");
+    test(!nonboundSocket.init(),
+         (string) "Cannot initialize socket that is bound to a port");
+    test(!nonboundSocket.bindToPort(8070),
+         (string) "Will not rebind socket that is already bound to a port");
   }
 
   printf("________________________________\n\n");
