@@ -86,7 +86,7 @@ bool UDPSocket::setBroadcasting(bool broadcast) {
 }
 
 // -1 if unsuccessful, else number of bytes written
-int UDPSocket::_sendTo(Endpoint &remote, const char *packet, int length) {
+int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
   if(UDP_DEBUG){
     printf("[DEBUG]: Sending %s to %s via UDP\n", packet, remote.getAddressC());
   }
@@ -111,7 +111,7 @@ int UDPSocket::_sendTo(Endpoint &remote, const char *packet, int length) {
 int UDPSocket::sendTo(char *buffer, int length, uint32_t dest, int port) {
   Endpoint remote;
   remote.setAddress(dest, port);
-  return _sendTo(remote, buffer, length);
+  return sendTo(remote, buffer, length);
 }
 
 int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {
