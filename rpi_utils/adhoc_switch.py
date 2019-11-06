@@ -54,7 +54,7 @@ def save_setting():
 if __name__=="__main__":
     adhoc_pin = 3
     GPIO.setup(adhoc_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    get_last_setting(states_i_w[GPIO.input(adhoc_pin)])
+    get_last_setting(GPIO.input(adhoc_pin))
 
     while True:
         current_state = GPIO.input(adhoc_pin)
