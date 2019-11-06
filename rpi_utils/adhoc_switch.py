@@ -63,10 +63,12 @@ if __name__=="__main__":
             if adhoc_state == 1:
                 print("WIFI")
                 save_setting()
+                time.sleep(5)
                 set_wifi()
             elif adhoc_state == 0:
                 print("AD HOC")
                 save_setting()
+                time.sleep(5)
                 set_adhoc()
             else:
                 raise "ERROR: Invalid adhoc pin reading: {adhoc_state}".format(adhoc_state=adhoc_state)
