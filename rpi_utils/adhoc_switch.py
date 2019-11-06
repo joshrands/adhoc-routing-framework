@@ -41,8 +41,10 @@ def get_last_setting(current):
                 adhoc_state = states_w_i[last]
             else:
                 print("[ERROR]: Could not load in last setting {} using current {}".format(last, current))
+                adhoc_state = current
     except FileNotFoundError:
         print("[ERROR]: Could not load in last setting file not found using current {}".format(current))
+        adhoc_state = current
 
 
 def save_setting():
