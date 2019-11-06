@@ -10,7 +10,8 @@ which will be stored in a circular queue which overwrites the oldest data in the
 1. Change test to show PASS FAIL on left hand side
     i. Maybe look at coloring...
 2. Rework code to make Message a struct and remove Endpoint
-3. Comment code
+3. 
+4. Comment code
 
 ## How to test this code:
 0. In a terminal, cd into the socket directory
@@ -29,9 +30,9 @@ which will be stored in a circular queue which overwrites the oldest data in the
 
 [message](message.h) - Stores packets and their endpoint
 
-[circular queue](circular_queue.h] - Implementation of a circular queue where when the queue is full new data overwrites previous data
+[circular queue](circular_queue.h) - Implementation of a circular queue where when the queue is full new data overwrites previous data
 
-[safe circular queue](safe_circular_queue.h] - Wrapper of [circular queue](circular_queue.h] which is thread safe
+[safe circular queue](safe_circular_queue.h) - Wrapper of [circular queue](circular_queue.h) which is thread safe
 
 [safe queue](safe_queue.h) - Wrapper of std::queue which is thread safe (can be swapped in instead of circular queue in threaded receiving)
 
