@@ -35,6 +35,7 @@ all:
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir; \
 	done
+	make 
 
 clean-all: 
 	for dir in $(SUBDIRS); do \
@@ -42,6 +43,7 @@ clean-all:
 		make clean; \
 		cd ../; \
 	done
+	make clean
 
 clean:
 	rm -f core ${TARGET} ${OBJ_FILES}
