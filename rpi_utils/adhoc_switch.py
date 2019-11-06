@@ -38,7 +38,7 @@ def get_last_setting(current):
     try:
         with open(state_file, 'r') as fin:
             last = fin.readline() 
-            print("Last setting was: last")
+            print("Last setting was:", last)
             if(last == 'adhoc' or last == 'wifi'):
                 adhoc_state = states_w_i[last]
                 time.sleep(1)
