@@ -1,5 +1,6 @@
 #ifndef SAFECIRCULARQUEUE_H
 #define SAFECIRCULARQUEUE_H
+#include "circular_queue.h"
 #include <iostream>
 #include <mutex>
 
@@ -16,11 +17,7 @@
  */
 template <typename T> class SafeCircularQueue {
 private:
-    unsigned int maxSize;
-    unsigned int size;
-    int front;
-    int rear;
-    T *storage;
+    CircularQueue<T> storage;
     std::mutex m;
 
 public:
@@ -28,32 +25,20 @@ public:
      * @brief Construct a new Safe Circular Queue object
      *
      */
-    SafeCircularQueue() {
-        maxSize = 50;
-        size = 0;
-        front = 0;
-        rear = 0;
-        storage = new T[maxSize];
-    }
+    SafeCircularQueue() {}
 
     /*!
      * @brief Construct a new Safe Circular Queue object
      *
      * @param maxSize the maximum number of elements in the queue
      */
-    SafeCircularQueue(int maxSize) {
-        this->maxSize = maxSize;
-        size = 0;
-        front = 0;
-        rear = 0;
-        storage = new T[maxSize];
-    }
+    SafeCircularQueue(int maxSize) :storage(maxSize){}
 
     /*!
      * @brief Destroy the Safe Circular Queue object
      *
      */
-    ~SafeCircularQueue() { delete[] storage; }
+    ~SafeCircularQueue() {}
 
     /*!
      * @brief Checks if the queue is empty
@@ -61,7 +46,7 @@ public:
      * @return true if it is
      * @return false if it is not
      */
-    bool empty() const { return size == 0; }
+    bool empty() const { return storage.empty(); }
 
     /*!
      * @brief Places the data on the queue will overwrite data at back
@@ -69,19 +54,7 @@ public:
      */
     void push(T elem) {
         std::lock_guard<std::mutex> lock(m);
-        storage[rear] = elem;
-        // Move rear along queue and looped back around if neccessary
-        rear++;
-        rear %= maxSize;
-        // increase size, but cap at maxSize
-        if (size == maxSize) {
-            // if size == maxSize then increment front and loop back if
-            // neccessary
-            front++;
-            front %= maxSize;
-        } else {
-            size++;
-        }
+        storage.push(elem);
     }
 
     /*!
@@ -93,11 +66,7 @@ public:
      */
     bool peek(T &elem){
         std::lock_guard<std::mutex> lock(m);
-        if (empty()) {
-            return false;
-        }
-        elem = storage[front];
-        return true;
+        return storage.peek(elem);
     }
 
     /*!
@@ -109,16 +78,7 @@ public:
      */
     bool pop(T &elem) {
         std::lock_guard<std::mutex> lock(m);
-        if (empty()) {
-            return false;
-        }
-        elem = storage[front];
-        // Move front back and wrap
-        front++;
-        front %= maxSize;
-        // decrement size
-        size--;
-        return true;
+        return storage.pop(elem);
     }
 
     /*!
@@ -129,15 +89,7 @@ public:
      */
     bool pop() {
         std::lock_guard<std::mutex> lock(m);
-        if (empty()) {
-            return false;
-        }
-        // Move front back and wrap
-        front++;
-        front %= maxSize;
-        // decrement size
-        size--;
-        return true;
+        return storage.pop();
     }
 };
 

@@ -24,16 +24,14 @@ AODV Protocol: https://www.ietf.org/rfc/rfc3561.txt
 5. Add AODVRoutingTable updates 
 
 ### Hardware
-1. Add adhoc/wifi switching
-2. Add auto login (if its a thing)
+1. Add auto login (if its a thing)
+2. Add auto git pull on wifi startup
 
 ### ADHOC-HARDWARE
-1. Implement data forwarding (wrap data packets and send to routing table neighbour)
-i. Actually implemented just check that this is handled correctly on AODV side (aodv.cc:83)
-ii. Add vector or some storage method if the packet was for us
-2. Add sliding window on udp message queue
+1. README
+2. Add packet sniffing and or check signal strength on packet receive
 4. Comment/Document
-5. Add packet sniffing and or check signal strength on packet receive
+5. 
 6.
 
 ### AODV-REM
