@@ -23,7 +23,7 @@ Hardware implementation of the Ad-hoc On demand Distance Vector routing protocol
   'g++ test.o -o test libhardware.a 
 
 ## File Insights
-[hardware_aodv](hardware_aodv.h) - Hardware implementation of [aodv](aodv.h)
+[hardware_aodv](hardware_aodv.h) - Hardware implementation of [aodv](../aodv/aodv.h) using udp sockets defined [here](../socket/udp_socket.h)
 
 [hardware_defines](hardware_defines.h) - Global defines used for debugging, logging, and hyperparameters for the code. 
 
