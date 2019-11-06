@@ -25,18 +25,18 @@ enum ModelState
 class ModelParameters
 {
 public:
-  ModelParameters() { }; // default constructor
-  ModelParameters(double mu, double beta, double sigma) { this->mu = mu; this->beta = beta; this->sigma = sigma; };
+    ModelParameters() { }; // default constructor
+    ModelParameters(float mu, float beta, float sigma) { this->mu = mu; this->beta = beta; this->sigma = sigma; };
 
-  double mu;
-  double beta;
-  double sigma; // standard deviation
+    float mu;
+    float beta;
+    float sigma; // standard deviation
 
-  ModelType type; // battery, rss, other
-  int timeToLive; // time to live in seconds
-  int ownerId;
-  int pairId; // if rss data
-  int hopsRemaining;
+    ModelType type; // battery, rss, other
+    int timeToLive; // time to live in seconds
+    int ownerId;
+    int pairId; // if rss data
+    int hopsRemaining;
 
-  int UPDATE_FREQUENCY = 1;
+    int UPDATE_FREQUENCY = 1;
 };
