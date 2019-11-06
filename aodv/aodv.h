@@ -15,6 +15,7 @@
 #include "aodv_rreq.h"
 #include "aodv_rrep.h"
 #include "aodv_rerr.h"
+#include "aodv_params.h"
 
 #include "send_packet.h"
 
@@ -79,8 +80,8 @@ public:
 	// get the routing table 
 	AODVRoutingTable* getTable() { return m_aodvTable; } 
 
-	// abstract function to be overwritten by child class 
-	virtual int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
+	// map of rreq ids and their corresponding packet to be sent once the route is established
+	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
 
 protected:
 	// node sequence number. MUST increment on a route discovery
@@ -91,14 +92,12 @@ protected:
 	vector<IP_ADDR> m_neighbors;
 	// aodv routing table
 	AODVRoutingTable* m_aodvTable;
-
-	// map of rreq ids and their corresponding packet to be sent once the route is established
-	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
-
 	// current packet id index
 	uint32_t packetIdCount;	
 	// map of destination and recently sent packets (packets will time out after a short time) 
 	map<IP_ADDR, queue<packet>> unackedPacketBuffer;
+	// store received data packets which are for this ip
+	vector<pair<char*, int>> receivedPackets;
 };
 
 /* AODVTest class
@@ -133,5 +132,8 @@ private:
 	vector<AODVTest*> m_physicalNeighbors;
 
 };
+
+// retry the route request message if you don't receive one
+void retryRouteRequestIfNoRREP(AODV* aodv, rreqPacket sendRREQ, int numberOfRetriesRemaining);
 
 #endif

@@ -27,38 +27,31 @@
 
 using std::memset;
 
-Socket::Socket() {sockfd = -1;}
+Socket::Socket() : sockfd(-1) {}
 
-Socket::~Socket() { //sclose(); 
-}
+Socket::~Socket() { sclose(); }
 
 bool Socket::initSocket(int type) {
   if (sockfd != -1) {
-    perror("socket already created\n");
+    perror("[ERROR]: Socket already created\n");
     return false;
   }
 
-  sockfd = socket(AF_INET, type, 0);
-  if (getSockfd() < 0) {
-    perror("socket creation failed\n");
+  int fd = socket(AF_INET, type, 0);
+  if (fd < 0) {
+    perror("[ERROR]: socket creation failed\n");
     return false;
   }
-  printf("Sockfd: %d\n", sockfd);
+  sockfd = fd;
+
   return true;
 }
 
 bool Socket::setOption(int level, int optname, const void *optval, socklen_t optlen) {
-  return (setsockopt(getSockfd(), level, optname, optval, optlen) < 0) ? false : true;
-} 
+  return (setsockopt(sockfd, level, optname, optval, optlen) < 0) ? false : true;
+}
 
 bool Socket::getOption(int level, int optname, void *optval, socklen_t *optlen) {
-  return (getsockopt(getSockfd(), level, optname, optval, optlen) < 0) ? false : true;
+  return (getsockopt(sockfd, level, optname, optval, optlen) < 0) ? false : true;
 }
-
-void Socket::sclose() { //close(sockfd); 
-}
-
-int Socket::getSockfd() {
-  int temp = sockfd;
-  return temp;
-}
+void Socket::sclose() { close(sockfd); }

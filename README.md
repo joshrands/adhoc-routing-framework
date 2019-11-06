@@ -23,20 +23,18 @@ AODV Protocol: https://www.ietf.org/rfc/rfc3561.txt
 4. Add TTL for RREQ dissemination (section 6.4)
 5. Add AODVRoutingTable updates 
 
-### HARDWARE AODV
-1. Make a Daemon to accept network packets
-  - https://stackoverflow.com/questions/17954432/creating-a-daemon-in-linux
-2. Use AODV object for routing table
-3. Use AODV packets
-4. Circular queue (max packets accepted)
-5. Check ip address to see if it ourselves
-6. Global debug definition
-7. Find the communication rate (use different numbers of pis)
-8. Packet sniffing
-9. AODV switch script
-10. Auto login
-11. Set up nice readme and comment alot of things
-12. 
+### Hardware
+1. Add adhoc/wifi switching
+2. Add auto login (if its a thing)
+
+### ADHOC-HARDWARE
+1. Implement data forwarding (wrap data packets and send to routing table neighbour)
+i. Actually implemented just check that this is handled correctly on AODV side (aodv.cc:83)
+ii. Add vector or some storage method if the packet was for us
+2. Add sliding window on udp message queue
+4. Comment/Document
+5. Add packet sniffing and or check signal strength on packet receive
+6.
 
 ### AODV-REM
 1. Add network monitoring 

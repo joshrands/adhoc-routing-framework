@@ -11,7 +11,7 @@ CXX = g++
 LD = g++
 LIB = ar
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK
-LDFLAGS = -g -pthread
+LDFLAGS = -g -std=c++11 -pthread
 LIBFLAGS = -cvq
 
 #
@@ -19,10 +19,10 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libmonitoring.a
-OBJ_LIB_FILES = rem.o rem_model.o network_monitor.o
+OBJ_LIB_FILES = rem.o rem_model.o network_monitor.o ../aodv/RoutingProtocol.o
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h defines.h network_monitor.h 
+INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h defines.h network_monitor.h ../aodv/RoutingProtocol.h 
 
 ${TARGET}: ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}

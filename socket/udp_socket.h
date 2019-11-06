@@ -23,12 +23,11 @@
 #ifndef UDPSOCKET_H
 #define UDPSOCKET_H
 
-#define UDP_DEBUG true
-
 #include "endpoint.h"
 #include "socket.h"
 #include "message.h"
 #include "safe_queue.h"
+#include "socket_defines.h"
 #include <iostream>
 #include <utility>
 
@@ -37,7 +36,6 @@ using namespace std;
 /*!
 UDP Socket
 */
-
 class UDPSocket : public Socket {
 
 public:
@@ -45,7 +43,7 @@ public:
    */
   UDPSocket();
 
-  ~UDPSocket() { sclose(); }
+  ~UDPSocket() { close(sockfd); }
 
   /*! Init the UDP Client Socket without binding it to any specific por
    *  @return true on success, false on failure
@@ -75,7 +73,7 @@ public:
    *  @param length The length of the packet to be sent
    *  @return the number of written bytes on success (>=0) or -1 on failure
    */
-  int sendTo(Endpoint &remote, char *packet, int length);
+  int _sendTo(Endpoint &remote, const char *packet, int length);
 
   /*!
    * Send a packet to an IP address and port
@@ -115,6 +113,13 @@ public:
    * 
    */
   bool areThereMessages();
+
+  /*!
+   * @brief Get the sockfd object
+   * 
+   * @return int 
+   */
+  int getSockfd() const;
 
 private:
   // To hold threaded messages

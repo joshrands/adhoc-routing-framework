@@ -10,8 +10,7 @@
 #include "../socket/endpoint.h"
 #include "../socket/udp_socket.h"
 #include "../aodv/aodv.h"
-
-#define H_DEBUG true
+#include "hardware_defines.h"
 
 class HardwareAODV : public AODV{
 private:
@@ -44,21 +43,28 @@ public:
     // Class methods
     
     /*!
-     * @brief Reads all messages from aodv socket and handles them accordingly
+     * @brief Reads all messages from sockets and has AODV handle them accordingly
      * 
      * @return -1 if no packets or the number of packets handled
      */
-    int handleAODVPackets();
+    int handlePackets();
 
     /*!
      * @brief Returns one of the packets on the data socket
      * 
-     * @param message the first message on the queue
-     * @return true a message was received
-     * @return false no messages
+     * @return vector of received packets
      */
-    bool getDataPacket(Message& message);
+    vector<Message> getDataPackets();
 };
+
+/*!
+ * @brief prints the data of a packet to the specified filed
+ * 
+ * @param file  where to print the packet
+ * @param buffer the packet to print
+ * @param length the length of the packet
+ */
+void printPacket(FILE* file, char * buffer, int length);
 
 
 #endif

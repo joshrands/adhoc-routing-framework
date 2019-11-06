@@ -31,7 +31,7 @@ string getStringFromIp(IP_ADDR ip)
 RoutingTable::RoutingTable()
 {
 	if (ROUTE_DEBUG)	
-		cout << "Routing table created" << endl;
+		cout << "[DEBUG]: Routing table created" << endl;
 }
 
 RoutingTable::~RoutingTable()

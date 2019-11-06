@@ -26,14 +26,14 @@ bool RREQHelper::shouldGenerateRREP(rreqPacket receivedRREQ)
 	if (receivedRREQ.destIP == this->m_ip)
 	{
 		if (RREQ_DEBUG)
-			cout << "RREQ reached final destination. Generating RREP..." << endl;
+			cout << "[DEBUG]: RREQ reached final destination. Generating RREP..." << endl;
 
 		return true;
 	}
 	else if (this->m_pTable->getNextHop(receivedRREQ.destIP) != 0 && this->m_pTable->getIsRouteActive(receivedRREQ.destIP))
 	{
 		if (RREQ_DEBUG)
-			cout << "This node " << getStringFromIp(this->m_ip) << " has a path to the final node in its routing table." << endl;
+			cout << "[DEBUG]: This node " << getStringFromIp(this->m_ip) << " has a path to the final node in its routing table." << endl;
 
 		return true;
 	}
@@ -68,7 +68,7 @@ rreqPacket RREQHelper::createRREQ(const IP_ADDR destIP, const uint32_t destSeqNu
 {
 	// Section 6.3 rfc3561
 	if (RREQ_DEBUG)
-		cout << "Creating Route Request message from " << getStringFromIp(this->m_ip) << " to " << getStringFromIp(destIP) << endl;
+		cout << "[DEBUG]: Creating Route Request message from " << getStringFromIp(this->m_ip) << " to " << getStringFromIp(destIP) << endl;
 
 	// there is no current path to the destination, create a RREQ 
 	rreqPacket rreq; 

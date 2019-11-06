@@ -29,15 +29,19 @@ using std::memset;
 
 UDPSocket::UDPSocket() : messages() {}
 
-bool UDPSocket::init(void){ 
-  printf("[DEBUG]: Initializing udp socket\n");
+bool UDPSocket::init(void) { 
+  if(UDP_DEBUG){
+    printf("[DEBUG]: Initializing udp socket\n");
+  }
   return initSocket(SOCK_DGRAM); 
 }
 
 // Server initialization
 bool UDPSocket::bindToPort(int port) {
-  printf("[DEBUG]: Binding udp socket to port %d\n", port);
-  if(getSockfd() < 0){
+  if(UDP_DEBUG){
+    printf("[DEBUG]: Binding udp socket to port %d\n", port);
+  }
+  if(sockfd < 0){
     if (!initSocket(SOCK_DGRAM))
       return false;
   }
@@ -49,12 +53,16 @@ bool UDPSocket::bindToPort(int port) {
   localHost.sin_port = htons(port);
   localHost.sin_addr.s_addr = INADDR_ANY;
 
-  if (bind(getSockfd(), (const struct sockaddr *)&localHost, sizeof(localHost)) < 0) {
-    sclose();
-    printf("[DEBUG]: Unsuccessful binding of udp socket to port %d\n", port);
+  if (bind(sockfd, (const struct sockaddr *)&localHost, sizeof(localHost)) < 0) {
+    close(sockfd);
+    if(UDP_DEBUG){
+      printf("[DEBUG]: Unsuccessful binding of udp socket to port %d\n", port);
+    }
     return false;
   }
-  printf("[DEBUG]: Successful binding of udp socket to port %d\n", port);
+  if(UDP_DEBUG){
+    printf("[DEBUG]: Successful binding of udp socket to port %d\n", port);
+  }
   return true;
 }
 
@@ -78,12 +86,18 @@ bool UDPSocket::setBroadcasting(bool broadcast) {
 }
 
 // -1 if unsuccessful, else number of bytes written
-int UDPSocket::sendTo(Endpoint &remote, char *packet, int length) {
+int UDPSocket::_sendTo(Endpoint &remote, const char *packet, int length) {
   if(UDP_DEBUG){
     printf("[DEBUG]: Sending %s to %s via UDP\n", packet, remote.getAddressC());
   }
+  if (sockfd < 0) {
+    if(UDP_DEBUG){
+      printf("[DEBUG]: sockfd is in error state\n");
+    }
+    return -1;
+  }
 
-  int returnVal = sendto(getSockfd(), packet, length, MSG_CONFIRM,
+  int returnVal = sendto(sockfd, packet, length, MSG_CONFIRM,
                 (const struct sockaddr *)&remote.remoteHost,
                 sizeof(remote.remoteHost));
   if(returnVal < 0){
@@ -95,32 +109,24 @@ int UDPSocket::sendTo(Endpoint &remote, char *packet, int length) {
 }
 
 int UDPSocket::sendTo(char *buffer, int length, uint32_t dest, int port) {
-  if(UDP_DEBUG){
-    printf("[DEBUG]: Sending %s to %d via UDP\n", buffer, dest) ;
-  }
-
-  in_addr dest_in;
-  dest_in.s_addr = dest;
-  sockaddr_in remote;
-  remote.sin_family = AF_INET;
-  remote.sin_addr = dest_in;
-  remote.sin_port = port;
-  int returnVal = sendto(getSockfd(), buffer, length, MSG_CONFIRM,
-                (const struct sockaddr *)&remote,
-                sizeof(remote));
-  if(returnVal < 0){
-    int errsv = errno;
-    printf("[ERROR] Could not send packet %s to %d\n", buffer, dest);
-    printf("[ERROR] %d\n", errsv);
-  }
-  return returnVal;
+  Endpoint remote;
+  remote.setAddress(dest, port);
+  return _sendTo(remote, buffer, length);
 }
 
 int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {
   // -1 if unsuccessful, else number of bytes received
+  
+  if (sockfd < 0){
+    if(UDP_DEBUG){
+      printf("[DEBUG]: UDP socketfd is in error state while trying to receive packets\n");
+    }
+    return -1;
+  }
+  
   remote.resetAddress();
   socklen_t remoteHostLen = sizeof(remote.remoteHost);
-  return recvfrom(getSockfd(), buffer, length, 0,
+  return recvfrom(sockfd, buffer, length, 0,
                   (struct sockaddr *)&remote.remoteHost, &remoteHostLen);
 }
 
@@ -130,14 +136,10 @@ void UDPSocket::receiveFromPortThread() {
   while (true) {
     char *buffer = (char *)malloc(MAXLINE * sizeof(char));
     Endpoint client;
-    socklen_t remoteHostLen = sizeof(client.remoteHost);
-    int n = recvfrom(getSockfd(), buffer, MAXLINE, 0,
-                  (struct sockaddr *)&client.remoteHost, &remoteHostLen);
-    
+    int n = receiveFrom(client, buffer, MAXLINE);
     if (n <= 0) {
       continue;
     }
-
     buffer[n] = '\0';
     messages.push(Message(client, buffer, n));
     // Need to find out why this is neccesary
@@ -151,3 +153,7 @@ bool UDPSocket::areThereMessages(){
   Message temp;
   return messages.peek(temp);
 } 
+
+int UDPSocket::getSockfd() const{
+  return sockfd;
+}

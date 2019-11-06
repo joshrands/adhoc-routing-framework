@@ -2,11 +2,11 @@
 #include <math.h>
 #include <cmath>
 
-// Add a data point to this model and call fit model
+// Add a data point to this modelParameters.and call fit model
 void PredictionModel::addDataPoint(double value, double time)
 {
     if (REM_DEBUG)
-        cout << "New data point added to model: "
+        cout << "New data point added to modelParameters. "
                 << time << ", " << value << endl;
 
     this->data.push_back(value);
@@ -33,7 +33,7 @@ void PredictionModel::addDataPoint(double value, double time)
     if (dataCount < INIT_COUNT)
     {
         if (REM_DEBUG)
-            cout << "Not enough data to fit model" << endl;
+            cout << "Not enough data to fit modelParameters." << endl;
         return;
     }
     else if (dataCount == INIT_COUNT)
@@ -43,7 +43,7 @@ void PredictionModel::addDataPoint(double value, double time)
         return;
     }
 
-    // model past initialization
+    // modelParameters.past initialization
     // compare this point to the expected point
     if (withinExpectedValueRange(time, value))
     {
@@ -64,7 +64,7 @@ void PredictionModel::addDataPoint(double value, double time)
         }
         else
         {
-        // check old model to see if a mistake was made in updating the model
+        // check old modelParameters.to see if a mistake was made in updating the model
         compareToPreviousModel();
         }
     }
@@ -84,7 +84,7 @@ void PredictionModel::calculateDeviations(vector<double> times, vector<double> v
     }
 
     // calculate sigma
-    model.sigma = totalDeviation / n;
+    modelParameters.sigma = totalDeviation / n;
 
     // TODO: Add to error array?
 }
@@ -96,7 +96,7 @@ bool PredictionModel::withinExpectedValueRange(double time, double value)
 
     double expected = this->getDataPoint(time);
     double deviation = std::abs(float(value - expected));
-    double threshold = model.sigma * NUM_DEVIATIONS;
+    double threshold = modelParameters.sigma * NUM_DEVIATIONS;
 
     if (threshold < MIN_DEVIATION)
         threshold = MIN_DEVIATION;
@@ -122,7 +122,7 @@ bool PredictionModel::withinExpectedValueRange(double time, double value)
         this->state = ModelState::UNSTABLE;
         return false;
     }
-    else if (deviation > model.sigma && ((deviation < 0 && lastDeviation < 0) || (deviation > 0 && lastDeviation > 0)))
+    else if (deviation > modelParameters.sigma && ((deviation < 0 && lastDeviation < 0) || (deviation > 0 && lastDeviation > 0)))
     {
         if (REM_DEBUG)
             cout << "UNSTABLE: Bad trend error" << endl;
@@ -136,8 +136,8 @@ bool PredictionModel::withinExpectedValueRange(double time, double value)
     return true;
 }
 
-// compare current model to previous models and check for mistake
-// return true if old model is better
+// compare current modelParameters.to previous modelParameters. and check for mistake
+// return true if old modelParameters.is better
 bool PredictionModel::compareToPreviousModel()
 {
   // TODO: Implement
@@ -145,17 +145,17 @@ bool PredictionModel::compareToPreviousModel()
   return false;
 }
 
-// adapt the current model for the latest measured data in window
+// adapt the current modelParameters.for the latest measured data in window
 void PredictionModel::adaptModel()
 {
     if (REM_DEBUG)
-        cout << "Adapting model to new data" << endl;
+        cout << "Adapting modelParameters.to new data" << endl;
 
-    // TODO: Consider going back to old model?
-    // store current model in old model
-    this->oldModel = model;
+    // TODO: Consider going back to old modelParameters.
+    // store current modelParameters.in old model
+    this->oldModel = modelParameters;
 
-    // build a new model and last 'bad data'
+    // build a new modelParameters.and last 'bad data'
     this->windowSize = MAX_DIFF_COUNT;
 
     // get data for regression
@@ -177,9 +177,9 @@ void PredictionModel::adaptModel()
     this->performRegression(newTimes, newData, newAvgs);
     this->compareToPreviousModel();
 
-    // create model packet
+    // create modelParameters.packet
     // broadcast packet
-    model.timeToLive = DEFAULT_TTL;
+    modelParameters.timeToLive = DEFAULT_TTL;
 
     // NS3-TODO: Broadcast this message?  Simulator::Schedule(Seconds(0.00001), &BroadcastModel, this);
 }
@@ -196,13 +196,13 @@ void PredictionModel::setParentNode(Ptr<Node> parent)
 BatteryModel::BatteryModel()
 {
   this->alphaTimeout = 1.0;
-  this->model.type = BATTERY;
+  this->modelParameters.type = BATTERY;
 }
 
 void BatteryModel::initialize()
 {
     if (BATTERY_DEBUG)
-        cout << "Initializing battery model for node " << this->ownerId << endl;
+        cout << "Initializing battery modelParameters.for node " << this->ownerId << endl;
 
     // start monitoring in ns3 discrete simulator
 
@@ -212,17 +212,17 @@ void BatteryModel::initialize()
 
 double BatteryModel::getDataPoint(double time)
 {
-    return model.mu * time + model.beta;
+    return modelParameters.mu * time + modelParameters.beta;
 }
 
 void BatteryModel::fitModel()
 {
 //  if (windowSize >= INIT_COUNT)
-//   cout << "Fitting battery model" << endl;
+//   cout << "Fitting battery modelParameters. << endl;
 
     performRegression(times, data, weightedAverages);
 
-    model.timeToLive = DEFAULT_TTL;
+    modelParameters.timeToLive = DEFAULT_TTL;
 
     // NS3-TODO: hardware abstract???
 //    Simulator::Schedule(Seconds(0.00001), &BroadcastModel, this);
@@ -251,11 +251,11 @@ void BatteryModel::performRegression(vector<double> times, vector<double> values
     double b = (y*xx - x*xy)/(n*xx - x*x);
     double m = (n*xy - x*y)/(n*xx - x*x);
 
-    model.mu = m;
-    model.beta = b;
+    modelParameters.mu = m;
+    modelParameters.beta = b;
 
     if (BATTERY_DEBUG)
-        cout << "New Battery model: y = " << m << "x + " << b << endl;
+        cout << "New Battery modelParameters. y = " << m << "x + " << b << endl;
 
     this->calculateDeviations(times, values);
 }
@@ -263,28 +263,28 @@ void BatteryModel::performRegression(vector<double> times, vector<double> values
 /* Class RssModel */
 RssModel::RssModel()
 {
-    this->model.type = RSS;
+    this->modelParameters.type = RSS;
 }
 
 void RssModel::initialize()
 {
     if (RSS_DEBUG)
-        cout << "Initializing local rss model for node " << this->ownerId << " with node " << this->pairId << endl;
+        cout << "Initializing local rss modelParameters.for node " << this->ownerId << " with node " << this->pairId << endl;
 }
 
 double RssModel::getDataPoint(double time)
 {
-    return model.mu * log(time + 10) + model.beta;
+    return modelParameters.mu * log(time + 10) + modelParameters.beta;
 }
 
 void RssModel::fitModel()
 {
   //if (windowSize >= INIT_COUNT)
-   // cout << "Fitting rss model" << endl;
+   // cout << "Fitting rss modelParameters. << endl;
 
     performRegression(times, data, weightedAverages);
 
-    model.timeToLive = DEFAULT_TTL;
+    modelParameters.timeToLive = DEFAULT_TTL;
     // NS3-TODO: Abstarct???
 //    Simulator::Schedule(Seconds(0.00001), &BroadcastModel, this);
 }
@@ -318,11 +318,11 @@ void RssModel::performRegression(vector<double> times, vector<double> values, ve
     double b = (y*xx - x*xy)/(n*xx - x*x);
     double m = (n*xy - x*y)/(n*xx - x*x);
 
-    model.mu = m;
-    model.beta = b;
+    modelParameters.mu = m;
+    modelParameters.beta = b;
 
     if (RSS_DEBUG) 
-        cout << "New RSS model: y = " << m << "x + " << b << endl;
+        cout << "New RSS modelParameters. y = " << m << "x + " << b << endl;
 
     this->calculateDeviations(times, values);
 }

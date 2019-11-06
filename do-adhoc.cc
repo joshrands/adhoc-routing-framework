@@ -4,62 +4,45 @@
 #include <thread>
 #include <utility>
 #include <fstream>
-#include <string>
 #include "hardware/hardware_aodv.h"
 
 using namespace std;
 
-struct config
-{
-    IP_ADDR deviceIP;
-};
-
-void getConfig(config* config);
-
 int main(){
     // This might be a double negative right now...
     AODV::AODV_PORT = 13415;
-    HardwareAODV haodv(getIpFromString("192.168.1.1"));
-    string message = "Hello friend";
+    HardwareAODV haodv(inet_addr("192.168.1.1"));
+
+    string message = "Hello World!";
+    char buffer[200];
+    strcpy(buffer, message.c_str());
+
+    vector<string> ips = { 
+        "192.168.1.2",
+        "192.168.1.3"
+        };
 
     while(true){
-        printf("[INFO]: Sending message\n");
-        uint32_t dest = getIpFromString("192.168.1.2");
-        haodv.sendPacket(&message[0], message.length(), dest);
-        haodv.sendPacket(&message[0], message.length(), dest);
-
-        int aodvPackets = haodv.handleAODVPackets();
-        if(aodvPackets < 0){
-            printf("[INFO]: Have not received any AODV packages\n");
-        }else{
-            printf("[INFO]: Received %d AODV packet(s)\n", aodvPackets);
+        // Send packets to all ips
+        for(auto ip : ips){
+            uint32_t dest = getIpFromString(ip);
+            haodv.sendPacket(buffer, message.length(), dest);
+            printf("Sent ");
+            printPacket(stdout, buffer, message.length());
+            printf(" to %s\n",ip);
         }
-        Message input;
-        if(haodv.getDataPacket(input)){
-            printf("[INFO]: Received %s from %d\n", input.getData(), input.getAddressI());
+        // Handle packets
+        int handleCount = haodv.handlePackets();
+        if(handleCount > 0){
+            printf("Handled %d AODV packets\n", handleCount);
         }
-        printf("_______________________________________________\n");
-        sleep(1);
+        // get data packets
+        printf("Received data:\n");
+        for(auto packet : haodv.getDataPackets()){
+            printPacket(stdout, packet.getData(), packet.getLength());
+            printf(" from %s\n", getStringFromIp(packet.getAddressI()));
+        }
+        
+
     }
-}
-
-void getConfig(config* config){
-    // read config file 
-    ifstream configFile;
-    configFile.open("config");
-
-    string line;
-    if (configFile.is_open())
-    {
-        // get ip address
-        getline(configFile, line);
-        cout << line << endl;
-        string ipString;
-        ipString = line.substr(11, line.length() - 11);
-
-        config->deviceIP = getIpFromString(ipString);
-
-        configFile.close();
-    }
-
 }
