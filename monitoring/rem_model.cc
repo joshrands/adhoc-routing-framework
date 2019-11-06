@@ -195,8 +195,9 @@ void PredictionModel::setParentNode(Ptr<Node> parent)
 /* Class BatteryModel */
 BatteryModel::BatteryModel()
 {
-  this->alphaTimeout = 1.0;
-  this->modelParameters.type = BATTERY;
+    this->alphaTimeout = 1.0;
+    this->modelParameters.type = BATTERY;
+    this->MODEL_TYPE = BATTERY;
 }
 
 void BatteryModel::initialize()
@@ -264,6 +265,7 @@ void BatteryModel::performRegression(vector<double> times, vector<double> values
 RssModel::RssModel()
 {
     this->modelParameters.type = RSS;
+    this->MODEL_TYPE = RSS;
 }
 
 void RssModel::initialize()

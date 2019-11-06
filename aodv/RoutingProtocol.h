@@ -71,6 +71,8 @@ public:
 	// default constructor
 	RoutingProtocol();
 
+	static int DATA_PORT;
+
 	const uint32_t getIp() { return ipAddress; }
 	void setIp(const uint32_t ip) { ipAddress = ip; }
 

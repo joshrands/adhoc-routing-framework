@@ -368,5 +368,4 @@ void test_aodv_link_break()
 	node3.logRoutingTable();
 	node4.logRoutingTable();
 
-	delete buffer;
 }

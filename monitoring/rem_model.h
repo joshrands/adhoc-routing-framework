@@ -33,12 +33,12 @@ public:
     double MIN_DEVIATION = MAX_THRESH_DIFF / 5;
 
     int UPDATE_FREQUENCY  = 1; // update model every x seconds
-    int DEFAULT_TTL       = 2; // default ttl is x seconds
+    uint16_t DEFAULT_TTL  = 3600; // default ttl is x seconds
     int PACKET_SIZE       = 19; // 13 bytes as of now
     int HOP_COUNT         = 2;
 
     // set depending on battery or rss
-    int MODEL_TYPE;
+    uint8_t MODEL_TYPE;
 
     virtual void initialize() = 0;
 
@@ -65,7 +65,7 @@ public:
     // NS3-TODO: ADD THIS IN HELPER  void setParentNode(Ptr<Node> parent);
 
     ModelParameters modelParameters;
-    int ownerId;
+    uint8_t ownerId;
 
     // broadcast socket for this model to communicate on
     /* NS3-TODO: ADD THESE IN HELPER 

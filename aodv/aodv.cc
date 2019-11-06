@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <thread>
 
-int AODV::DATA_PORT = 5555;
 int AODV::AODV_PORT = 5432;
 
 AODV::AODV() {

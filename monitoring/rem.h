@@ -57,15 +57,15 @@ protected:
     uint32_t simStartTime;
 
     // local models: only one battery model but multiple RSS models
-    BatteryModel batteryModel;
+    BatteryModel localBatteryModel;
     // the owner is always this node, the int key is the pairId
     map<int,RssModel> localRssModels; 
 
     // network models: models created by other nodes 
     // int key is the ownerId
-    map<int,BatteryModel> batteryModels;
+    map<int,BatteryModel> netBatteryModels;
     // int key is the ownerId to a vector of pairIds with associated RssModels
-    map<int,vector<pair<int,RssModel>>> netRssModels;
+    map<int,map<int,RssModel>> netRssModels;
 
 /* NS3-TODO:  
     Ptr<Node> parentNode; // parent node
