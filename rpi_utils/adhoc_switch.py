@@ -26,11 +26,11 @@ def bash(*commands):
 
 
 def set_adhoc():
-    bash("mv /etc/network/interfaces_adhoc /etc/network/interfaces","reboot") 
+    bash("cp /etc/network/interfaces_adhoc /etc/network/interfaces","reboot") 
 
 
 def set_wifi():
-    bash("mv /etc/network/interfaces_wifi /etc/network/interfaces","reboot")
+    bash("cp /etc/network/interfaces_wifi /etc/network/interfaces","reboot")
 
 
 def get_last_setting(current):
