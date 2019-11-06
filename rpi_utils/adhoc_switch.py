@@ -12,7 +12,7 @@ password = 'smallsat'
 adhoc_network_name = 'SmallSat'
 wifi_network_name = 'CSMwireless'
 interface = 'wlan0'
-state_file = 'last_setting.txt'
+state_file = '/home/pi/AdHocRouting/rpi_utils/last_setting.txt'
 adhoc_state = 0
 states_w_i = {"adhoc" : 0, "wifi" : 1}
 states_i_w = {0 : "adhoc", 1 : "wifi"}
@@ -26,20 +26,28 @@ def bash(*commands):
 
 
 def set_adhoc():
-    bash(("mv /etc/network/interfaces_adhoc /etc/network/interfaces",)) 
+    bash("cp /etc/network/interfaces_adhoc /etc/network/interfaces","reboot") 
 
 
 def set_wifi():
-    bash(("mv /etc/network/interfaces_wifi /etc/network/interfaces",))
+    bash("cp /etc/network/interfaces_wifi /etc/network/interfaces","reboot")
 
 
 def get_last_setting(current):
-    with open(state_file, 'r') as fin:
-        last = fin.readline()
-        if(last == 'adhoc' or last == 'wifi'):
-            adhoc_state = states_w_i[last]
-        else:
-            print("[ERROR]: Could not load in last setting {} using current {}".format(last, current))
+    global adhoc_state
+    try:
+        with open(state_file, 'r') as fin:
+            last = fin.readline() 
+            print("Last setting was:", last)
+            if(last == 'adhoc' or last == 'wifi'):
+                adhoc_state = states_w_i[last]
+                time.sleep(1)
+            else:
+                print("[ERROR]: Could not load in last setting {} using current {}".format(last, current))
+                adhoc_state = current
+    except FileNotFoundError:
+        print("[ERROR]: Could not load in last setting file not found using current {}".format(current))
+        adhoc_state = current
 
 
 def save_setting():
@@ -48,20 +56,23 @@ def save_setting():
 
 if __name__=="__main__":
     adhoc_pin = 3
-    GPIO.setup(adhoc_pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-    get_last_setting(states_i_w[GPIO.input(adhoc_pin)])
+    GPIO.setup(adhoc_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    time.sleep(1) 
+    get_last_setting(GPIO.input(adhoc_pin)) 
 
     while True:
         current_state = GPIO.input(adhoc_pin)
         if current_state != adhoc_state:
             adhoc_state = current_state
             if adhoc_state == 1:
-                print("WIFI")
+                print("Switching to WIFI mode...")
                 save_setting()
+                time.sleep(5)
                 set_wifi()
             elif adhoc_state == 0:
-                print("AD HOC")
+                print("Switching to AD HOC mode....")
                 save_setting()
+                time.sleep(5)
                 set_adhoc()
             else:
                 raise "ERROR: Invalid adhoc pin reading: {adhoc_state}".format(adhoc_state=adhoc_state)
