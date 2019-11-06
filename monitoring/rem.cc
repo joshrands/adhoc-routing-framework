@@ -133,4 +133,6 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
     buffer-=12;
 
     routing->socketSendPacket(buffer, 16, getIpFromString(BROADCAST), RoutingProtocol::DATA_PORT);
+
+    delete buffer;
 }
