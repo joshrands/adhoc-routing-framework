@@ -46,7 +46,6 @@ public:
 	void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP = -1);
 
 	static int AODV_PORT;
-	static int DATA_PORT;
 
 	// decode a received packet buffer from UPD port 654
 	void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source);

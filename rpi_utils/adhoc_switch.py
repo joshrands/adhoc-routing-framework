@@ -38,10 +38,9 @@ def get_last_setting(current):
     try:
         with open(state_file, 'r') as fin:
             last = fin.readline() 
-            print(last)
+            print("Last setting was:", last)
             if(last == 'adhoc' or last == 'wifi'):
                 adhoc_state = states_w_i[last]
-                print(adhoc_state) 
                 time.sleep(1)
             else:
                 print("[ERROR]: Could not load in last setting {} using current {}".format(last, current))
@@ -58,7 +57,7 @@ def save_setting():
 if __name__=="__main__":
     adhoc_pin = 3
     GPIO.setup(adhoc_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-    time.time(3) 
+    time.sleep(1) 
     get_last_setting(GPIO.input(adhoc_pin)) 
 
     while True:
@@ -66,12 +65,12 @@ if __name__=="__main__":
         if current_state != adhoc_state:
             adhoc_state = current_state
             if adhoc_state == 1:
-                print("WIFI")
+                print("Switching to WIFI mode...")
                 save_setting()
                 time.sleep(5)
                 set_wifi()
             elif adhoc_state == 0:
-                print("AD HOC")
+                print("Switching to AD HOC mode....")
                 save_setting()
                 time.sleep(5)
                 set_adhoc()
