@@ -23,16 +23,11 @@ AODV Protocol: https://www.ietf.org/rfc/rfc3561.txt
 4. Add TTL for RREQ dissemination (section 6.4)
 5. Add AODVRoutingTable updates 
 
-### Hardware
-1. Add auto login (if its a thing)
-2. Add auto git pull on wifi startup
+### SOCKET
+[code here](socket)
 
 ### ADHOC-HARDWARE
-1. README
-2. Add packet sniffing and or check signal strength on packet receive
-4. Comment/Document
-5. 
-6.
+[code here](hardware)
 
 ### AODV-REM
 1. Add network monitoring 
