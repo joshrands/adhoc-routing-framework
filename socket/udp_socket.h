@@ -26,7 +26,7 @@
 #include "endpoint.h"
 #include "socket.h"
 #include "message.h"
-#include "safe_queue.h"
+#include "safe_circular_queue.h"
 #include "socket_defines.h"
 #include <iostream>
 #include <utility>
@@ -123,7 +123,7 @@ public:
 
 private:
   // To hold threaded messages
-  SafeQueue<Message> messages;
+  SafeCircularQueue<Message> messages;
 };
 
 #endif

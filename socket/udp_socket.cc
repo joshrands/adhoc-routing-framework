@@ -27,7 +27,7 @@
 #include <errno.h>
 using std::memset;
 
-UDPSocket::UDPSocket() : messages() {}
+UDPSocket::UDPSocket() : messages(UDP_QUEUE_SIZE) {}
 
 bool UDPSocket::init(void) { 
   if(UDP_DEBUG){
