@@ -2,8 +2,7 @@
 
 #include <iostream>
 #include <string.h>
-
-using namespace std;
+#include "aodv_params.h"
 
 RREQHelper::RREQHelper()
 {
@@ -46,8 +45,6 @@ bool RREQHelper::isDuplicateRREQ(rreqPacket receivedRREQ)
 	// if the origIP exists in the routing table AND the sequence number matches 
 	uint32_t packetSeqNum = receivedRREQ.origSeqNum;
 	uint32_t tableSeqNum = this->m_pTable->getDestSequenceNumber(receivedRREQ.origIP);
-	// or if the last rreq message id matched this one...
-	uint32_t tableLastId = this->m_pTable->getLastRREQId(receivedRREQ.origIP);
 
 	// special case that this rreq is originally from this node
 	if (receivedRREQ.origIP == this->m_ip)
@@ -57,11 +54,29 @@ bool RREQHelper::isDuplicateRREQ(rreqPacket receivedRREQ)
 	int currentCost = this->m_pTable->getCostOfDest(receivedRREQ.origIP);
 	int newCost = this->m_pTable->getCostOfRREQ(receivedRREQ);
 
-	if ( (packetSeqNum == tableSeqNum || tableLastId == receivedRREQ.rreqID) 
-		&& (newCost > currentCost) ) 
+	// or if the last rreq message id matched this one...
+//	uint32_t tableLastId = this->m_pTable->getLastRREQId(receivedRREQ.origIP);
+
+	if ( (packetSeqNum == tableSeqNum || m_receivedRREQIds[receivedRREQ.origIP].count(receivedRREQ.rreqID))
+			&& (newCost >= currentCost) 
+	   ) 
+	{
+		// this is a duplicate
 		return true;
+	}
 	else
+	{
+		// this is not a duplicate! Add to receivedRREQ set 
+		m_receivedRREQIds[receivedRREQ.origIP].insert(receivedRREQ.rreqID);
+		if (m_receivedRREQIds[receivedRREQ.origIP].size() > OLD_RREQ_COUNT)
+		{
+			if (RREQ_DEBUG)
+				cout << "[DEBUG]: RREQ ID buffer at capacity, erasing old IDs" << endl;
+			// add capacity... remove an old rreqId
+			m_receivedRREQIds[receivedRREQ.origIP].erase(m_receivedRREQIds[receivedRREQ.origIP].begin());
+		}
 		return false;
+	}
 }
 
 rreqPacket RREQHelper::createRREQ(const IP_ADDR destIP, const uint32_t destSeqNum)

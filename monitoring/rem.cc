@@ -86,6 +86,7 @@ void REM::updateLocalBatteryModel(double batteryLevel)
     localBatteryModel.addDataPoint(batteryLevel, getCurrentTimeMS());
 }
 
+// TODO: IP_ADDRRRRRR
 void REM::updateLocalRSSModel(int pairId, double rss)
 {
     // check if node already has this model

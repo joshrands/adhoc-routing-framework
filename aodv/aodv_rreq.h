@@ -13,6 +13,11 @@
 #include "aodv_defines.h"
 #include "aodv_packets.h"
 #include "aodv_routing_table.h"
+#include <map>
+#include <vector>
+#include <set>	
+
+using namespace std;
 
 class RREQHelper 
 {
@@ -44,6 +49,8 @@ private:
 	IP_ADDR m_ip;
 	uint32_t m_rreqID;
 	uint32_t* m_pSequenceNum;	
+
+	map<IP_ADDR,set<uint32_t>> m_receivedRREQIds;
 };
 
 #endif
