@@ -5,6 +5,19 @@
 #include "string.h"
 
 // Very cheap testing framework
+using namespace std;
+
+const string RED = "\033[1;31m";
+const string GREEN = "\033[1;32m";
+const string END = "\033[0m\n";
+
+void test(bool condition, string desc)
+{
+	if (condition)
+		cout << GREEN << "[PASS]: " << desc << END;
+	else 
+		cout << RED << "[FAIL]: " << desc << END;
+}
 
 void test_test();
 void test_inet_addr();
@@ -17,23 +30,23 @@ void test_aodv_link_break();
 
 int main (int argc, char *argv[]) 
 {	
-	cout << "Running tests..." << endl;	
+	cout << "[TEST]: Running tests..." << endl;	
 
 	test_test();
 	test_inet_addr();
 	test_routing_table();
 	test_aodv();
 
-	cout << "TESTS COMPLETE." << endl;
+	cout << "[TEST]: TESTS COMPLETE." << endl;
 
 	return 0;
 }
 
 void test_test()
 {
-	// this test tests tests
-	assert(true == true);
-	cout << "Test test complete." << endl;
+	test(true == true, "true == true");
+	// fail test... 
+	test(true == false, "true == false??? This was supposed to fail :)");
 }
 
 void test_inet_addr()
@@ -44,12 +57,12 @@ void test_inet_addr()
 
 	inet_pton(AF_INET, "192.168.1.4", &(sa.sin_addr));
 
-	cout << sa.sin_addr.s_addr << endl;
+//	cout << sa.sin_addr.s_addr << endl;
 
 	IP_ADDR ip = getIpFromString("192.168.1.4");
-	cout << ip << endl;
+//	cout << ip << endl;
 
-	assert(sa.sin_addr.s_addr == ip);
+	test(sa.sin_addr.s_addr == ip, "sa.sin_addr.s_addr == ip");
 
 	// go from number to string
 	inet_ntop(AF_INET, &(sa.sin_addr), str, INET_ADDRSTRLEN);
@@ -57,13 +70,12 @@ void test_inet_addr()
 	string ipString1(str);
 	string ipString2 = getStringFromIp(ip);
 
-	cout << ipString1 << " : " << ipString2 << endl;
-	assert(ipString1 == ipString2);
+	test(ipString1 == ipString2, "ipString1 == ipString2");
 
-	assert(inet_addr("192.168.1.4") == getIpFromString("192.168.1.4"));
+	test(inet_addr("192.168.1.4") == getIpFromString("192.168.1.4"),"inet_addr(\"192.168.1.4\") == getIpFromString(\"192.168.1.4\")");
 
 	AODVTest aodv("192.168.1.4");
-	assert(inet_addr("192.168.1.4") == aodv.getIp());
+	test(inet_addr("192.168.1.4") == aodv.getIp(),"inet_addr(\"192.168.1.4\") == aodv.getIp()");
 	cout << getStringFromIp(aodv.getIp()) << endl;
 }
 

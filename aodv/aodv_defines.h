@@ -10,13 +10,15 @@
 #define BROADCAST           "255.255.255.255"
 #define HEADER_SIZE         9
 
-#define AODV_PRINT_PACKET   1
-#define AODV_LOG_OUTPUT	    1
-#define AODV_DEBUG		    DEBUG && 1 
-#define RREQ_DEBUG		    DEBUG && 1
-#define RREP_DEBUG		    DEBUG && 1
-#define RERR_DEBUG          DEBUG && 1
-#define TABLE_DEBUG         DEBUG && 1
-#define MONITOR_DEBUG       DEBUG && 1
+#define GLOBAL_AODV_DEBUG   0
+
+#define AODV_PRINT_PACKET   1 && GLOBAL_AODV_DEBUG
+#define AODV_LOG_OUTPUT	    1 && GLOBAL_AODV_DEBUG
+#define AODV_DEBUG		    DEBUG && 1 && GLOBAL_AODV_DEBUG
+#define RREQ_DEBUG		    DEBUG && 1 && GLOBAL_AODV_DEBUG
+#define RREP_DEBUG		    DEBUG && 1 && GLOBAL_AODV_DEBUG
+#define RERR_DEBUG          DEBUG && 1 && GLOBAL_AODV_DEBUG
+#define TABLE_DEBUG         DEBUG && 1 && GLOBAL_AODV_DEBUG
+#define MONITOR_DEBUG       DEBUG && 1 && GLOBAL_AODV_DEBUG
 
 #endif
