@@ -8,6 +8,18 @@
 
 using namespace std;
 
+const string RED = "\033[1;31m";
+const string GREEN = "\033[1;32m";
+const string END = "\033[0m\n";
+
+void test(bool condition, string desc)
+{
+	if (condition)
+		cout << GREEN << "[PASS]: " << desc << END;
+	else 
+		cout << RED << "[FAIL]: " << desc << END;
+}
+
 // Very cheap testing framework
 void test_test();
 void test_battery_model();
@@ -15,13 +27,13 @@ void test_rss_model();
 
 int main (int argc, char *argv[]) 
 {	
-	cout << "Running tests..." << endl;	
+	cout << "[TESTS]: Running tests..." << endl;	
 
 	test_test();
 	test_battery_model();
 	test_rss_model();
 
-	cout << "TESTS COMPLETE." << endl;
+	cout << "[TESTS]: TESTS COMPLETE." << endl;
 
 	return 0;
 }
@@ -29,8 +41,7 @@ int main (int argc, char *argv[])
 void test_test()
 {
 	// this test tests tests
-	assert(true == true);
-	cout << "Test test complete." << endl;
+	test(true == true, "true == true");
 }
 
 void test_battery_model()
@@ -46,15 +57,13 @@ void test_battery_model()
 
 	if (BATTERY_DEBUG)
 	{
-		cout << "Data count = " << model.getDataCount() << endl;
-		cout << "Predicted battery = " << model.getDataPoint(4) << endl;
+		cout << "[DEBUG]: Data count = " << model.getDataCount() << endl;
+		cout << "[DEBUG]: Predicted battery = " << model.getDataPoint(4) << endl;
 	}
 
-	assert(model.getDataCount() == 4);
-	assert(model.getDataPoint(4) == 30);
-	assert(model.getDataPoint(8) == 10);
-
-	cout << "REM Battery Model test COMPLETE." << endl;
+	test(model.getDataCount() == 4, "getDataCount() == 4");
+	test(model.getDataPoint(4) == 30, "getDataPoint(4) == 30");
+	test(model.getDataPoint(8) == 10, "getDataPoint(8) == 10");
 }
 
 void test_rss_model()
@@ -69,16 +78,14 @@ void test_rss_model()
 
 	if (RSS_DEBUG)
 	{
-		cout << "Data count = " << model.getDataCount() << endl;
-		cout << "Predicted rss = " << model.getDataPoint(6) << endl;
-		cout << "Difference = " << std::abs(float(model.getDataPoint(6) - (-72))) << endl;
-		cout << "Difference to 75: " << abs(float(model.getDataPoint(10) - (-75))) << endl;
+		cout << "[DEBUG]: Data count = " << model.getDataCount() << endl;
+		cout << "[DEBUG]: Predicted rss = " << model.getDataPoint(6) << endl;
+		cout << "[DEBUG]: Difference = " << std::abs(float(model.getDataPoint(6) - (-72))) << endl;
+		cout << "[DEBUG]: Difference to 75: " << abs(float(model.getDataPoint(10) - (-75))) << endl;
 	}
 
-	assert(model.getDataCount() == 4);
-	// test with accuracry requirement of 1 dB
-	assert(abs(float(model.getDataPoint(6) - (-72))) <= 1);
-	assert(abs(float(model.getDataPoint(10) - (-75))) <= 1);
-
-	cout << "REM RSS Model test COMPLETE." << endl;
+	test(model.getDataCount() == 4, "getDataCount() == 4");
+	// test with accuracry requirement of 0.5 dB
+	test(abs(float(model.getDataPoint(6) - (-72))) <= 0.5, to_string(abs(float(model.getDataPoint(6) - (-72)))) + " <= 0.5");
+	test(abs(float(model.getDataPoint(10) - (-75))) <= 0.5, to_string(abs(float(model.getDataPoint(10) - (-75)))) + " <= 0.5");
 }

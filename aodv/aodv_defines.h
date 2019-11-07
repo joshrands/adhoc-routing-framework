@@ -6,7 +6,6 @@
 #include <arpa/inet.h>
 #include "../defines.h"
 
-#define IP_ADDR			    uint32_t
 #define BROADCAST           "255.255.255.255"
 #define HEADER_SIZE         9
 
