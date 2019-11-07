@@ -33,7 +33,7 @@ void REM::initializeBatteryModel()
     else
     {
         if (BATTERY_DEBUG)
-            cout << "[DEBUG]: This model should not be being initialized" << endl;
+            cout << "[WARNING]: This model should not be being initialized" << endl;
     }
 }
 
@@ -50,7 +50,7 @@ void REM::initializeRssModel(IP_ADDR pairIp)
 
     model.initialize();
     if (REM_DEBUG)
-        cout << "[DEBUG]: [DEBUG] Local RSS model initialized." << endl;
+        cout << "[DEBUG]: Local RSS model initialized." << endl;
 
     localRssModels[pairIp] = model;
 }
@@ -82,8 +82,16 @@ double REM::getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp = -1)
 
 void REM::updateLocalBatteryModel(double batteryLevel)
 {
-    // might call broadcast model...
+    // adding a new point might result in a new model...
     localBatteryModel.addDataPoint(batteryLevel, getCurrentTimeMS());
+
+    // if the model needs to be broadcasted, do it! 
+    if (localBatteryModel.needsToBeBroadcasted)
+    {
+        sendUpdatedModel(&localBatteryModel, getIpFromString(BROADCAST));
+        // model has been broadcasted
+        localBatteryModel.needsToBeBroadcasted = false;
+    }
 }
 
 void REM::updateLocalRSSModel(IP_ADDR pairIp, double rss)
@@ -94,7 +102,16 @@ void REM::updateLocalRSSModel(IP_ADDR pairIp, double rss)
         initializeRssModel(pairIp);
     }
 
+    // adding a data point might result in a new model...
     localRssModels[pairIp].addDataPoint(rss, getCurrentTimeMS());
+
+    // if the model needs to be broadcasted, do it! 
+    if (localRssModels[pairIp].needsToBeBroadcasted)
+    {
+        sendUpdatedModel(&(localRssModels[pairIp]), getIpFromString(BROADCAST));
+        // model has been broadcasted
+        localRssModels[pairIp].needsToBeBroadcasted = false;
+    }
 }
 
 void REM::updateNetworkBatteryModel(IP_ADDR ownerIp, BatteryModel model)

@@ -6,7 +6,7 @@
 void PredictionModel::addDataPoint(double value, double time)
 {
     if (REM_DEBUG)
-        cout << "[DEBUG]: New data point added to modelParameters. "
+        cout << "[DEBUG]: New data point added to model "
                 << time << ", " << value << endl;
 
     this->data.push_back(value);
@@ -33,7 +33,7 @@ void PredictionModel::addDataPoint(double value, double time)
     if (dataCount < INIT_COUNT)
     {
         if (REM_DEBUG)
-            cout << "[DEBUG]: Not enough data to fit modelParameters." << endl;
+            cout << "[DEBUG]: Not enough data to fit model " << endl;
         return;
     }
     else if (dataCount == INIT_COUNT)
@@ -59,13 +59,13 @@ void PredictionModel::addDataPoint(double value, double time)
 
         if (difCount >= MAX_DIFF_COUNT)
         {
-        // too many bad data points in a row
-        adaptModel(); // reset difCount
+            // too many bad data points in a row
+            adaptModel(); // reset difCount
         }
         else
         {
-        // check old modelParameters.to see if a mistake was made in updating the model
-        compareToPreviousModel();
+            // check old modelParameters.to see if a mistake was made in updating the model
+            compareToPreviousModel();
         }
     }
 }
@@ -149,7 +149,7 @@ bool PredictionModel::compareToPreviousModel()
 void PredictionModel::adaptModel()
 {
     if (REM_DEBUG)
-        cout << "[DEBUG]: Adapting modelParameters.to new data" << endl;
+        cout << "[DEBUG]: Adapting model to new data" << endl;
 
     // TODO: Consider going back to old modelParameters.
     // store current modelParameters.in old model
@@ -181,7 +181,8 @@ void PredictionModel::adaptModel()
     // broadcast packet
     modelParameters.timeToLive = DEFAULT_TTL;
 
-    // NS3-TODO: Broadcast this message?  Simulator::Schedule(Seconds(0.00001), &BroadcastModel, this);
+    // set model needs to be broadcasted and NetworkMonitor will take care of it
+    needsToBeBroadcasted = true;
 }
 
 /* NS3-TODO: 
@@ -203,7 +204,9 @@ BatteryModel::BatteryModel()
 void BatteryModel::initialize()
 {
     if (BATTERY_DEBUG)
-        cout << "[DEBUG]: Initializing battery modelParameters.for node " << this->ownerIp << endl;
+        cout << "[DEBUG]: Initializing battery model for node " << this->ownerIp << endl;
+
+    needsToBeBroadcasted = false;
 
     // start monitoring in ns3 discrete simulator
 
@@ -225,8 +228,8 @@ void BatteryModel::fitModel()
 
     modelParameters.timeToLive = DEFAULT_TTL;
 
-    // NS3-TODO: hardware abstract???
-//    Simulator::Schedule(Seconds(0.00001), &BroadcastModel, this);
+    // this model needs to be broadcasted!
+    needsToBeBroadcasted = true;
 }
 
 void BatteryModel::performRegression(vector<double> times, vector<double> values, vector<double> wAvgs)
@@ -256,7 +259,7 @@ void BatteryModel::performRegression(vector<double> times, vector<double> values
     modelParameters.beta = b;
 
     if (BATTERY_DEBUG)
-        cout << "[DEBUG]: New Battery modelParameters. y = " << m << "x + " << b << endl;
+        cout << "[DEBUG]: New Battery model y = " << m << "x + " << b << endl;
 
     this->calculateDeviations(times, values);
 }
@@ -271,7 +274,9 @@ RssModel::RssModel()
 void RssModel::initialize()
 {
     if (RSS_DEBUG)
-        cout << "[DEBUG]: Initializing local rss modelParameters.for node " << this->ownerIp << " with node " << this->pairIp << endl;
+        cout << "[DEBUG]: Initializing local rss model for node " << this->ownerIp << " with node " << this->pairIp << endl;
+
+    needsToBeBroadcasted = false;
 }
 
 double RssModel::getDataPoint(double time)
@@ -320,7 +325,7 @@ void RssModel::performRegression(vector<double> times, vector<double> values, ve
     modelParameters.beta = b;
 
     if (RSS_DEBUG) 
-        cout << "[DEBUG]: New RSS modelParameters. y = " << m << "x + " << b << endl;
+        cout << "[DEBUG]: New RSS model y = " << m << "x + " << b << endl;
 
     this->calculateDeviations(times, values);
 }

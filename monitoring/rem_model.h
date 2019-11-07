@@ -81,6 +81,8 @@ public:
 
     REMModelPacket createREMModelPacket();
 
+    bool needsToBeBroadcasted;
+
 protected:
     double timeToLive; // ttl
     ModelState state;
