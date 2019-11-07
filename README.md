@@ -23,18 +23,11 @@ AODV Protocol: https://www.ietf.org/rfc/rfc3561.txt
 4. Add TTL for RREQ dissemination (section 6.4)
 5. Add AODVRoutingTable updates 
 
-### Hardware
-1. Add adhoc/wifi switching
-2. Add auto login (if its a thing)
+### SOCKET
+[code here](socket)
 
 ### ADHOC-HARDWARE
-1. Implement data forwarding (wrap data packets and send to routing table neighbour)
-i. Actually implemented just check that this is handled correctly on AODV side (aodv.cc:83)
-ii. Add vector or some storage method if the packet was for us
-2. Add sliding window on udp message queue
-4. Comment/Document
-5. Add packet sniffing and or check signal strength on packet receive
-6.
+[code here](hardware)
 
 ### AODV-REM
 1. Add network monitoring 

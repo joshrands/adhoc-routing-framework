@@ -26,7 +26,7 @@
 #include "endpoint.h"
 #include "socket.h"
 #include "message.h"
-#include "safe_queue.h"
+#include "safe_circular_queue.h"
 #include "socket_defines.h"
 #include <iostream>
 #include <utility>
@@ -73,7 +73,7 @@ public:
    *  @param length The length of the packet to be sent
    *  @return the number of written bytes on success (>=0) or -1 on failure
    */
-  int _sendTo(Endpoint &remote, const char *packet, int length);
+  int sendTo(Endpoint &remote, const char *packet, int length);
 
   /*!
    * Send a packet to an IP address and port
@@ -123,7 +123,7 @@ public:
 
 private:
   // To hold threaded messages
-  SafeQueue<Message> messages;
+  SafeCircularQueue<Message> messages;
 };
 
 #endif

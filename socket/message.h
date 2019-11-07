@@ -54,6 +54,7 @@ private:
     Endpoint end;
     char* data;
     int length;
+
 };
 
 #endif
