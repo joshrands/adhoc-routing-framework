@@ -39,31 +39,40 @@ UDP Socket
 class UDPSocket : public Socket {
 
 public:
-  /*! Instantiate an UDP Socket
+  /*! 
+   * @brief Instantiate an UDP Socket
    */
   UDPSocket();
 
   ~UDPSocket() { close(sockfd); }
 
-  /*! Init the UDP Client Socket without binding it to any specific por
+  /*! 
+   *  @brief Init the UDP Client Socket without binding it to any specific por
+   * 
    *  @return true on success, false on failure
    */
   bool init(void);
 
-  /*! Bind a UDP Server Socket to a specific port
-   *  @param port The port to listen for incoming connections on
-   *  @return true on success, false on failure
+  /*! 
+   * @brief Bind a UDP Server Socket to a specific port
+   *  
+   * @param port The port to listen for incoming connections on
+   * @return true on success, false on failure
    */
   bool bindToPort(int port);
 
-  /*! Join the multicast group at the given address
-   *  @param address The address of the multicast group
-   *  @return true on success, false on failure
+  /*! 
+   * @brief Join the multicast group at the given address
+   *  
+   * @param address The address of the multicast group
+   * @return true on success, false on failure
    */
   bool joinMulticastGroup(const char *address);
 
-  /*! Set the socket in broadcasting mode
-   *  @return true on success, false on failure
+  /*! 
+   * @brief Set the socket in broadcasting mode
+   *  
+   * @return true on success, false on failure
    */
   bool setBroadcasting(bool broadcast = true);
 
@@ -76,7 +85,7 @@ public:
   int sendTo(Endpoint &remote, const char *packet, int length);
 
   /*!
-   * Send a packet to an IP address and port
+   * @brief Send a packet to an IP address and port
    * 
    * @param buffer 
    * @param length 
@@ -85,7 +94,8 @@ public:
    */
   int sendTo(char* buffer, int length, uint32_t dest, int port);
 
-  /*! Receive a packet from a remote endpoint
+  /*! 
+   *  @brief Receive a packet from a remote endpoint
    *  @param remote The remote endpoint
    *  @param buffer The buffer for storing the incoming packet data. If a packet
    *                is too long to fit in the supplied buffer, excess bytes are discarded
@@ -102,7 +112,7 @@ public:
   /*!
    * @brief Get one message from the socket
    * 
-   * @param message the first message on the queue
+   * @param message will get set to the first message on the queue
    * @return true a message was received
    * @return false no messages
    */

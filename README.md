@@ -44,4 +44,8 @@ This code is currently stand alone classes, but I added test.cc to so we can tes
 2. Using a terminal, cd into the src directory and type 'make'
 3. Code should compile and you can run ./test to run the tests
 
-I use Visual Studio Code to develop. It has a nice built in terminal. 
+I use Visual Studio Code to develop. It has a nice built in terminal. <- Cool story bro
+
+
+## Questions
+[better route vs duplicate?](aodv/aodv_rreq.cc:57)
