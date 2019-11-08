@@ -12,26 +12,10 @@ AODV::AODV() {
         cout << "[DEBUG]: Warning: Must update aodv ip address.";
 }
 
-AODV::AODV(const char *ip) : AODV(getIpFromString(ip)) {
-    if (AODV_DEBUG)
-        cout << "[DEBUG]: Created new aodv routing protocol." << endl;
-    /*
-        this->ipAddress = getIpFromString(ip);
-        this->sequenceNum = 0;
-        this->m_aodvTable = new AODVRoutingTable();
-
-        this->rreqHelper.setRoutingTable(this->getTable());
-        this->rreqHelper.setIp(getIp());
-        this->rreqHelper.setSequenceNumPointer(&(this->sequenceNum));
-
-        this->rrepHelper.setIp(getIp());
-        this->rrepHelper.setRoutingTable(this->getTable());
-        this->rrepHelper.setSequenceNum(&(this->sequenceNum));
-
-        this->rerrHelper.setIp(getIp());
-        this->rerrHelper.setRoutingTable(this->getTable());
-        this->rerrHelper.setSequenceNum(&(this->sequenceNum));
-    */
+AODV::AODV(const char* ip) : AODV(getIpFromString(ip))
+{
+	if (AODV_DEBUG)
+		cout << "[DEBUG]: Created new aodv routing protocol." << endl;
 }
 
 AODV::AODV(IP_ADDR ip) {

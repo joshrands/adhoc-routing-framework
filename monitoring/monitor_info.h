@@ -7,6 +7,7 @@
  * Date: 11/2/2019
  ********************************/
 
+#include "../defines.h"
 struct local_data
 {
     double batteryLevel;
@@ -14,6 +15,6 @@ struct local_data
 
 struct pair_data
 {
-    int pairId;
+    IP_ADDR pairIp;
     double rss;
 };

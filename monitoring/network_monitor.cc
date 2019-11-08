@@ -1,5 +1,5 @@
 #include "network_monitor.h"
-#include "defines.h"
+#include "monitor_defines.h"
 
 #include <iostream>
 
@@ -8,65 +8,65 @@ using namespace std;
 NetworkMonitor::NetworkMonitor()
 {
     if (MONITOR_DEBUG)
-        cout << "New network monitoring service for unassigned node" << endl;
+        cout << "[DEBUG]: New network monitoring service for unassigned node" << endl;
 
-    parentId = 0;
+    m_parentIp = 0;
 }
 
-NetworkMonitor::NetworkMonitor(int nodeId)
+NetworkMonitor::NetworkMonitor(IP_ADDR nodeIp)
 {
-    this->parentId = nodeId;
+    m_parentIp = nodeIp;
 
     if (MONITOR_DEBUG)
-        cout << "New monitoring service for Node " << this->parentId << endl;
+        cout << "[DEBUG]: New monitoring service for Node " << m_parentIp << endl;
 }
 
-bool NetworkMonitor::localDataExistsForNode(int nodeId)
+bool NetworkMonitor::localDataExistsForNode(IP_ADDR nodeIp)
 {
-    if (localMonitoringData.count(nodeId) > 0)
+    if (localMonitoringData.count(nodeIp) > 0)
         return true;
     else
         return false;
 }
 
-bool NetworkMonitor::pairDataExistsForNode(int nodeId)
+bool NetworkMonitor::pairDataExistsForNode(IP_ADDR nodeIp)
 {
-    if (pairMonitoringData.count(nodeId) > 0)
+    if (pairMonitoringData.count(nodeIp) > 0)
         return true;
     else 
         return false;
 }
 
-bool NetworkMonitor::isNodeOneHopNeighbor(int nodeId)
+bool NetworkMonitor::isNodeOneHopNeighbor(IP_ADDR nodeIp)
 {
     // if this node has pair monitoring data paired with me 
-    vector<pair_data> localPairData = pairMonitoringData[parentId];
+    vector<pair_data> localPairData = pairMonitoringData[m_parentIp];
 
     for (pair_data data : localPairData)
     {
-        if (data.pairId == nodeId)
+        if (data.pairIp == nodeIp)
             return true;
     }
 
     return false;
 }
 
-local_data NetworkMonitor::getLocalDataForNode(int nodeId)
+local_data NetworkMonitor::getLocalDataForNode(IP_ADDR nodeIp)
 {
-    return localMonitoringData[nodeId];
+    return localMonitoringData[nodeIp];
 }
 
-pair_data NetworkMonitor::getPairDataBetweenNodes(int nodeId, int ownerNodeId = -1)
+pair_data NetworkMonitor::getPairDataBetweenNodes(IP_ADDR nodeIp, IP_ADDR ownerIp = -1)
 {
     // the default is with this node 
-    if (ownerNodeId == -1)
-        ownerNodeId = parentId;
+    if (ownerIp == -1)
+        ownerIp = m_parentIp;
 
     // we are looking at models from the ownderNodeId
-    vector<pair_data> pairData = pairMonitoringData[ownerNodeId];
+    vector<pair_data> pairData = pairMonitoringData[ownerIp];
     for (pair_data data : pairData)
     {
-        if (data.pairId == nodeId)
+        if (data.pairIp == nodeIp)
             return data;
     }
 }
