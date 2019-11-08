@@ -10,21 +10,25 @@
 
 using namespace std;
 
-void test(bool condition, char *message) {
-    printf("%s: ", message);
-    if (!condition) {
-        cout << "FAIL" << endl;
-    }
-    cout << "PASS" << endl;
+const string RED = "\033[1;31m";
+const string GREEN = "\033[1;32m";
+const string END = "\033[0m\n";
+
+void test(bool condition, string desc)
+{
+	if (condition)
+		cout << GREEN << "[PASS]: " << desc << END;
+	else 
+		cout << RED << "[FAIL]: " << desc << END;
 }
 
-void test(bool condition, string message) {
-    cout << "[TEST]: " << message << ": ";
-    if (!condition) {
-        cout << "FAIL" << endl;
-    }
-    cout << "PASS" << endl;
+void test(bool condition, char *desc) {
+    if (condition) {
+        cout << GREEN << "[PASS]: " << desc << endl;
+    } else
+        cout << RED << "[FAIL]: " << desc <<endl;
 }
+
 
 int main() {
     // Test initialization and ports
