@@ -30,14 +30,14 @@ void test_aodv_link_break();
 
 int main (int argc, char *argv[]) 
 {	
-	cout << "[TEST]: Running tests..." << endl;	
+	cout << "[TESTS]: Running tests..." << endl;	
 
 	test_test();
 	test_inet_addr();
 	test_routing_table();
 	test_aodv();
 
-	cout << "[TEST]: TESTS COMPLETE." << endl;
+	cout << "[TESTS]: TESTS COMPLETE." << endl;
 
 	return 0;
 }
@@ -76,7 +76,6 @@ void test_inet_addr()
 
 	AODVTest aodv("192.168.1.4");
 	test(inet_addr("192.168.1.4") == aodv.getIp(),"inet_addr(\"192.168.1.4\") == aodv.getIp()");
-	cout << getStringFromIp(aodv.getIp()) << endl;
 }
 
 void test_routing_table()
@@ -87,21 +86,21 @@ void test_routing_table()
 	IP_ADDR dest = getIpFromString("192.168.0.20");
 	IP_ADDR nextHop = getIpFromString("192.168.0.22");
 	
-	assert(0 == table.getNextHop(dest));
+	test(0 == table.getNextHop(dest), "0 == table.getNextHop(dest)");
 
 	// haven't updated the routing table so shouldn't be the next hop yet...
-	assert(nextHop != table.getNextHop(dest));
+	test(nextHop != table.getNextHop(dest), "nextHop != table.getNextHop(dest)");
 
 	table.updateTableEntry(dest, nextHop);
-	assert(nextHop == table.getNextHop(dest));
+	test(nextHop == table.getNextHop(dest), "nextHop == table.getNextHop(dest)");
 
 	nextHop = getIpFromString("192.168.0.11");
 	table.updateTableEntry(dest, nextHop);
 	// test that the table entry changed 
-	assert(nextHop == table.getNextHop(dest));
-	assert(getIpFromString("192.168.0.22") != table.getNextHop(dest));
+	test(nextHop == table.getNextHop(dest), "nextHop == table.getNextHop(dest)");
+	test(getIpFromString("192.168.0.22") != table.getNextHop(dest), "table.getNextHop(dest) != 192.168.0.22");
 
-	cout << "Test routing table complete." << endl;
+	cout << "[TESTS]: Test routing table complete." << endl;
 }
 
 void test_aodv()
@@ -123,25 +122,21 @@ void test_aodv_rreq_simple()
 	// create a rreq packet to destination
 	rreqPacket rreq = aodv.rreqHelper.createRREQ(dest);
 
-	assert(rreq.type == 0x01);
-	assert(rreq.hopCount == 0);
-	assert(rreq.rreqID == 1);
-	assert(rreq.destIP == dest);
-	assert(rreq.origIP == aodv.getIp());
-	assert(rreq.origSeqNum == 1);	
+	test(rreq.type == 0x01, "rreq.type == 0x01");
+	test(rreq.hopCount == 0, "rreq.hopCount == 0");
+	test(rreq.rreqID == 1, "rreq.rreqID == 1");
+	test(rreq.destIP == dest, "rreq.destIP == dest");
+	test(rreq.origIP == aodv.getIp(), "rreq.origIP == aodv.getIP()");
+	test(rreq.origSeqNum == 1, "rreq.origSeqNum == 1");	
 
 	// try a rreq for a different destination 
 	dest = getIpFromString("192.168.0.22");
 	rreq = aodv.rreqHelper.createRREQ(dest);
 
-	assert(rreq.type == 0x01);
-	assert(rreq.hopCount == 0);
-	assert(rreq.rreqID == 2);
-	assert(rreq.destIP == dest);
-	assert(rreq.origIP == aodv.getIp());
-	assert(rreq.origSeqNum == 2);	
+	test(rreq.rreqID == 2, "rreq.rreqID == 2");
+	test(rreq.origSeqNum == 2, "rreq.origSeqNum == 2");	
 
-	cout << "Test aodv rreq simple complete." << endl;
+	cout << "[TESTS]: Test aodv rreq simple complete." << endl;
 }
 
 void test_aodv_rreq_forwarding()
@@ -160,8 +155,6 @@ void test_aodv_rreq_forwarding()
 	// create a rreq from node 0 to node 4
 	rreqPacket rreq = node0.rreqHelper.createRREQ(node4.getIp());
 
-	cout << "Created packet." << endl;
-
 	// rreq received by node1 from node0 
 	rreq = node1.rreqHelper.createForwardRREQ(rreq, node0.getIp());
 	// rreq received by node2 from node1
@@ -173,14 +166,13 @@ void test_aodv_rreq_forwarding()
 
 	// Create RREP! 
 
-	assert(rreq.hopCount == 4);
+	test(rreq.hopCount == 4, "rreq.hopCount == 4");
 
 	// check routing table update 
 	// for node3 to send packet to node0, go through node2
-	assert(node3.getTable()->getNextHop(node0.getIp()) == node2.getIp());
-	assert(node3.getTable()->getNextHop(node0.getIp()) != node1.getIp());
+	test(node3.getTable()->getNextHop(node0.getIp()) == node2.getIp(), "Next hop from node 3 to node 0 is node 2");
 
-	cout << "Test aodv rreq forwarding complete." << endl;
+	cout << "[TESTS]: Test aodv rreq forwarding complete." << endl;
 }
 
 void test_aodv_do_nothing()
@@ -202,18 +194,14 @@ void test_aodv_rreq_buffer()
 	rreqPacket receivedRREQ;
 	receivedRREQ = aodv.rreqHelper.readRREQBuffer(buffer);
 
-	assert(receivedRREQ.type == rreq.type);
-	assert(receivedRREQ.origIP == rreq.origIP);
-
 	// Send a message to an unavailable location
 	char message []="Hello World\0";
 	aodv.sendPacket(message, 13, dest);
 	assert(aodv.packetInRreqBuffer(dest));
 
 	// "Find route"
-	
 
-	cout << "Test aodv rreq buffer complete." << endl;
+	cout << "[TESTS]: Test aodv rreq buffer complete." << endl;
 
 	delete buffer;
 }
@@ -249,14 +237,12 @@ void test_aodv_rreq_to_rrep()
 
 	delete buffer;
 
-	cout << getStringFromIp(AODVTest::lastNode) << endl;
-	
 	node0.logRoutingTable();
 	node1.logRoutingTable();
 	node2.logRoutingTable();
 	node3.logRoutingTable();
 
-	cout << "Test aodv rreq to rrep complete." << endl;
+	cout << "[TESTS]: Test aodv rreq to rrep complete." << endl;
 }
 
 void test_aodv_loop_prevention()
@@ -300,7 +286,7 @@ void test_aodv_loop_prevention()
 	node3.logRoutingTable();
 	node4.logRoutingTable();
 
-	cout << "Test aodv loop prevention passed" << endl;
+	cout << "[TESTS]: Test aodv loop prevention passed" << endl;
 
 	delete buffer;
 }
@@ -308,7 +294,7 @@ void test_aodv_loop_prevention()
 void test_aodv_rreq_no_route()
 {
 	// TODO: Add this test 
-	cout << "WARNING: Aodv can NOT handle no possible route." << endl;
+	cout << "[WARNING]: Aodv can NOT handle no possible route." << endl;
 }
 
 void test_aodv_rreq()
@@ -360,7 +346,7 @@ void test_aodv_link_break()
 	node0.sendPacket(buffer, length, node4.getIp());
 	delete buffer;
 
-	assert(AODVTest::lastReceive == node4.getIp());
+	test(AODVTest::lastReceive == node4.getIp(), "Last received packet was by node 4");
 
 	// break the link between 2 and 4
 	node4.removeNeighbor(&node2);
@@ -369,10 +355,7 @@ void test_aodv_link_break()
 	node0.sendPacket(buffer, length, node4.getIp());
 //	node0.sendPacket(buffer, length, node4.getIp());
 
-	cout << "Last received: " << getStringFromIp(AODVTest::lastReceive) << endl;
-//	assert(AODVTest::lastReceive == node4.getIp());
-
-	cout << "Test aodv link break passed" << endl;
+	cout << "[TESTS]: Test aodv link break passed" << endl;
 
 	node0.logRoutingTable();
 	node1.logRoutingTable();
