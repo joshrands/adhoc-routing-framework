@@ -19,8 +19,8 @@ public:
     //  static const int INIT_COUNT = 3; // DEPRECATED. REAL INIT_COUNT IN MODEL
     static const int HOP_COUNT = 2;
 
-    REM() : NetworkMonitor() { } 
-    REM(IP_ADDR nodeIp) : NetworkMonitor(nodeIp) { } 
+    REM() : NetworkMonitor() { clusterHeadIp = getIpFromString(BROADCAST); } 
+    REM(IP_ADDR nodeIp) : NetworkMonitor(nodeIp) { clusterHeadIp = getIpFromString(BROADCAST); } 
 
     // NS3-TODO:  void initialize(Ptr<Node> parent, Ptr<EnergySource> battery, Ptr<Socket> socket); // initialize node 'parent' with network monitoring service
     // temp:
@@ -29,7 +29,7 @@ public:
     void initializeRssModel(IP_ADDR pairIp);
 
     // get monitoring information 
-    double getBatteryLevel(IP_ADDR ownerIp);
+    double getBatteryLevel(IP_ADDR ownerIp = -1);
     double getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp);
 
     // update local models with new data points 
@@ -53,6 +53,8 @@ protected:
     // get the current time in milliseconds. abstract function for sim and hardware implementations
     virtual uint32_t getCurrentTimeMS() = 0;
     uint32_t simStartTime;
+
+    IP_ADDR clusterHeadIp;
 
     // local models: only one battery model but multiple RSS models
     BatteryModel localBatteryModel;
@@ -78,10 +80,13 @@ public:
 
     double getCurrentBatteryLevel() override;
 
-    void runClock(int duration);
+    void runClock(int duration = 1000);
+    void drainBattery();
 
 protected:
     int m_clock = 10000;
+    double m_battery = 100; 
+
     uint32_t getCurrentTimeMS() override;
 
 };

@@ -216,7 +216,10 @@ void BatteryModel::initialize()
 
 double BatteryModel::getDataPoint(double time)
 {
-    return modelParameters.mu * time + modelParameters.beta;
+    if (this->state == ModelState::STABLE)
+        return modelParameters.mu * time + modelParameters.beta;
+    else 
+        return NULL;
 }
 
 void BatteryModel::fitModel()
@@ -281,7 +284,10 @@ void RssModel::initialize()
 
 double RssModel::getDataPoint(double time)
 {
-    return modelParameters.mu * log(time + 10) + modelParameters.beta;
+    if (this->state == ModelState::STABLE)
+        return modelParameters.mu * log(time + 10) + modelParameters.beta;
+    else 
+        return NULL;
 }
 
 void RssModel::fitModel()

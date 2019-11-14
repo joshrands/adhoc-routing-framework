@@ -55,7 +55,7 @@ void REM::initializeRssModel(IP_ADDR pairIp)
     localRssModels[pairIp] = model;
 }
 
-double REM::getBatteryLevel(IP_ADDR ownerIp = -1)
+double REM::getBatteryLevel(IP_ADDR ownerIp)
 {
     if (ownerIp == -1)
     {
@@ -88,6 +88,9 @@ void REM::updateLocalBatteryModel(double batteryLevel)
     // if the model needs to be broadcasted, do it! 
     if (localBatteryModel.needsToBeBroadcasted)
     {
+        if (REM_DEBUG)
+            cout << "[DEBUG]: Sending updated battery model from node " << getStringFromIp(m_parentIp) << endl;
+
         sendUpdatedModel(&localBatteryModel, getIpFromString(BROADCAST));
         // model has been broadcasted
         localBatteryModel.needsToBeBroadcasted = false;
@@ -138,6 +141,8 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
 
     // allocate 20 bytes for a model packet
     int size = sizeof(packet);
+    if (REM_DEBUG)
+        cout << "[DEBUG]: Sending REM model packet. Size = " << size << endl;
 
     char* buffer = (char*)(malloc(size));
     memcpy(buffer, &packet, size);
@@ -149,17 +154,20 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
 
 double REMTest::getCurrentBatteryLevel()
 {
-    return 50.0;
+    return m_battery;
 } 
 
 uint32_t REMTest::getCurrentTimeMS()
 {
-    // clock a second 
-    m_clock -= 1000;
     return m_clock;
 } 
 
-void REMTest::runClock(int duration = 1000)
+void REMTest::runClock(int duration)
 {
     m_clock -= duration;
+}
+
+void REMTest::drainBattery()
+{
+    m_battery -= 2;
 }
