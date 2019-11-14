@@ -146,3 +146,13 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
 
     delete buffer;
 }
+
+double REMTest::getCurrentBatteryLevel()
+{
+    return 50.0;
+} 
+
+uint32_t REMTest::getCurrentTimeMS()
+{
+    return --m_clock;
+} 

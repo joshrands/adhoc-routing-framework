@@ -1,5 +1,6 @@
 
 #include "rem.h"
+#include "../aodv/aodv.h"
 
 #include <assert.h>
 #include "string.h"
@@ -24,6 +25,7 @@ void test(bool condition, string desc)
 void test_test();
 void test_battery_model();
 void test_rss_model();
+void test_rem();
 
 int main (int argc, char *argv[]) 
 {	
@@ -32,6 +34,7 @@ int main (int argc, char *argv[])
 	test_test();
 	test_battery_model();
 	test_rss_model();
+	test_rem();
 
 	cout << "[TESTS]: TESTS COMPLETE." << endl;
 
@@ -64,6 +67,8 @@ void test_battery_model()
 	test(model.getDataCount() == 4, "getDataCount() == 4");
 	test(model.getDataPoint(4) == 30, "getDataPoint(4) == 30");
 	test(model.getDataPoint(8) == 10, "getDataPoint(8) == 10");
+
+	cout << "[TESTS]: Battery model test complete." << endl;
 }
 
 void test_rss_model()
@@ -88,4 +93,17 @@ void test_rss_model()
 	// test with accuracry requirement of 0.5 dB
 	test(abs(float(model.getDataPoint(6) - (-72))) <= 0.5, to_string(abs(float(model.getDataPoint(6) - (-72)))) + " <= 0.5");
 	test(abs(float(model.getDataPoint(10) - (-75))) <= 0.5, to_string(abs(float(model.getDataPoint(10) - (-75)))) + " <= 0.5");
+
+	cout << "[TESTS]: RSS model test complete." << endl;
+}
+
+void test_rem()
+{
+	IP_ADDR node1 = getIpFromString("192.168.0.1");
+	REMTest rem;
+	// create a routing protocol 
+	AODVTest aodv("192.168.0.1");
+
+
+	cout << "[TESTS]: REM tests complete." << endl;
 }

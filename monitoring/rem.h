@@ -20,8 +20,8 @@ public:
     //  static const int INIT_COUNT = 3; // DEPRECATED. REAL INIT_COUNT IN MODEL
     static const int HOP_COUNT = 2;
 
-    REM() : NetworkMonitor() { simStartTime = getCurrentTimeMS(); }
-    REM(IP_ADDR nodeIp) : NetworkMonitor(nodeIp) { simStartTime = getCurrentTimeMS(); }
+    REM() : NetworkMonitor() { } 
+    REM(IP_ADDR nodeIp) : NetworkMonitor(nodeIp) { } 
 
     // NS3-TODO:  void initialize(Ptr<Node> parent, Ptr<EnergySource> battery, Ptr<Socket> socket); // initialize node 'parent' with network monitoring service
     // temp:
@@ -71,4 +71,16 @@ protected:
 */
 };
 
+class REMTest : public REM
+{
+public:
+    REMTest() : REM() { simStartTime = getCurrentTimeMS(); }
+    REMTest(IP_ADDR parentIp) : REM(parentIp) { simStartTime = getCurrentTimeMS(); }
 
+    double getCurrentBatteryLevel() override;
+
+protected:
+    int m_clock = 10000;
+    uint32_t getCurrentTimeMS() override;
+
+};
