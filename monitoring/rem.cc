@@ -9,7 +9,7 @@ void REM::initialize(IP_ADDR parentIp)
     m_parentIp = parentIp;
 
     if (REM_DEBUG)
-        cout << "[DEBUG]: Initializing REM monitoring service for node " << m_parentIp << endl;
+        cout << "[DEBUG]: Initializing REM monitoring service for node " << getStringFromIp(m_parentIp) << endl;
 
     localBatteryModel.HOP_COUNT = HOP_COUNT;
     localBatteryModel.modelParameters.UPDATE_FREQUENCY = localBatteryModel.UPDATE_FREQUENCY;
@@ -154,5 +154,12 @@ double REMTest::getCurrentBatteryLevel()
 
 uint32_t REMTest::getCurrentTimeMS()
 {
-    return --m_clock;
+    // clock a second 
+    m_clock -= 1000;
+    return m_clock;
 } 
+
+void REMTest::runClock(int duration = 1000)
+{
+    m_clock -= duration;
+}

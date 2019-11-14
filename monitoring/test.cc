@@ -104,6 +104,8 @@ void test_rem()
 	// create a routing protocol 
 	AODVTest aodv("192.168.0.1");
 
+	rem.routing = &aodv;
+	rem.initialize(node1);
 
 	cout << "[TESTS]: REM tests complete." << endl;
 }

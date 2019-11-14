@@ -204,7 +204,7 @@ BatteryModel::BatteryModel()
 void BatteryModel::initialize()
 {
     if (BATTERY_DEBUG)
-        cout << "[DEBUG]: Initializing battery model for node " << this->ownerIp << endl;
+        cout << "[DEBUG]: Initializing battery model for node " << getStringFromIp(this->ownerIp) << endl;
 
     needsToBeBroadcasted = false;
 

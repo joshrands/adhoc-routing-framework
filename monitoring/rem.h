@@ -10,7 +10,6 @@
 
 #include "network_monitor.h"
 #include "rem_model.h"
-#include "../aodv/RoutingProtocol.h"
 
 #include <vector>
 
@@ -78,6 +77,8 @@ public:
     REMTest(IP_ADDR parentIp) : REM(parentIp) { simStartTime = getCurrentTimeMS(); }
 
     double getCurrentBatteryLevel() override;
+
+    void runClock(int duration);
 
 protected:
     int m_clock = 10000;
