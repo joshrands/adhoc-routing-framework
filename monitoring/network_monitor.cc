@@ -71,4 +71,3 @@ pair_data NetworkMonitor::getPairDataBetweenNodes(IP_ADDR nodeIp, IP_ADDR ownerI
     }
 }
 
-

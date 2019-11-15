@@ -105,6 +105,9 @@ void REM::updateLocalRSSModel(IP_ADDR pairIp, double rss)
         initializeRssModel(pairIp);
     }
 
+    if (REM_DEBUG)
+        cout << "[DEBUG]: Updating local RSS model between " << getStringFromIp(m_parentIp) << " and " << getStringFromIp(pairIp) << endl;
+
     // adding a data point might result in a new model...
     localRssModels[pairIp].addDataPoint(rss, getCurrentTimeMS());
 
@@ -151,6 +154,14 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
 
     delete buffer;
 }
+
+void REM::updatePairData(pair_data pairData)
+{
+    if (REM_DEBUG)
+        cout << "[DEBUG]: Updating pair data for REM model" << endl;
+        
+    updateLocalRSSModel(pairData.pairIp, pairData.rss);
+} 
 
 double REMTest::getCurrentBatteryLevel()
 {

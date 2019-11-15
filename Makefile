@@ -18,7 +18,7 @@ LIBFLAGS = -cvq
 TARGET = do-adhoc
 OBJ_LIB_FILES = hardware/hardware_aodv.o adhoc_routing.o #$(socket/*.o)
 
-STATIC_LIBRARIES = hardware/libhardware.a 
+STATIC_LIBRARIES = hardware/libhardware.a monitoring/libmonitoring.a 
 
 OBJ_FILES = ${OBJ_LIB_FILES} 
 INC_FILES = adhoc_routing.h
@@ -31,8 +31,9 @@ ${TARGET}: #${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} ${TARGET}.o -o $@ ${STATIC_LIBRARIES}
 
 test: 
+	${CXX} -c ${CXXFLAGS} adhoc_routing.cc -o adhoc_routing.o 	
 	${CXX} -c ${CXXFLAGS} test.cc -o test.o
-	${LD} ${LDFLAGS} ${OBJ_FILES} test.o -o test ${STATIC_LIBRARIES} 
+	${LD} ${LDFLAGS} adhoc_routing.o test.o aodv/*.o monitoring/*.o -o test 
 	./test
 
 %.o : %.cc ${INC_FILES}

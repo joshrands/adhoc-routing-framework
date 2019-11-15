@@ -32,6 +32,8 @@ public:
     double getBatteryLevel(IP_ADDR ownerIp = -1);
     double getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp);
 
+    void updatePairData(pair_data pairData) override;
+
     // update local models with new data points 
     void updateLocalBatteryModel(double batteryLevel);
     void updateLocalRSSModel(IP_ADDR pairIp, double rss);

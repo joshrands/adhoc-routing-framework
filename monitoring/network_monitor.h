@@ -20,6 +20,8 @@ public:
     NetworkMonitor();
     NetworkMonitor(IP_ADDR nodeIp);
 
+    virtual void updatePairData(pair_data pairData) = 0;
+
     // various initialize functions for creating new models 
     virtual void initialize(IP_ADDR parentIp) = 0;
     // abstract function for classes to update network monitoring data
