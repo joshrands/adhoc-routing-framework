@@ -209,20 +209,28 @@ void AODV::decodeReceivedPacketBuffer(char *buffer, int length,
     uint8_t type;
     memcpy(&type, buffer, 1);
 
-    switch (type) {
-    case 1:
-        handleRREQ(buffer, length, source);
-        break;
-    case 2:
-        handleRREP(buffer, length, source);
-        break;
-    case 3:
-        handleRERR(buffer, length, source);
-        break;
-    default:
-        // the packet is not AODV. Forward the packet
+    if (AODV_PORT == port)
+    {
+        switch (type) {
+        case 1:
+            handleRREQ(buffer, length, source);
+            break;
+        case 2:
+            handleRREP(buffer, length, source);
+            break;
+        case 3:
+            handleRERR(buffer, length, source);
+            break;
+        default:
+            // the packet is not AODV. ERROR because on AODV port 
+            cout << "[ERROR]: Non-AODV on AODV Port" << endl;
+            break;
+        }
+    }
+    else if (DATA_PORT == port) 
+    {
+        // on data port! receive packet like normal  
         receivePacket(buffer, length, source);
-        break;
     }
 }
 
