@@ -141,14 +141,17 @@ void test_rem()
 		aodv2.sendPacket(buffer, msg.length(), node1);
 	}
 
-	// both nodes should have received each others models 
+	// test that the nodes actually built their own models...
+	test(abs(rem1.getBatteryLevel() - rem1.getCurrentBatteryLevel()) < 0.01, "Node 1's own battery level: " + to_string(rem1.getBatteryLevel()) + " : " + to_string(rem1.getCurrentBatteryLevel()));
+	test(abs(rem2.getBatteryLevel() - rem2.getCurrentBatteryLevel()) < 0.01, "Node 2's own battery level: " + to_string(rem2.getBatteryLevel()));
 
+	// both nodes should have received each others models 
 	// test neighbors should not be detected yet 
 	test(rem1.isNodeOneHopNeighbor(node2) == true, "Node 2 should be detected as a neighbor");
 	test(rem2.isNodeOneHopNeighbor(node1) == true, "Node 1 should be detected as a neighbor");
 
-	test(rem1.getBatteryLevel(node2) == 94, "Node 1 assumed battery level of node 2: " + to_string(rem1.getBatteryLevel(node2)));
-	test(rem2.getBatteryLevel(node1) == 94, "Node 2 assumed battery level of node 1: " + to_string(rem2.getBatteryLevel(node1)));
+	test(abs(rem1.getBatteryLevel(node2) - rem2.getCurrentBatteryLevel()) < 0.01, "Node 1 assumed battery level of node 2: " + to_string(rem1.getBatteryLevel(node2)));
+	test(abs(rem2.getBatteryLevel(node1) - rem1.getCurrentBatteryLevel()) < 0.01, "Node 2 assumed battery level of node 1: " + to_string(rem2.getBatteryLevel(node1)));
 
 	cout << "[TESTS]: REM tests complete." << endl;
 }

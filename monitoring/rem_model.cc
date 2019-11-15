@@ -264,6 +264,8 @@ void BatteryModel::performRegression(vector<double> times, vector<double> values
     if (BATTERY_DEBUG)
         cout << "[DEBUG]: New Battery model y = " << m << "x + " << b << endl;
 
+    this->state = ModelState::STABLE;
+
     this->calculateDeviations(times, values);
 }
 
