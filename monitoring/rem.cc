@@ -4,12 +4,12 @@
 #include <ctime>
 #include <string.h>
 
-void REM::initialize(int parentId)
+void REM::initialize(IP_ADDR parentIp)
 {
-    this->parentId = parentId;
+    m_parentIp = parentIp;
 
     if (REM_DEBUG)
-        cout << "Initializing REM monitoring service for node " << this->parentId << endl;
+        cout << "[DEBUG]: Initializing REM monitoring service for node " << getStringFromIp(m_parentIp) << endl;
 
     localBatteryModel.HOP_COUNT = HOP_COUNT;
     localBatteryModel.modelParameters.UPDATE_FREQUENCY = localBatteryModel.UPDATE_FREQUENCY;
@@ -24,115 +24,150 @@ void REM::initializeBatteryModel()
     {
         localBatteryModel.setState(ModelState::INIT);
         if (BATTERY_DEBUG)
-            cout << "Insufficient data to build battery model" << endl;
+            cout << "[DEBUG]: Insufficient data to build battery model" << endl;
 
         // this model is for parent of this network monitoring object 
-        localBatteryModel.ownerId = getParentId();
+        localBatteryModel.ownerIp = getParentIp();
         localBatteryModel.initialize();
     }
     else
     {
         if (BATTERY_DEBUG)
-            cout << "This model should not be being initialized" << endl;
+            cout << "[WARNING]: This model should not be being initialized" << endl;
     }
 }
 
-void REM::initializeRssModel(int pairId)
+void REM::initializeRssModel(IP_ADDR pairIp)
 {
     // create a new model
     RssModel model;
 
-    model.ownerId = parentId; 
-    model.pairId = pairId;
+    model.ownerIp = m_parentIp; 
+    model.pairIp = pairIp;
     model.dataCount = 0;
 // NS3-TODO        model.parentNode = receiveNode;
     model.HOP_COUNT = this->HOP_COUNT;
 
     model.initialize();
     if (REM_DEBUG)
-        cout << "[DEBUG] Local RSS model initialized." << endl;
+        cout << "[DEBUG]: Local RSS model initialized." << endl;
 
-    localRssModels[pairId] = model;
+    localRssModels[pairIp] = model;
 }
 
-double REM::getBatteryLevel(int ownerId = -1)
+double REM::getBatteryLevel(IP_ADDR ownerIp)
 {
-    if (ownerId == -1)
+    if (ownerIp == -1)
     {
         return localBatteryModel.getDataPoint(getCurrentTimeMS());
     }
     else 
     {
-        return netBatteryModels[ownerId].getDataPoint(getCurrentTimeMS());
+        return netBatteryModels[ownerIp].getDataPoint(getCurrentTimeMS());
     }
 }
 
-double REM::getRSSBetweenNodes(int pairId, int ownerId = -1)
+double REM::getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp = -1)
 {
-    if (ownerId == -1)
+    if (ownerIp == -1)
     {
         // this is a local model
-        return localRssModels[pairId].getDataPoint(getCurrentTimeMS());
+        return localRssModels[pairIp].getDataPoint(getCurrentTimeMS());
     }
     else 
     {
-        netRssModels[ownerId][pairId].getDataPoint(getCurrentTimeMS());        
+        netRssModels[ownerIp][pairIp].getDataPoint(getCurrentTimeMS());        
     }
 }
 
 void REM::updateLocalBatteryModel(double batteryLevel)
 {
-    // might call broadcast model...
+    // adding a new point might result in a new model...
     localBatteryModel.addDataPoint(batteryLevel, getCurrentTimeMS());
+
+    // if the model needs to be broadcasted, do it! 
+    if (localBatteryModel.needsToBeBroadcasted)
+    {
+        if (REM_DEBUG)
+            cout << "[DEBUG]: Sending updated battery model from node " << getStringFromIp(m_parentIp) << endl;
+
+        sendUpdatedModel(&localBatteryModel, getIpFromString(BROADCAST));
+        // model has been broadcasted
+        localBatteryModel.needsToBeBroadcasted = false;
+    }
 }
 
-void REM::updateLocalRSSModel(int pairId, double rss)
+void REM::updateLocalRSSModel(IP_ADDR pairIp, double rss)
 {
     // check if node already has this model
-    if (localRssModels.count(pairId) <= 0)
+    if (localRssModels.count(pairIp) <= 0)
     {
-        initializeRssModel(pairId);
+        initializeRssModel(pairIp);
     }
 
-    localRssModels[pairId].addDataPoint(rss, getCurrentTimeMS());
+    // adding a data point might result in a new model...
+    localRssModels[pairIp].addDataPoint(rss, getCurrentTimeMS());
+
+    // if the model needs to be broadcasted, do it! 
+    if (localRssModels[pairIp].needsToBeBroadcasted)
+    {
+        sendUpdatedModel(&(localRssModels[pairIp]), getIpFromString(BROADCAST));
+        // model has been broadcasted
+        localRssModels[pairIp].needsToBeBroadcasted = false;
+    }
 }
 
-void REM::updateNetworkBatteryModel(int ownerId, BatteryModel model)
+void REM::updateNetworkBatteryModel(IP_ADDR ownerIp, BatteryModel model)
 {
-    netBatteryModels[ownerId] = model;
+    netBatteryModels[ownerIp] = model;
 }
 
-void REM::updateNetworkRSSModel(int ownerId, int pairId, RssModel model)
+void REM::updateNetworkRSSModel(IP_ADDR ownerIp, IP_ADDR pairIp, RssModel model)
 {
-    netRssModels[ownerId][pairId] = model;
+    netRssModels[ownerIp][pairIp] = model;
 }
 
 void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
 {
     /********8********16********24********32
-     * NodeID|   Time to live   |Model Type
+     *          Node IP Address
+     * Resrv |   Time to live   |Model Type
      *             Mu (float)
      *            Beta (float)
      *           Sigma (float)
     ***************************************/
+    
+    REMModelPacket packet = model->createREMModelPacket();
 
-    // allocate 16 bytes for a model packet
-    char* buffer = (char*)(malloc(16));
+    // allocate 20 bytes for a model packet
+    int size = sizeof(packet);
+    if (REM_DEBUG)
+        cout << "[DEBUG]: Sending REM model packet. Size = " << size << endl;
 
-    memcpy(buffer, &(model->ownerId), 1);
-    buffer++;
-    memcpy(buffer, &(model->DEFAULT_TTL), 2);
-    buffer+=2;
-    memcpy(buffer, &(model->MODEL_TYPE), 1);
-    buffer++;
-    memcpy(buffer, &(model->modelParameters.mu), 4);
-    buffer+=4;
-    memcpy(buffer, &(model->modelParameters.beta), 4);
-    buffer+=4;
-    memcpy(buffer, &(model->modelParameters.sigma), 4);
-    buffer-=12;
+    char* buffer = (char*)(malloc(size));
+    memcpy(buffer, &packet, size);
 
-    routing->socketSendPacket(buffer, 16, getIpFromString(BROADCAST), RoutingProtocol::DATA_PORT);
+    routing->socketSendPacket(buffer, size, getIpFromString(BROADCAST), RoutingProtocol::DATA_PORT);
 
     delete buffer;
+}
+
+double REMTest::getCurrentBatteryLevel()
+{
+    return m_battery;
+} 
+
+uint32_t REMTest::getCurrentTimeMS()
+{
+    return m_clock;
+} 
+
+void REMTest::runClock(int duration)
+{
+    m_clock -= duration;
+}
+
+void REMTest::drainBattery()
+{
+    m_battery -= 2;
 }

@@ -8,10 +8,12 @@
  * Date: 10/28/2019
  ********************************/
 
-#define RSS_OUT_OF_RANGE        -99.99
+#define RSS_OUT_OF_RANGE        -80
 
 #include "rem_parameters.h"
-#include "defines.h"
+#include "monitor_defines.h"
+#include "rem_packet.h"
+#include "../aodv/RoutingProtocol.h"
 
 #include <vector>
 #include <iostream>
@@ -65,7 +67,7 @@ public:
     // NS3-TODO: ADD THIS IN HELPER  void setParentNode(Ptr<Node> parent);
 
     ModelParameters modelParameters;
-    uint8_t ownerId;
+    IP_ADDR ownerIp;
 
     // broadcast socket for this model to communicate on
     /* NS3-TODO: ADD THESE IN HELPER 
@@ -76,7 +78,11 @@ public:
     int dataCount = 0;
 
     // only for RSS model
-    int pairId; // id of pair node
+    IP_ADDR pairIp; // ip of pair node
+
+    REMModelPacket createREMModelPacket();
+
+    bool needsToBeBroadcasted;
 
 protected:
     double timeToLive; // ttl

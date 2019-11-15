@@ -10,8 +10,6 @@
 
 #include "network_monitor.h"
 #include "rem_model.h"
-#include "rem_packet.h"
-#include "../aodv/RoutingProtocol.h"
 
 #include <vector>
 
@@ -21,29 +19,29 @@ public:
     //  static const int INIT_COUNT = 3; // DEPRECATED. REAL INIT_COUNT IN MODEL
     static const int HOP_COUNT = 2;
 
-    REM() : NetworkMonitor() { simStartTime = getCurrentTimeMS(); }
-    REM(int nodeId) : NetworkMonitor(nodeId) { simStartTime = getCurrentTimeMS(); }
+    REM() : NetworkMonitor() { clusterHeadIp = getIpFromString(BROADCAST); } 
+    REM(IP_ADDR nodeIp) : NetworkMonitor(nodeIp) { clusterHeadIp = getIpFromString(BROADCAST); } 
 
     // NS3-TODO:  void initialize(Ptr<Node> parent, Ptr<EnergySource> battery, Ptr<Socket> socket); // initialize node 'parent' with network monitoring service
     // temp:
-    void initialize(int parentId);
+    void initialize(IP_ADDR parentIp);
     void initializeBatteryModel();
-    void initializeRssModel(int pairId);
+    void initializeRssModel(IP_ADDR pairIp);
 
     // get monitoring information 
-    double getBatteryLevel(int ownerId);
-    double getRSSBetweenNodes(int pairId, int ownerId);
+    double getBatteryLevel(IP_ADDR ownerIp = -1);
+    double getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp);
 
     // update local models with new data points 
     void updateLocalBatteryModel(double batteryLevel);
-    void updateLocalRSSModel(int pairId, double rss);
+    void updateLocalRSSModel(IP_ADDR pairIp, double rss);
 
     // updating local models might result in drastic changes that need to be broadcasted...
     void sendUpdatedModel(PredictionModel* model, IP_ADDR dest);
 
     // update network models
-    void updateNetworkBatteryModel(int ownerId, BatteryModel model);
-    void updateNetworkRSSModel(int ownerId, int pairId, RssModel model);
+    void updateNetworkBatteryModel(IP_ADDR ownerIp, BatteryModel model);
+    void updateNetworkRSSModel(IP_ADDR ownerIp, IP_ADDR pairIp, RssModel model);
 
     // abstract function for getting current battery level
     virtual double getCurrentBatteryLevel() = 0;
@@ -56,16 +54,17 @@ protected:
     virtual uint32_t getCurrentTimeMS() = 0;
     uint32_t simStartTime;
 
+    IP_ADDR clusterHeadIp;
+
     // local models: only one battery model but multiple RSS models
     BatteryModel localBatteryModel;
-    // the owner is always this node, the int key is the pairId
-    map<int,RssModel> localRssModels; 
+    // the owner is always this node, the IP_ADDR is the ip address of the paired node 
+    map<IP_ADDR,RssModel> localRssModels; 
 
     // network models: models created by other nodes 
-    // int key is the ownerId
-    map<int,BatteryModel> netBatteryModels;
+    map<IP_ADDR,BatteryModel> netBatteryModels;
     // int key is the ownerId to a vector of pairIds with associated RssModels
-    map<int,map<int,RssModel>> netRssModels;
+    map<IP_ADDR,map<IP_ADDR,RssModel>> netRssModels;
 
 /* NS3-TODO:  
     Ptr<Node> parentNode; // parent node
@@ -73,4 +72,21 @@ protected:
 */
 };
 
+class REMTest : public REM
+{
+public:
+    REMTest() : REM() { simStartTime = getCurrentTimeMS(); }
+    REMTest(IP_ADDR parentIp) : REM(parentIp) { simStartTime = getCurrentTimeMS(); }
 
+    double getCurrentBatteryLevel() override;
+
+    void runClock(int duration = 1000);
+    void drainBattery();
+
+protected:
+    int m_clock = 10000;
+    double m_battery = 100; 
+
+    uint32_t getCurrentTimeMS() override;
+
+};

@@ -8,33 +8,20 @@ Author: Josh Rands
 
 ## To Do
 
+### Bugs
+
+0. Aodv's decodeReceivedPacket does not care about ports... if a data packet is sent with 0x01 as the first byte it will be classified as a RREQ message. 
+
 ### AODV 
 
 AODV Protocol: https://www.ietf.org/rfc/rfc3561.txt
+[code here](aodv)
 
-1. Add functions for generating RREQ
-2. Add functions for generating RREP
-  - Create struct for packet format (section 5.2)
-  - Add check in RREQ if time for RREP (section 6.6)
-  - Unicast RREP message back to orig (section 6.7)
-3. Add functions for generating RERR
-  - Create struct for packet format (section 5.3)
-  - Generate RERR in all 3 situations (section 6.11)
-4. Add TTL for RREQ dissemination (section 6.4)
-5. Add AODVRoutingTable updates 
-
-### Hardware
-1. Add adhoc/wifi switching
-2. Add auto login (if its a thing)
+### SOCKET
+[code here](socket)
 
 ### ADHOC-HARDWARE
-1. Implement data forwarding (wrap data packets and send to routing table neighbour)
-i. Actually implemented just check that this is handled correctly on AODV side (aodv.cc:83)
-ii. Add vector or some storage method if the packet was for us
-2. Add sliding window on udp message queue
-4. Comment/Document
-5. Add packet sniffing and or check signal strength on packet receive
-6.
+[code here](hardware)
 
 ### AODV-REM
 1. Add network monitoring 
@@ -48,7 +35,11 @@ ii. Add vector or some storage method if the packet was for us
 This code is currently stand alone classes, but I added test.cc to so we can test while we develop. 
 
 1. Clone this repository 
-2. Using a terminal, cd into the src directory and type 'make'
-3. Code should compile and you can run ./test to run the tests
+2. Using a terminal, type 'make clean-all & make all'
+3. Code should compile and you can run ./do-adhoc to start doing ad hoc! 
 
-I use Visual Studio Code to develop. It has a nice built in terminal. 
+I use Visual Studio Code to develop. It has a nice built in terminal. <- Cool story bro <<-- Thanks mayn 
+
+
+## Questions
+[better route vs duplicate?](aodv/aodv_rreq.cc:57)

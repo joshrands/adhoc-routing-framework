@@ -7,6 +7,7 @@ Abstract implementation of the Ad-hoc On demand Distance Vector routing protocol
 Modeled after RFC 3561: https://www.ietf.org/rfc/rfc3561.txt
 
 ## To-Do
+0. Change Sequence number duplicate RREQ check to check set of past received sequences
 1. Add ttl for sent packets and remove packets after time  
 2. Create function for sending all buffered packets for a destination IP 
 3. Create a function for creating new bufferedPacket in map 
@@ -39,7 +40,7 @@ Modeled after RFC 3561: https://www.ietf.org/rfc/rfc3561.txt
 
 [aodv_routing_table](aodv_routing_table.h) - The routing table for AODV. Stores information such as next hop, time to live, sequence numbers, and more. 
 
-[defines](defines.h) - Global defines used for debugging, logging, etc. 
+[aodv_defines](aodv_defines.h) - Global defines used for debugging, logging, etc. 
 
 [aodv_sim](aodv_sim.h) - An implementation of AODV that can be used in Network Simulator 3 when binded to a socket send data function in the simulator. 
 
