@@ -28,6 +28,8 @@ public:
     void initializeBatteryModel();
     void initializeRssModel(IP_ADDR pairIp);
 
+    void updateLocalModels();
+
     // get monitoring information 
     double getBatteryLevel(IP_ADDR ownerIp = -1);
     double getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp);

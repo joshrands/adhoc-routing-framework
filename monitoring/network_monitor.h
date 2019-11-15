@@ -27,6 +27,8 @@ public:
     // abstract function for classes to update network monitoring data
     // can be done by asking for updates, using models, etc 
 
+    virtual void updateLocalModels() = 0;
+
     // get monitoring information 
     virtual double getBatteryLevel(IP_ADDR ownerIp) = 0;
     virtual double getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp) = 0;
@@ -53,6 +55,7 @@ protected:
     IP_ADDR m_parentIp;
 
     // list of nodes that this node has monitoring data for 
+    // these maps are updated from other data in the child classes for network monitoring 
     map<IP_ADDR,local_data> localMonitoringData;
     map<IP_ADDR,vector<pair_data>> pairMonitoringData;
 };

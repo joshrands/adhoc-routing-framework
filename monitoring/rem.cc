@@ -55,6 +55,25 @@ void REM::initializeRssModel(IP_ADDR pairIp)
     localRssModels[pairIp] = model;
 }
 
+void REM::updateLocalModels()
+{
+    localMonitoringData[m_parentIp].batteryLevel = getBatteryLevel();
+
+    // clear pair monitoring data and update with new 
+    pairMonitoringData.clear();
+
+    auto it = localRssModels.begin();
+    while (it != localRssModels.end())
+    {
+        pair_data data;
+        data.pairIp = it->first;
+        data.rss = it->second.getDataPoint(getCurrentTimeMS());
+
+        pairMonitoringData[m_parentIp].push_back(data);
+        it++;
+    }
+}
+
 double REM::getBatteryLevel(IP_ADDR ownerIp)
 {
     if (ownerIp == -1)
