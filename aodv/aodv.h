@@ -45,7 +45,7 @@ public:
 	// try to send data to a destination - the next hop is determined from the routing table  
 	void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP = -1);
 
-	static int AODV_PORT;
+//	static int ROUTING_PORT;
 
 	// decode a received packet buffer from UPD port 654
 	void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source, int port);
@@ -129,6 +129,13 @@ public:
 
 private:
 	vector<AODVTest*> m_physicalNeighbors;
+
+};
+
+class AODVMonitorTest : public AODVTest 
+{
+public:
+	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) override;
 
 };
 

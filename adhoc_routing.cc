@@ -3,7 +3,17 @@
 void AdHocRouting::receivePacketWithPairData(char* packet, int length, IP_ADDR source, int port, pair_data pairData)
 {
     this->updatePairData(pairData);
-    routing->decodeReceivedPacketBuffer(packet, length, source, port);
+
+    if (MONITOR_PORT == port)
+    {
+        // handle as network monitoring
+        monitor->handleMonitoringPacketBuffer(packet, length, source, port);
+    }
+    else if (ROUTING_PORT == port || DATA_PORT == port)
+    {
+        // handle as routing 
+        routing->decodeReceivedPacketBuffer(packet, length, source, port);
+    }
 }
 
 void AdHocRouting::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP)

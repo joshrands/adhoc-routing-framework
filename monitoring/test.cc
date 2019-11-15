@@ -25,6 +25,7 @@ void test(bool condition, string desc)
 void test_test();
 void test_battery_model();
 void test_rss_model();
+void test_packet_encode_decode();
 
 int main (int argc, char *argv[]) 
 {	
@@ -33,6 +34,7 @@ int main (int argc, char *argv[])
 	test_test();
 	test_battery_model();
 	test_rss_model();
+	test_packet_encode_decode();
 
 	cout << "[TESTS]: TESTS COMPLETE." << endl;
 
@@ -93,4 +95,45 @@ void test_rss_model()
 	test(abs(float(model.getDataPoint(10) - (-75))) <= 0.5, to_string(abs(float(model.getDataPoint(10) - (-75)))) + " <= 0.5");
 
 	cout << "[TESTS]: RSS model test complete." << endl;
+}
+
+void test_packet_encode_decode()
+{
+	IP_ADDR node1 = getIpFromString("192.168.0.1");
+	IP_ADDR node2 = getIpFromString("192.168.0.2");
+
+	REMTest remTest;
+	remTest.initialize(node1);
+
+	// TODO: Add warnings if no routing protocol has been assigned... 
+	AODVTest aodvTest(node1);
+	remTest.routing = &aodvTest;
+
+	// add data points 
+	// battery = 50 at time 0
+	remTest.updateLocalBatteryModel(remTest.getCurrentBatteryLevel());
+	remTest.runClock();
+	remTest.updateLocalBatteryModel(remTest.getCurrentBatteryLevel());
+	remTest.runClock();
+	remTest.updateLocalBatteryModel(remTest.getCurrentBatteryLevel());
+	remTest.runClock();
+	remTest.updateLocalBatteryModel(remTest.getCurrentBatteryLevel());
+	remTest.runClock();
+
+	REMModelPacket modelPacket = remTest.localBatteryModel.createREMModelPacket();
+	int length = sizeof(modelPacket);
+	char* buffer = (char*)(malloc(length));
+	memcpy(buffer, &(modelPacket), length);
+
+	REMTest rem;
+	rem.initialize(node2);
+
+	AODVTest aodv(node2);
+	rem.routing = &aodv;
+
+	rem.handleMonitoringPacketBuffer(buffer, length, node1, MONITOR_PORT);
+
+	test(rem.getBatteryLevel(node1) == remTest.getCurrentBatteryLevel(), "Received network packet test: " + to_string(rem.getBatteryLevel(node1)));
+
+	cout << "[TESTS]: Packet encode decode tests complete." << endl;
 }

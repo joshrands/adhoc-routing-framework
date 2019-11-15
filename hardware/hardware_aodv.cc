@@ -13,8 +13,8 @@ void HardwareAODV::_hardwareAODV(){
     if(!aodvSocket->setOption(SOL_SOCKET, SO_REUSEPORT, &reuseVal, sizeof(reuseVal))){
         fprintf(stderr, "Could not set the aodv socket to reuse ports\n");
     }
-    if (!aodvSocket->bindToPort(AODV_PORT)) {
-        fprintf(stderr, "Could not bind the aodv socket to port:%d\n", AODV_PORT);
+    if (!aodvSocket->bindToPort(ROUTING_PORT)) {
+        fprintf(stderr, "Could not bind the aodv socket to port:%d\n", ROUTING_PORT);
     }
     if(!aodvSocket->setBroadcasting()){
         fprintf(stderr, "Could not set the aodv socket to broadcasting\n");
@@ -62,7 +62,7 @@ HardwareAODV::~HardwareAODV(){
 
 // Override functions
 int HardwareAODV::socketSendPacket(char *buffer, int length, IP_ADDR dest, int port){
-    if(port == AODV_PORT){
+    if(port == ROUTING_PORT){
         if(HARDWARE_DEBUG){
             printf("[DEBUG]: sending packet ");
             printPacket(stdout, buffer, length);
@@ -91,7 +91,7 @@ int HardwareAODV::handlePackets(){
             printPacket(stdout, message.getData(), message.getLength());
             printf("\n");
         }
-        decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI(), AODV_PORT);
+        decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI(), ROUTING_PORT);
         count ++;
     }
     if(HARDWARE_DEBUG) printf("[DEBUG]: Handled %d packets from AODV\n", count);

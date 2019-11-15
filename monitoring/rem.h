@@ -28,6 +28,7 @@ public:
     void initializeBatteryModel();
     void initializeRssModel(IP_ADDR pairIp);
 
+    void handleMonitoringPacketBuffer(char* packet, int length, IP_ADDR source, int port) override;
     void updateLocalModels();
 
     // get monitoring information 
@@ -52,6 +53,11 @@ public:
 
     RoutingProtocol* routing;
 
+    // local models: only one battery model but multiple RSS models
+    BatteryModel localBatteryModel;
+    // the owner is always this node, the IP_ADDR is the ip address of the paired node 
+    map<IP_ADDR,RssModel> localRssModels; 
+
 // NS3-TODO: abstractize?    Ptr<Socket> socket;
 protected:
     // get the current time in milliseconds. abstract function for sim and hardware implementations
@@ -59,11 +65,6 @@ protected:
     uint32_t simStartTime;
 
     IP_ADDR clusterHeadIp;
-
-    // local models: only one battery model but multiple RSS models
-    BatteryModel localBatteryModel;
-    // the owner is always this node, the IP_ADDR is the ip address of the paired node 
-    map<IP_ADDR,RssModel> localRssModels; 
 
     // network models: models created by other nodes 
     map<IP_ADDR,BatteryModel> netBatteryModels;

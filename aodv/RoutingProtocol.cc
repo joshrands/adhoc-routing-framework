@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int RoutingProtocol::DATA_PORT = 5555;
+//int RoutingProtocol::DATA_PORT = 5555;
 
 IP_ADDR getIpFromString(string ipStr)
 {

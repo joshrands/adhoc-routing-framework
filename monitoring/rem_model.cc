@@ -348,6 +348,12 @@ REMModelPacket PredictionModel::createREMModelPacket()
     model.mu = this->modelParameters.mu;
     model.beta = this->modelParameters.beta;
     model.sigma = this->modelParameters.sigma;
+    model.pairIp = 0;
+    
+    if (this->MODEL_TYPE == ModelType::RSS)
+    {
+        model.pairIp = this->pairIp; 
+    }
 
     return model;
 }

@@ -16,10 +16,11 @@ struct REMModelPacket
 {
     uint8_t type;
     IP_ADDR parentIp;
-    uint32_t timestamp; // timestamp of packet
     uint16_t timeToLive; // time to live of model in minutes
 
     float mu;
     float beta;
     float sigma;
+
+    IP_ADDR pairIp; // optional pair ip if this is a pair-wise model 
 }; 

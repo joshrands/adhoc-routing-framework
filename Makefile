@@ -35,7 +35,7 @@ test:
 	${CXX} -c ${CXXFLAGS} adhoc_routing.cc -o adhoc_routing.o 	
 	${CXX} -c ${CXXFLAGS} test.cc -o test.o
 	${LD} ${LDFLAGS} adhoc_routing.o test.o aodv/*.o monitoring/*.o -o test 
-	./test
+#	./test
 
 test-all:
 	make all 

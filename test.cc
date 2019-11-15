@@ -85,6 +85,8 @@ void test_adhoc()
 	// generate a battery model on node 1
 	for (int i = 0; i < 3; i++)
 	{
+		cout << "[DEBUG]: Updating battery round 1" << endl;
+
 		rem1.updateLocalBatteryModel(rem1.getCurrentBatteryLevel());
 		rem1.runClock();
 		rem1.drainBattery();	
@@ -97,6 +99,8 @@ void test_adhoc()
 		string msg = "Hello!";
 		char* buffer = (char*)(malloc(msg.length()));
 		memcpy(buffer, &(msg[0]), msg.length());
+		char* buffer2 = (char*)(malloc(msg.length()));
+		memcpy(buffer2, &(msg[0]), msg.length());
 
 //		adhoc1.sendPacket(buffer, msg.length(), node2);
 //		adhoc2.sendPacket(buffer, msg.length(), node1);
@@ -112,9 +116,31 @@ void test_adhoc()
 		pairFrom2.pairIp = node2;
 		pairFrom2.rss = -50;
 
-		adhoc1.updatePairData(pairFrom2);
-		adhoc2.updatePairData(pairFrom1);
+		// USE FAKE PORTS FOR NOW 
+		adhoc1.receivePacketWithPairData(buffer, msg.length(), node2, 0, pairFrom2);
+		adhoc2.receivePacketWithPairData(buffer2, msg.length(), node1, 0, pairFrom1);
 	}
+
+	// send all models. 
+	pair_data pairFrom1;
+	pairFrom1.pairIp = node1;
+	pairFrom1.rss = -50;
+	pair_data pairFrom2;
+	pairFrom2.pairIp = node2;
+	pairFrom2.rss = -50;
+
+	// THIS SHOULD HAPPEN AUTOMATICALLY NORMALLY  
+	REMModelPacket battery1 = rem1.localBatteryModel.createREMModelPacket();
+	int length = sizeof(battery1);
+	char* buffer = (char*)(malloc(length));
+	memcpy(buffer, &(battery1), length);
+	adhoc2.receivePacketWithPairData(buffer, length, node1, MONITOR_PORT, pairFrom1);
+
+	REMModelPacket battery2 = rem2.localBatteryModel.createREMModelPacket();
+	length = sizeof(battery2);
+	char* buffer2 = (char*)(malloc(length));
+	memcpy(buffer2, &(battery2), length);
+	adhoc1.receivePacketWithPairData(buffer2, length, node2, MONITOR_PORT, pairFrom2);
 
 	// test that the nodes actually built their own models...
 	test(abs(rem1.getBatteryLevel() - rem1.getCurrentBatteryLevel()) < 0.01, "Node 1's own battery level: " + to_string(rem1.getBatteryLevel()) + " : " + to_string(rem1.getCurrentBatteryLevel()));

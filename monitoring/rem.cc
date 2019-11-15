@@ -80,6 +80,84 @@ void REM::updateLocalModels()
     }
 }
 
+void REM::handleMonitoringPacketBuffer(char* packet, int length, IP_ADDR source, int port)
+{
+    // current packet structure (double check sendUpdatedModel) 
+
+    /********8********16********24********32
+     *          Node IP Address
+     * Resrv |   Time to live   |Model Type
+     *             Mu (float)
+     *            Beta (float)
+     *           Sigma (float)
+     *          Pair IP (Optional)
+    ***************************************/
+
+    // decode the packet 
+    ModelParameters params;
+
+    IP_ADDR ownerIp;
+    memcpy(&ownerIp, packet, 4);
+    params.ownerId = ownerIp;
+
+    memcpy(&(params.timeToLive), &(packet[5]), 2);
+
+    uint8_t type;
+    memcpy(&type, &(packet[7]), 1);
+
+    params.type = (ModelType)(type);
+    if (REM_DEBUG)
+        cout << "[DEBUG]: Rem model type: " << params.type << endl;
+
+    memcpy(&(params.mu), &(packet[8]), 4);
+    memcpy(&(params.beta), &(packet[12]), 4);
+    memcpy(&(params.sigma), &(packet[16]), 4);
+
+    // Create model! 
+    switch (params.type)
+    {
+        case ModelType::BATTERY:
+            {
+            if (REM_DEBUG)
+                cout << "[DEBUG]: Adding network battery model for node " << getStringFromIp(ownerIp) << endl;
+
+            BatteryModel batteryModel;
+            batteryModel.modelParameters = params;
+            batteryModel.ownerIp = ownerIp;
+            batteryModel.setState(ModelState::STABLE);
+
+            // add the model to the list of network models 
+            netBatteryModels[ownerIp] = batteryModel;
+            } 
+            break;
+
+        case ModelType::RSS:
+            {
+            // pair data! 
+            IP_ADDR pairIp;
+            memcpy(&(pairIp), &(packet[20]), 4);
+            params.pairId = pairIp;
+
+            if (REM_DEBUG) 
+                cout << "[DEBUG]: Adding network rss model for node " << getStringFromIp(ownerIp) << " between " << getStringFromIp(pairIp) << endl;
+
+
+            RssModel rssModel;
+            rssModel.modelParameters = params;
+            rssModel.ownerIp = ownerIp;
+            rssModel.setState(ModelState::STABLE);
+
+            netRssModels[ownerIp][pairIp] = rssModel;
+            }
+
+            break;
+
+        default:
+            cout << "[ERROR]: Unknown REM model type." << endl;
+            break;
+    }
+}
+
 double REM::getBatteryLevel(IP_ADDR ownerIp)
 {
     if (ownerIp == -1)
@@ -163,6 +241,7 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
      *             Mu (float)
      *            Beta (float)
      *           Sigma (float)
+     *          Pair IP (Optional)
     ***************************************/
     
     REMModelPacket packet = model->createREMModelPacket();
@@ -175,7 +254,7 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
     char* buffer = (char*)(malloc(size));
     memcpy(buffer, &packet, size);
 
-    routing->socketSendPacket(buffer, size, getIpFromString(BROADCAST), RoutingProtocol::DATA_PORT);
+    routing->socketSendPacket(buffer, size, getIpFromString(BROADCAST), MONITOR_PORT);
 
     delete buffer;
 }

@@ -27,6 +27,7 @@ public:
     // abstract function for classes to update network monitoring data
     // can be done by asking for updates, using models, etc 
 
+    virtual void handleMonitoringPacketBuffer(char* packet, int length, IP_ADDR source, int port) = 0;
     virtual void updateLocalModels() = 0;
 
     // get monitoring information 

@@ -71,7 +71,7 @@ public:
 	// default constructor
 	RoutingProtocol();
 
-	static int DATA_PORT;
+//	static int DATA_PORT;
 
 	virtual void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP) = 0;
 	virtual void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source, int port) = 0;
