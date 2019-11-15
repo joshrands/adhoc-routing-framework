@@ -52,6 +52,8 @@ void REM::initializeRssModel(IP_ADDR pairIp)
     if (REM_DEBUG)
         cout << "[DEBUG]: Local RSS model initialized." << endl;
 
+    model.setState(ModelState::STABLE);
+
     localRssModels[pairIp] = model;
 }
 
@@ -65,11 +67,15 @@ void REM::updateLocalModels()
     auto it = localRssModels.begin();
     while (it != localRssModels.end())
     {
-        pair_data data;
-        data.pairIp = it->first;
-        data.rss = it->second.getDataPoint(getCurrentTimeMS());
+        if (it->second.getState() == ModelState::STABLE)
+        {
+            pair_data data;
+            data.pairIp = it->first;
+            data.rss = it->second.getDataPoint(getCurrentTimeMS());
 
-        pairMonitoringData[m_parentIp].push_back(data);
+            pairMonitoringData[m_parentIp].push_back(data);
+        }
+
         it++;
     }
 }

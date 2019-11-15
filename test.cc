@@ -98,10 +98,12 @@ void test_adhoc()
 		char* buffer = (char*)(malloc(msg.length()));
 		memcpy(buffer, &(msg[0]), msg.length());
 
-		adhoc1.sendPacket(buffer, msg.length(), node2);
-		adhoc2.sendPacket(buffer, msg.length(), node1);
+//		adhoc1.sendPacket(buffer, msg.length(), node2);
+//		adhoc2.sendPacket(buffer, msg.length(), node1);
 
 		// have to cheat with pair data for now... 
+		// should use this function:
+//		adhoc1.receivePacketWithPairData()
 		// TODO: Fix this??? 
 		pair_data pairFrom1;
 		pairFrom1.pairIp = node1;
