@@ -197,7 +197,7 @@ void AODV::broadcastRREQBuffer(rreqPacket rreq) {
 }
 
 void AODV::decodeReceivedPacketBuffer(char *buffer, int length,
-                                      IP_ADDR source) {
+                                      IP_ADDR source, int port) {
     //	cout << "Node " << getStringFromIp(getIp()) << " received a packet. " <<
     // endl;
 
@@ -504,7 +504,7 @@ int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest,
             AODVTest::globalPacketCount++;
 
             m_physicalNeighbors.at(i)->decodeReceivedPacketBuffer(
-                buffer, length, getIp());
+                buffer, length, getIp(), port);
         }
     }
 

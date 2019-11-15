@@ -7,7 +7,7 @@
 class AdHocRouting
 {
 public:
-    void receivePacketWithPairData(char* packet, int length, IP_ADDR source, pair_data pairData);
+    void receivePacketWithPairData(char* packet, int length, IP_ADDR source, int port, pair_data pairData);
  	void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP = -1);
 
     // SHOULD BE FOR TESTING ONLY 

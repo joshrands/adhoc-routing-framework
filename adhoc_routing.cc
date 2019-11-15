@@ -1,9 +1,9 @@
 #include "adhoc_routing.h"
 
-void AdHocRouting::receivePacketWithPairData(char* packet, int length, IP_ADDR source, pair_data pairData)
+void AdHocRouting::receivePacketWithPairData(char* packet, int length, IP_ADDR source, int port, pair_data pairData)
 {
     this->updatePairData(pairData);
-    routing->decodeReceivedPacketBuffer(packet, length, source);
+    routing->decodeReceivedPacketBuffer(packet, length, source, port);
 }
 
 void AdHocRouting::sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP)

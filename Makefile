@@ -31,10 +31,21 @@ ${TARGET}: #${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} ${TARGET}.o -o $@ ${STATIC_LIBRARIES}
 
 test: 
+	make clean
 	${CXX} -c ${CXXFLAGS} adhoc_routing.cc -o adhoc_routing.o 	
 	${CXX} -c ${CXXFLAGS} test.cc -o test.o
 	${LD} ${LDFLAGS} adhoc_routing.o test.o aodv/*.o monitoring/*.o -o test 
 	./test
+
+test-all:
+	make all 
+	for dir in $(SUBDIRS); do \
+		cd $$dir; \
+		./test; \
+		cd ../; \
+	done
+	make clean
+	make test
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} do-adhoc.cc -o $@ $<

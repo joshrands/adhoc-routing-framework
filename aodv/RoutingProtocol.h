@@ -74,7 +74,7 @@ public:
 	static int DATA_PORT;
 
 	virtual void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP) = 0;
-	virtual void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source) = 0;
+	virtual void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source, int port) = 0;
 
 	const uint32_t getIp() { return ipAddress; }
 	void setIp(const uint32_t ip) { ipAddress = ip; }

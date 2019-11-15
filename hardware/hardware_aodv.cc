@@ -91,7 +91,7 @@ int HardwareAODV::handlePackets(){
             printPacket(stdout, message.getData(), message.getLength());
             printf("\n");
         }
-        decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI());
+        decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI(), AODV_PORT);
         count ++;
     }
     if(HARDWARE_DEBUG) printf("[DEBUG]: Handled %d packets from AODV\n", count);
@@ -103,7 +103,7 @@ int HardwareAODV::handlePackets(){
             printPacket(stdout, message.getData(), message.getLength());
             printf("\n");
         }
-        decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI());
+        decodeReceivedPacketBuffer(message.getData(), message.getLength(), message.getAddressI(), DATA_PORT);
         count ++;
         count_data ++;
     }
