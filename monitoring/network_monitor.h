@@ -9,6 +9,7 @@
 
 #include "monitor_info.h"
 #include "../defines.h"
+
 #include <vector>
 #include <map>
 
@@ -23,7 +24,14 @@ public:
     virtual void initialize(IP_ADDR parentIp) = 0;
     // abstract function for classes to update network monitoring data
     // can be done by asking for updates, using models, etc 
-//    virtual void updateNetworkMonitoringData() = 0;
+
+    // get monitoring information 
+    virtual double getBatteryLevel(IP_ADDR ownerIp) = 0;
+    virtual double getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp) = 0;
+
+    // update local models with new data points 
+    virtual void updateLocalBatteryModel(double batteryLevel) = 0;
+    virtual void updateLocalRSSModel(IP_ADDR pairIp, double rss) = 0;
 
     bool localDataExistsForNode(IP_ADDR nodeIp);
     bool pairDataExistsForNode(IP_ADDR nodeIp);
