@@ -2,11 +2,12 @@
 #define MESSAGE_H
 
 #include "endpoint.h"
+#include <sys/ioctl.h>
 
 class Message{
 public:
     Message(){};
-    Message(Endpoint end, char* data, int length);
+    Message(Endpoint end, char* data, int length, int bitrate=-1);
 
     /*!
      * @brief Returns the IP address of the message sender
@@ -41,7 +42,7 @@ public:
      * 
      * @return int 
      */
-    int getPort(void);
+    int getPort(void) const;
 
     /*!
      * @brief Get the Endpoint object
@@ -50,11 +51,18 @@ public:
      */
     Endpoint& getEndpoint(void);
 
+    /*!
+     * @brief Get the Bitrate object
+     * 
+     * @return int bitrate
+     */
+    int getBitrate(void) const;
+
 private:
     Endpoint end;
     char* data;
     int length;
-
+    int bitrate;
 };
 
 #endif
