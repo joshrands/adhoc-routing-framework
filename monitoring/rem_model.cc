@@ -355,5 +355,8 @@ REMModelPacket PredictionModel::createREMModelPacket()
         model.pairIp = this->pairIp; 
     }
 
+    if (MONITOR_DEBUG)
+        cout << "[DEBUG]: REM model packet created from node " << getStringFromIp(model.parentIp) << endl;
+
     return model;
 }

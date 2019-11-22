@@ -96,22 +96,20 @@ void REM::handleMonitoringPacketBuffer(char* packet, int length, IP_ADDR source,
     // decode the packet 
     ModelParameters params;
 
-    IP_ADDR ownerIp;
-    memcpy(&ownerIp, packet, 4);
-    params.ownerId = ownerIp;
+    // buffer is in REMModelPacket format 
+    REMModelPacket modelPacket;
+    memcpy(&modelPacket, packet, sizeof(params));
+    cout << getStringFromIp(modelPacket.parentIp) << endl;
 
-    memcpy(&(params.timeToLive), &(packet[5]), 2);
+    params.ownerId = modelPacket.parentIp;
+    params.type = (ModelType)modelPacket.type;
+    params.timeToLive = modelPacket.timeToLive;
+    params.mu = modelPacket.mu;
+    params.beta = modelPacket.beta;
+    params.sigma = modelPacket.sigma;
 
-    uint8_t type;
-    memcpy(&type, &(packet[7]), 1);
-
-    params.type = (ModelType)(type);
     if (REM_DEBUG)
-        cout << "[DEBUG]: Rem model type: " << params.type << endl;
-
-    memcpy(&(params.mu), &(packet[8]), 4);
-    memcpy(&(params.beta), &(packet[12]), 4);
-    memcpy(&(params.sigma), &(packet[16]), 4);
+        cout << "[DEBUG]: REM model type: " << params.type << endl;
 
     // Create model! 
     switch (params.type)
@@ -119,35 +117,32 @@ void REM::handleMonitoringPacketBuffer(char* packet, int length, IP_ADDR source,
         case ModelType::BATTERY:
             {
             if (REM_DEBUG)
-                cout << "[DEBUG]: Adding network battery model for node " << getStringFromIp(ownerIp) << endl;
+                cout << "[DEBUG]: Adding network battery model for node " << getStringFromIp(params.ownerId) << endl;
 
             BatteryModel batteryModel;
             batteryModel.modelParameters = params;
-            batteryModel.ownerIp = ownerIp;
+            batteryModel.ownerIp = params.ownerId;
             batteryModel.setState(ModelState::STABLE);
 
             // add the model to the list of network models 
-            netBatteryModels[ownerIp] = batteryModel;
+            netBatteryModels[params.ownerId] = batteryModel;
             } 
             break;
 
         case ModelType::RSS:
             {
             // pair data! 
-            IP_ADDR pairIp;
-            memcpy(&(pairIp), &(packet[20]), 4);
-            params.pairId = pairIp;
+            params.pairId = modelPacket.pairIp;
 
             if (REM_DEBUG) 
-                cout << "[DEBUG]: Adding network rss model for node " << getStringFromIp(ownerIp) << " between " << getStringFromIp(pairIp) << endl;
-
+                cout << "[DEBUG]: Adding network rss model for node " << getStringFromIp(params.ownerId) << " between " << getStringFromIp(params.pairId) << endl;
 
             RssModel rssModel;
             rssModel.modelParameters = params;
-            rssModel.ownerIp = ownerIp;
+            rssModel.ownerIp = params.ownerId;
             rssModel.setState(ModelState::STABLE);
 
-            netRssModels[ownerIp][pairIp] = rssModel;
+            netRssModels[params.ownerId][params.pairId] = rssModel;
             }
 
             break;
