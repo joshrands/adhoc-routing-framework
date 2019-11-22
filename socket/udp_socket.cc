@@ -157,7 +157,7 @@ void UDPSocket::receiveFromPortThread() {
     if(ioctl(sockfd, SIOCGIWSTATS, &req) == -1){
       fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get TX strength\n", strerror(errno));
     }
-    int level = (stats.qual.updated & IW_QUAL_DBM)? -1 :stats.qual.level; //
+    int level = stats.qual.level; //
     
     messages.push(Message(sender, buffer, n, level));
   }
