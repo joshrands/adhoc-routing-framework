@@ -148,13 +148,15 @@ void UDPSocket::receiveFromPortThread() {
     buffer[n] = '\0';
 
     // Collect signal strength put in map
-    int level = -1;
-    __u16 txpow;
-    if(ioctl(sockfd, SIOCGIWTXPOW, &txpow, sizeof(txpow)) == -1){
-      fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get TX strength\n", strerror(errno));
-    }
-
-    messages.push(Message(sender, buffer, n, level));    
+    struct iw_statistics stats;
+    struct iwreq req;
+    memset(&stats, 0, sizeof(stats));
+    memset(&req, 0, sizeof(iwreq));
+    sprintf(req.ifr_name, INTERFACE_NAME);
+    req.u.data.pointer = &stats;
+    req.u.data.length = sizeof(iw_statistics);
+    int level = (stats.qual.updated & IW_QUAL_DBM)? -1 :stats.qual.level;
+    messages.push(Message(sender, buffer, n, level));
   }
 }
 
