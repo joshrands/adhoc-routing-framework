@@ -53,6 +53,7 @@ int main() {
                 printf("Message: %s dBm: %d\n", incoming.getData(), incoming.getRss());
                 
             }
+            sleep(1);
         }
     }
 
