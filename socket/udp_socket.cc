@@ -27,7 +27,6 @@ using std::memset;
 
 
 UDPSocket::UDPSocket() : messages(UDP_QUEUE_SIZE), Socket() {
-  sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
 }
 
 UDPSocket::~UDPSocket(){ 
@@ -151,6 +150,7 @@ void UDPSocket::receiveFromPortThread() {
     // Get received signal strength
     memset(&stats, 0, sizeof(stats)); // clear old data
     memset(&req, 0, sizeof(iwreq));   // clear old data
+    sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
     req.u.data.pointer = &stats; // Set pointers
     req.u.data.length = sizeof(iw_statistics);  // Set pointers
     // Pull in data
