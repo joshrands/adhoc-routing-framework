@@ -30,6 +30,10 @@
 #include "socket_defines.h"
 #include <iostream>
 #include <utility>
+#include <unordered_map>
+#include <linux/wireless.h>
+#include <cstring>
+#include <errno.h>
 
 using namespace std;
 
@@ -44,7 +48,7 @@ public:
    */
   UDPSocket();
 
-  ~UDPSocket() { close(sockfd); }
+  ~UDPSocket();
 
   /*! 
    *  @brief Init the UDP Client Socket without binding it to any specific por

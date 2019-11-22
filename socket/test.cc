@@ -197,9 +197,8 @@ void testCircularQueue() {
 UDPSocket *createThreadedSocket(thread &returnThread, int port) {
     UDPSocket *threadedSocket = new UDPSocket();
     if (!threadedSocket->bindToPort(port)) {
-        fprintf(stderr, "Could not bind the receiver socket to port:%d\n",
+        fprintf(stderr, "[ERROR]: Could not bind the receiver socket to port:%d\n",
                 port);
-        exit(-1);
     }
     // Thread a recvfrom call
     returnThread = thread(&UDPSocket::receiveFromPortThread, threadedSocket);
