@@ -7,7 +7,7 @@
 class Message{
 public:
     Message(){};
-    Message(Endpoint end, char* data, int length, int bitrate=-1);
+    Message(Endpoint end, char* data, int length, int rss=-1);
 
     /*!
      * @brief Returns the IP address of the message sender
@@ -52,17 +52,17 @@ public:
     Endpoint& getEndpoint(void);
 
     /*!
-     * @brief Get the Bitrate object
+     * @brief Get the received signal strength
      * 
-     * @return int bitrate
+     * @return int rss
      */
-    int getBitrate(void) const;
+    int getRss(void) const;
 
 private:
     Endpoint end;
     char* data;
     int length;
-    int bitrate;
+    int rss;
 };
 
 #endif
