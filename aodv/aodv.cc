@@ -232,8 +232,8 @@ void AODV::handleRREQ(char *buffer, int length, IP_ADDR source) {
     // 1. make sure this is a valid rreq message
     if (length != sizeof(rreqPacket)) {
         if (AODV_DEBUG)
-            cout << "[DEBUG]: ERROR handling rreq packet. Invalid length."
-                 << endl;
+            cout << "[ERROR]: Error handling rreq packet. Invalid length of " << length
+                 << " should be " << sizeof(rreqPacket) << endl;
 
         return;
     }

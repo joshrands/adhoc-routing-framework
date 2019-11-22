@@ -9,7 +9,7 @@ void REM::initialize(IP_ADDR parentIp)
     m_parentIp = parentIp;
 
     if (REM_DEBUG)
-        cout << "[DEBUG]: Initializing REM monitoring service for node " << m_parentIp << endl;
+        cout << "[DEBUG]: Initializing REM monitoring service for node " << getStringFromIp(m_parentIp) << endl;
 
     localBatteryModel.HOP_COUNT = HOP_COUNT;
     localBatteryModel.modelParameters.UPDATE_FREQUENCY = localBatteryModel.UPDATE_FREQUENCY;
@@ -55,7 +55,7 @@ void REM::initializeRssModel(IP_ADDR pairIp)
     localRssModels[pairIp] = model;
 }
 
-double REM::getBatteryLevel(IP_ADDR ownerIp = -1)
+double REM::getBatteryLevel(IP_ADDR ownerIp)
 {
     if (ownerIp == -1)
     {
@@ -88,6 +88,9 @@ void REM::updateLocalBatteryModel(double batteryLevel)
     // if the model needs to be broadcasted, do it! 
     if (localBatteryModel.needsToBeBroadcasted)
     {
+        if (REM_DEBUG)
+            cout << "[DEBUG]: Sending updated battery model from node " << getStringFromIp(m_parentIp) << endl;
+
         sendUpdatedModel(&localBatteryModel, getIpFromString(BROADCAST));
         // model has been broadcasted
         localBatteryModel.needsToBeBroadcasted = false;
@@ -138,6 +141,8 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
 
     // allocate 20 bytes for a model packet
     int size = sizeof(packet);
+    if (REM_DEBUG)
+        cout << "[DEBUG]: Sending REM model packet. Size = " << size << endl;
 
     char* buffer = (char*)(malloc(size));
     memcpy(buffer, &packet, size);
@@ -145,4 +150,24 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
     routing->socketSendPacket(buffer, size, getIpFromString(BROADCAST), RoutingProtocol::DATA_PORT);
 
     delete buffer;
+}
+
+double REMTest::getCurrentBatteryLevel()
+{
+    return m_battery;
+} 
+
+uint32_t REMTest::getCurrentTimeMS()
+{
+    return m_clock;
+} 
+
+void REMTest::runClock(int duration)
+{
+    m_clock -= duration;
+}
+
+void REMTest::drainBattery()
+{
+    m_battery -= 2;
 }

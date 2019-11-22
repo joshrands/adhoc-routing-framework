@@ -1,5 +1,6 @@
 
 #include "rem.h"
+#include "../aodv/aodv.h"
 
 #include <assert.h>
 #include "string.h"
@@ -24,6 +25,7 @@ void test(bool condition, string desc)
 void test_test();
 void test_battery_model();
 void test_rss_model();
+void test_rem();
 
 int main (int argc, char *argv[]) 
 {	
@@ -32,6 +34,7 @@ int main (int argc, char *argv[])
 	test_test();
 	test_battery_model();
 	test_rss_model();
+	test_rem();
 
 	cout << "[TESTS]: TESTS COMPLETE." << endl;
 
@@ -64,6 +67,8 @@ void test_battery_model()
 	test(model.getDataCount() == 4, "getDataCount() == 4");
 	test(model.getDataPoint(4) == 30, "getDataPoint(4) == 30");
 	test(model.getDataPoint(8) == 10, "getDataPoint(8) == 10");
+
+	cout << "[TESTS]: Battery model test complete." << endl;
 }
 
 void test_rss_model()
@@ -88,4 +93,62 @@ void test_rss_model()
 	// test with accuracry requirement of 0.5 dB
 	test(abs(float(model.getDataPoint(6) - (-72))) <= 0.5, to_string(abs(float(model.getDataPoint(6) - (-72)))) + " <= 0.5");
 	test(abs(float(model.getDataPoint(10) - (-75))) <= 0.5, to_string(abs(float(model.getDataPoint(10) - (-75)))) + " <= 0.5");
+
+	cout << "[TESTS]: RSS model test complete." << endl;
+}
+
+void test_rem()
+{
+	IP_ADDR node1 = getIpFromString("192.168.0.1");
+	REMTest rem1;
+	// create a routing protocol 
+	AODVTest aodv1(node1);
+
+	rem1.routing = &aodv1;
+	rem1.initialize(node1);
+
+	IP_ADDR node2 = getIpFromString("192.168.0.2");
+	REMTest rem2; 
+	AODVTest aodv2(node2); 
+
+	rem2.routing = &aodv2;
+	rem2.initialize(node2);
+
+	// connect nodes! 
+	aodv1.addNeighbor(&aodv2);
+	aodv2.addNeighbor(&aodv1);
+
+	// test neighbors should not be detected yet 
+	test(rem1.isNodeOneHopNeighbor(node2) == false, "Node 2 should not be detected as a neighbor yet");
+	test(rem2.isNodeOneHopNeighbor(node1) == false, "Node 1 should not be detected as a neighbor yet");
+
+	// generate a battery model on node 1
+	for (int i = 0; i < 3; i++)
+	{
+		rem1.updateLocalBatteryModel(rem1.getCurrentBatteryLevel());
+		rem1.runClock();
+		rem1.drainBattery();	
+		rem2.updateLocalBatteryModel(rem2.getCurrentBatteryLevel());
+		rem2.runClock();
+		rem2.drainBattery();
+
+		// send hello messages! 
+		string msg = "Hello!";
+		char* buffer = (char*)(malloc(msg.length()));
+		memcpy(buffer, &(msg[0]), msg.length());
+
+		aodv1.sendPacket(buffer, msg.length(), node2);
+		aodv2.sendPacket(buffer, msg.length(), node1);
+	}
+
+	// both nodes should have received each others models 
+
+	// test neighbors should not be detected yet 
+	test(rem1.isNodeOneHopNeighbor(node2) == true, "Node 2 should be detected as a neighbor");
+	test(rem2.isNodeOneHopNeighbor(node1) == true, "Node 1 should be detected as a neighbor");
+
+	test(rem1.getBatteryLevel(node2) == 94, "Node 1 assumed battery level of node 2: " + to_string(rem1.getBatteryLevel(node2)));
+	test(rem2.getBatteryLevel(node1) == 94, "Node 2 assumed battery level of node 1: " + to_string(rem2.getBatteryLevel(node1)));
+
+	cout << "[TESTS]: REM tests complete." << endl;
 }

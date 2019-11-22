@@ -23,7 +23,7 @@ public:
     virtual void initialize(IP_ADDR parentIp) = 0;
     // abstract function for classes to update network monitoring data
     // can be done by asking for updates, using models, etc 
-    virtual void updateNetworkMonitoringData() = 0;
+//    virtual void updateNetworkMonitoringData() = 0;
 
     bool localDataExistsForNode(IP_ADDR nodeIp);
     bool pairDataExistsForNode(IP_ADDR nodeIp);

@@ -8,11 +8,12 @@
  * Date: 10/28/2019
  ********************************/
 
-#define RSS_OUT_OF_RANGE        -99.99
+#define RSS_OUT_OF_RANGE        -80
 
 #include "rem_parameters.h"
 #include "monitor_defines.h"
 #include "rem_packet.h"
+#include "../aodv/RoutingProtocol.h"
 
 #include <vector>
 #include <iostream>
