@@ -85,8 +85,6 @@ void test_adhoc()
 	// generate a battery model on node 1
 	for (int i = 0; i < 3; i++)
 	{
-		cout << "[DEBUG]: Updating battery round 1" << endl;
-
 		rem1.updateLocalBatteryModel(rem1.getCurrentBatteryLevel());
 		rem1.runClock();
 		rem1.drainBattery();	

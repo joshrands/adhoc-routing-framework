@@ -147,7 +147,6 @@ void test_local_update_thread()
 	AODVTest aodv("192.168.0.1");
 	rem.routing = &aodv;
 
-//	this_thread::sleep_for(5);
 	std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
 	cout << "[TESTS]: Local update thread tests complete." << endl;
