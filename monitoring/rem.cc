@@ -59,6 +59,10 @@ void REM::initializeRssModel(IP_ADDR pairIp)
 
 void REM::updateLocalModels()
 {
+    if (MONITOR_DEBUG)
+        cout << "[DEBUG]: Updating local models" << endl;
+
+    // this function is being continously called by a thread and upon updating pair data 
     localMonitoringData[m_parentIp].batteryLevel = getBatteryLevel();
 
     // clear pair monitoring data and update with new 

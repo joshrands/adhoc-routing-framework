@@ -12,6 +12,9 @@
 
 #include <vector>
 #include <map>
+#include <thread>
+#include <chrono>
+#include <mutex>
 
 using namespace std;
 class NetworkMonitor
@@ -19,7 +22,8 @@ class NetworkMonitor
 public:
     NetworkMonitor();
     NetworkMonitor(IP_ADDR nodeIp);
-
+    ~NetworkMonitor();
+    
     virtual void updatePairData(pair_data pairData) = 0;
 
     // various initialize functions for creating new models 
@@ -52,6 +56,9 @@ public:
     int getParentIp() { return this->m_parentIp; }
 
 protected:
+    thread localUpdateThread;
+    mutex localUpdateMutex;
+
     // node being monitored 
     IP_ADDR m_parentIp;
 
@@ -60,3 +67,5 @@ protected:
     map<IP_ADDR,local_data> localMonitoringData;
     map<IP_ADDR,vector<pair_data>> pairMonitoringData;
 };
+
+void runLocalModelUpdateThread(NetworkMonitor* monitor, mutex* mux);

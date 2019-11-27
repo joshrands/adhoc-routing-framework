@@ -31,5 +31,5 @@ void AdHocRouting::updatePairData(pair_data pairData)
     // after creating new models, update local models in network monitoring 
     // TODO: Is this necessary? Local models will be updated on their own thread. 
     // TODO: It is doing more than battery... why is update local models doing that? 
-//    monitor->updateLocalModels();
+    monitor->updateLocalModels();
 }

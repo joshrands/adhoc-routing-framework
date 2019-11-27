@@ -6,6 +6,7 @@
 #include "string.h"
 #include <cmath>
 #include <iostream>
+#include <thread>
 
 using namespace std;
 
@@ -26,6 +27,7 @@ void test_test();
 void test_battery_model();
 void test_rss_model();
 void test_packet_encode_decode();
+void test_local_update_thread();
 
 int main (int argc, char *argv[]) 
 {	
@@ -35,6 +37,7 @@ int main (int argc, char *argv[])
 	test_battery_model();
 	test_rss_model();
 	test_packet_encode_decode();
+	test_local_update_thread();
 
 	cout << "[TESTS]: TESTS COMPLETE." << endl;
 
@@ -136,4 +139,14 @@ void test_packet_encode_decode()
 	test(rem.getBatteryLevel(node1) == remTest.getCurrentBatteryLevel(), "Received network packet test: " + to_string(rem.getBatteryLevel(node1)));
 
 	cout << "[TESTS]: Packet encode decode tests complete." << endl;
+}
+
+void test_local_update_thread()
+{
+	REMTest rem(getIpFromString("192.168.0.1"));
+
+//	this_thread::sleep_for(5);
+	std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+	cout << "[TESTS]: Local update thread tests complete." << endl;
 }

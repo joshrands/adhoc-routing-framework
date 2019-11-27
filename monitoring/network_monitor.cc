@@ -8,7 +8,7 @@ using namespace std;
 NetworkMonitor::NetworkMonitor()
 {
     if (MONITOR_DEBUG)
-        cout << "[DEBUG]: New network monitoring service for unassigned node" << endl;
+        cout << "[ERROR]: New network monitoring service for unassigned node" << endl;
 
     m_parentIp = 0;
 }
@@ -19,6 +19,14 @@ NetworkMonitor::NetworkMonitor(IP_ADDR nodeIp)
 
     if (MONITOR_DEBUG)
         cout << "[DEBUG]: New monitoring service for Node " << m_parentIp << endl;
+
+    // start thread for local data monitoring 
+    localUpdateThread = thread(runLocalModelUpdateThread, this, &(this->localUpdateMutex));
+    localUpdateThread.detach();
+}
+
+NetworkMonitor::~NetworkMonitor()
+{
 }
 
 bool NetworkMonitor::localDataExistsForNode(IP_ADDR nodeIp)
@@ -74,3 +82,21 @@ pair_data NetworkMonitor::getPairDataBetweenNodes(IP_ADDR nodeIp, IP_ADDR ownerI
     }
 }
 
+void runLocalModelUpdateThread(NetworkMonitor* monitor, mutex* mux)
+{
+    // use mutex to protect memory
+    mux->lock();
+
+    if (monitor == NULL)
+    {
+        mux->unlock();
+        terminate();
+    }
+
+    monitor->updateLocalModels();
+    this_thread::sleep_for(chrono::milliseconds(LOCAL_DATA_UPDATE_RATE_MS));
+
+    mux->unlock();
+
+    runLocalModelUpdateThread(monitor, mux);
+}
