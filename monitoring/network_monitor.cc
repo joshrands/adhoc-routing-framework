@@ -82,6 +82,11 @@ pair_data NetworkMonitor::getPairDataBetweenNodes(IP_ADDR nodeIp, IP_ADDR ownerI
     }
 }
 
+void NetworkMonitor::runClock(int duration)
+{
+    m_clock_MS += duration;
+}
+
 void runLocalModelUpdateThread(NetworkMonitor* monitor, mutex* mux)
 {
     // use mutex to protect memory
@@ -95,6 +100,7 @@ void runLocalModelUpdateThread(NetworkMonitor* monitor, mutex* mux)
 
     monitor->updateLocalModels();
     this_thread::sleep_for(chrono::milliseconds(LOCAL_DATA_UPDATE_RATE_MS));
+    monitor->runClock(LOCAL_DATA_UPDATE_RATE_MS);
 
     mux->unlock();
 

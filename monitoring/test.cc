@@ -144,6 +144,8 @@ void test_packet_encode_decode()
 void test_local_update_thread()
 {
 	REMTest rem(getIpFromString("192.168.0.1"));
+	AODVTest aodv("192.168.0.1");
+	rem.routing = &aodv;
 
 //	this_thread::sleep_for(5);
 	std::this_thread::sleep_for(std::chrono::milliseconds(5000));

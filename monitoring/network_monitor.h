@@ -23,7 +23,7 @@ public:
     NetworkMonitor();
     NetworkMonitor(IP_ADDR nodeIp);
     ~NetworkMonitor();
-    
+
     virtual void updatePairData(pair_data pairData) = 0;
 
     // various initialize functions for creating new models 
@@ -55,7 +55,12 @@ public:
 
     int getParentIp() { return this->m_parentIp; }
 
+    void runClock(int duration = 1000);
+
 protected:
+    int m_clock_MS = 0;
+    double m_battery = 100; 
+
     thread localUpdateThread;
     mutex localUpdateMutex;
 

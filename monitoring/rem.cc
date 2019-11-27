@@ -62,6 +62,8 @@ void REM::updateLocalModels()
     if (MONITOR_DEBUG)
         cout << "[DEBUG]: Updating local models" << endl;
 
+    updateLocalBatteryModel(this->getCurrentBatteryLevel());
+
     // this function is being continously called by a thread and upon updating pair data 
     localMonitoringData[m_parentIp].batteryLevel = getBatteryLevel();
 
@@ -250,12 +252,17 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
     if (REM_DEBUG)
         cout << "[DEBUG]: Sending REM model packet. Size = " << size << endl;
 
-    char* buffer = (char*)(malloc(size));
-    memcpy(buffer, &packet, size);
+    if (routing == nullptr)
+        cout << "[ERROR]: NO ROUTING PROTOCOL" << endl;
+    else 
+    {
+        char* buffer = (char*)(malloc(size));
+        memcpy(buffer, &packet, size);
 
-    routing->socketSendPacket(buffer, size, getIpFromString(BROADCAST), MONITOR_PORT);
+        routing->socketSendPacket(buffer, size, getIpFromString(BROADCAST), MONITOR_PORT);
 
-    delete buffer;
+        delete buffer;
+    }
 }
 
 void REM::updatePairData(pair_data pairData)
@@ -273,12 +280,7 @@ double REMTest::getCurrentBatteryLevel()
 
 uint32_t REMTest::getCurrentTimeMS()
 {
-    return m_clock;
-} 
-
-void REMTest::runClock(int duration)
-{
-    m_clock -= duration;
+    return m_clock_MS;
 }
 
 void REMTest::drainBattery()
