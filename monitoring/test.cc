@@ -1,6 +1,6 @@
 
 #include "rem.h"
-#include "../aodv/aodv.h"
+#include "aodv.h"
 
 #include <assert.h>
 #include "string.h"

@@ -10,8 +10,10 @@
 CXX = g++
 LD = g++
 LIB = ar
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK
-LDFLAGS = -g -pthread
+INC_DIRS = -I../ -I../monitoring
+
+CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
+LDFLAGS = -g -pthread ${INC_DIRS}
 LIBFLAGS = -cvq
 
 #
@@ -19,10 +21,10 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libaodv.a
-OBJ_LIB_FILES = RoutingProtocol.o aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o send_packet.o aodv_sim.o ../monitoring/network_monitor.o 
+OBJ_LIB_FILES = RoutingProtocol.o aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o send_packet.o aodv_sim.o
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
-INC_FILES = ${TARGET}.h RoutingProtocol.h aodv.h aodv_rreq.h aodv_rrep.h aodv_rerr.h aodv_routing_table.h send_packet.h aodv_sim.h aodv_params.h ../defines.h ../monitoring/network_monitor.h ../monitoring/monitor_info.h
+INC_FILES = ${TARGET}.h RoutingProtocol.h aodv.h aodv_rreq.h aodv_rrep.h aodv_rerr.h aodv_routing_table.h send_packet.h aodv_sim.h aodv_params.h defines.h network_monitor.h monitor_info.h
 
 ${TARGET}: ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
@@ -30,8 +32,8 @@ ${TARGET}: ${OBJ_FILES}
 	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES}
 	rm -f "*.o"
 
-%.o : %.cc ${INC_FILES}
-	${CXX} -c ${CXXFLAGS} -o $@ $<
+%.o : %.cc ${INC_FILES} ${INC_DIRS}
+	${CXX} -c ${CXXFLAGS} $ -o $@ $<
 
 run:
 	make 

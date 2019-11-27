@@ -33,3 +33,12 @@ void AdHocRouting::updatePairData(pair_data pairData)
     // TODO: It is doing more than battery... why is update local models doing that? 
     monitor->updateLocalModels();
 }
+
+void AdHocRouting::printGlobalVariables()
+{
+    if (DEBUG)
+    {
+        cout << "[DEBUG]: ROUTING_PORT: " << ROUTING_PORT << " DATA_PORT: " << DATA_PORT << " MONITOR_PORT: " << MONITOR_PORT 
+                << " LOCAL_DATA_UPDATE_RATE_MS: " << LOCAL_DATA_UPDATE_RATE_MS << endl;
+    }
+}

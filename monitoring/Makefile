@@ -10,8 +10,10 @@
 CXX = g++
 LD = g++
 LIB = ar
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK
-LDFLAGS = -g -std=c++11 -pthread
+INC_DIRS = -I../ -I../aodv
+
+CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
+LDFLAGS = -g -std=c++11 -pthread ${INC_DIRS}
 LIBFLAGS = -cvq
 
 #
@@ -24,7 +26,7 @@ OBJ_LIB_FILES = rem.o rem_model.o network_monitor.o ../aodv/*.o
 STATIC_LIBRARIES = ../aodv/libaodv.a
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h monitor_defines.h network_monitor.h ../aodv/RoutingProtocol.h ../defines.h
+INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h monitor_defines.h network_monitor.h RoutingProtocol.h defines.h
 
 SUBDIRS = ../aodv 
 

@@ -70,7 +70,7 @@ local_data NetworkMonitor::getLocalDataForNode(IP_ADDR nodeIp)
 pair_data NetworkMonitor::getPairDataBetweenNodes(IP_ADDR nodeIp, IP_ADDR ownerIp = -1)
 {
     // the default is with this node 
-    if (ownerIp == -1)
+    if (signed(ownerIp) == -1)
         ownerIp = m_parentIp;
 
     // we are looking at models from the ownderNodeId
@@ -80,6 +80,9 @@ pair_data NetworkMonitor::getPairDataBetweenNodes(IP_ADDR nodeIp, IP_ADDR ownerI
         if (data.pairIp == nodeIp)
             return data;
     }
+
+    pair_data empty;
+    return empty;
 }
 
 void NetworkMonitor::runClock(int duration)

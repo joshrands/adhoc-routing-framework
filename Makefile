@@ -10,8 +10,10 @@
 CXX = g++
 LD = g++
 LIB = ar
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK
-LDFLAGS = -g -pthread
+INC_DIRS = -I./aodv -I./monitoring -I./hardware -I./socket -I./
+
+CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
+LDFLAGS = -g -pthread ${INC_DIRS}
 LIBFLAGS = -cvq
 
 # You should be able to add object files here without changing anything else

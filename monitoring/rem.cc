@@ -160,7 +160,7 @@ void REM::handleMonitoringPacketBuffer(char* packet, int length, IP_ADDR source,
 
 double REM::getBatteryLevel(IP_ADDR ownerIp)
 {
-    if (ownerIp == -1)
+    if (signed(ownerIp) == -1)
     {
         return localBatteryModel.getDataPoint(getCurrentTimeMS());
     }
@@ -172,14 +172,14 @@ double REM::getBatteryLevel(IP_ADDR ownerIp)
 
 double REM::getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp = -1)
 {
-    if (ownerIp == -1)
+    if (signed(ownerIp) == -1)
     {
         // this is a local model
         return localRssModels[pairIp].getDataPoint(getCurrentTimeMS());
     }
     else 
     {
-        netRssModels[ownerIp][pairIp].getDataPoint(getCurrentTimeMS());        
+        return netRssModels[ownerIp][pairIp].getDataPoint(getCurrentTimeMS());        
     }
 }
 

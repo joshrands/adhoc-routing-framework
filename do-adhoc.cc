@@ -10,7 +10,7 @@ using namespace std;
 
 int main(){
     // This might be a double negative right now...
-    ROUTING_PORT = 13415;
+//    ROUTING_PORT = 13415;
     HardwareAODV haodv(inet_addr("192.168.1.1"));
 
     string message = "Hello World!";

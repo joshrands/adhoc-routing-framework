@@ -14,7 +14,7 @@
 #include "rem_parameters.h"
 #include "monitor_defines.h"
 #include "rem_packet.h"
-#include "../aodv/RoutingProtocol.h"
+#include "RoutingProtocol.h"
 
 #include <vector>
 #include <iostream>

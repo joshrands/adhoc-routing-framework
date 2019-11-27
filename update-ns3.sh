@@ -3,17 +3,14 @@
 
 [ -d "./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model" ] && rm -r ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
 mkdir ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
-mkdir ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model/aodv
-mkdir ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model/monitoring
 
 # copy aodv 
-cp -r ./aodv/*.h ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model/aodv
-cp -r ./aodv/*.cc ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model/aodv
-cp -r ./monitoring/*.h ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model/monitoring
-cp -r ./monitoring/*.cc ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model/monitoring
+cp -r ./aodv/*.h ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
+cp -r ./aodv/*.cc ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
+cp -r ./monitoring/*.h ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
+cp -r ./monitoring/*.cc ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
 
-rm ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model/aodv/test*
-rm ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model/monitoring/test*
+rm ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model/test*
 
 cp ./defines.h ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
 cp ./adhoc_routing.* ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model

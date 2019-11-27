@@ -7,7 +7,7 @@
  * Date: 11/2/2019
  ********************************/
 
-#include "../defines.h"
+#include "defines.h"
 struct local_data
 {
     double batteryLevel;
