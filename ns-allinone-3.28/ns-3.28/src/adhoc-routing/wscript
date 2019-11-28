@@ -21,6 +21,7 @@ def build(bld):
 				'model/network_monitor.cc',
 				'model/rem.cc',
 				'model/rem_model.cc',
+				'model/rem_sim.cc',
         'helper/adhoc-routing-helper.cc',
         ]
 
@@ -47,6 +48,7 @@ def build(bld):
 				'model/aodv_params.h',
 				'model/network_monitor.h',
 				'model/rem.h',
+				'model/rem_sim.h',
 				'model/rem_model.h',
 				'model/monitor_defines.h',
 				'model/monitor_info.h',

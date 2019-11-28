@@ -12,18 +12,18 @@
 
 #include "aodv.h"
 
-class AODVns3 : public AODV
+class AODVSim : public AODV
 {
 public:
     // constructors 
-    AODVns3();
-    AODVns3(IP_ADDR ip);
+    AODVSim();
+    AODVSim(IP_ADDR ip);
 
     // TODO: implement later with network monitoring
 	void getOneHopNeighbors();
 
     int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
-    function<int(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)> ns3SocketSendPacket;
+    function<int(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)> simSocketSendPacket;
 };
 
 #endif

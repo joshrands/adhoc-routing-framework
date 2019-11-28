@@ -1,7 +1,7 @@
 //#include "aodv/RoutingProtocol.h"
 //#include "monitoring/network_monitor.h"
-#include "aodv.h"
-#include "rem.h"
+#include "aodv_sim.h"
+#include "rem_sim.h"
 
 // class to combine routing and monitoring 
 class AdHocRouting
