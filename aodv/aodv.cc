@@ -193,7 +193,7 @@ void AODV::broadcastRREQBuffer(rreqPacket rreq) {
              << getStringFromIp(getIp()) << endl;
 
     char *rreqBuffer = RREQHelper::createRREQBuffer(rreq);
-    socketSendPacket(rreqBuffer, sizeof(rreq), getIpFromString(BROADCAST),
+    socketSendPacket(rreqBuffer, sizeof(rreq), getIpFromString(BROADCAST_STR),
                      ROUTING_PORT);
 
     delete rreqBuffer;
@@ -490,7 +490,7 @@ int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest,
                                int port) {
     for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++) {
         if ((dest == m_physicalNeighbors.at(i)->getIp() ||
-             dest == getIpFromString(BROADCAST)))
+             dest == getIpFromString(BROADCAST_STR)))
         {
             // send packet to this node
             AODVTest::lastReceive = m_physicalNeighbors.at(i)->getIp();

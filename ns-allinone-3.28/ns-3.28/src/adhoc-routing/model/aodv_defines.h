@@ -6,7 +6,7 @@
 #include <arpa/inet.h>
 #include "defines.h"
 
-#define BROADCAST           "255.255.255.255"
+#define BROADCAST_STR       "255.255.255.255"
 #define HEADER_SIZE         9
 
 #define GLOBAL_AODV_DEBUG   1

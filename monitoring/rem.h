@@ -19,8 +19,8 @@ public:
     //  static const int INIT_COUNT = 3; // DEPRECATED. REAL INIT_COUNT IN MODEL
     static const int HOP_COUNT = 2;
 
-    REM() : NetworkMonitor() { clusterHeadIp = getIpFromString(BROADCAST); routing = nullptr; } 
-    REM(IP_ADDR nodeIp) : NetworkMonitor(nodeIp) { clusterHeadIp = getIpFromString(BROADCAST); routing = nullptr; } 
+    REM() : NetworkMonitor() { clusterHeadIp = getIpFromString(BROADCAST_STR); routing = nullptr; } 
+    REM(IP_ADDR nodeIp) : NetworkMonitor(nodeIp) { clusterHeadIp = getIpFromString(BROADCAST_STR); routing = nullptr; } 
 
     // NS3-TODO:  void initialize(Ptr<Node> parent, Ptr<EnergySource> battery, Ptr<Socket> socket); // initialize node 'parent' with network monitoring service
     // temp:

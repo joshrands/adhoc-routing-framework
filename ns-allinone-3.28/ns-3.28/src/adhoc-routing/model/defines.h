@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #define IP_ADDR			    uint32_t
+#define BROADCAST_STR       "255.255.255.255"
 
 #define ROUTING_PORT        5555
 #define DATA_PORT           5432

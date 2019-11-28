@@ -3,6 +3,7 @@
 #define ADHOC_ROUTING_HELPER_H
 
 #include "ns3/adhoc_routing.h"
+#include "ns3/defines.h"
 #include "ns3/node.h"
 
 namespace ns3 {

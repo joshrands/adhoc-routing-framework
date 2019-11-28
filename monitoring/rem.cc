@@ -200,7 +200,7 @@ void REM::updateLocalBatteryModel(double batteryLevel)
         if (REM_DEBUG)
             cout << "[DEBUG]: Sending updated battery model from node " << getStringFromIp(m_parentIp) << endl;
 
-        sendUpdatedModel(&localBatteryModel, getIpFromString(BROADCAST));
+        sendUpdatedModel(&localBatteryModel, getIpFromString(BROADCAST_STR));
         // model has been broadcasted
         localBatteryModel.needsToBeBroadcasted = false;
     }
@@ -223,7 +223,7 @@ void REM::updateLocalRSSModel(IP_ADDR pairIp, double rss)
     // if the model needs to be broadcasted, do it! 
     if (localRssModels[pairIp].needsToBeBroadcasted)
     {
-        sendUpdatedModel(&(localRssModels[pairIp]), getIpFromString(BROADCAST));
+        sendUpdatedModel(&(localRssModels[pairIp]), getIpFromString(BROADCAST_STR));
         // model has been broadcasted
         localRssModels[pairIp].needsToBeBroadcasted = false;
     }
@@ -264,7 +264,7 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
         char* buffer = (char*)(malloc(size));
         memcpy(buffer, &packet, size);
 
-        routing->socketSendPacket(buffer, size, getIpFromString(BROADCAST), MONITOR_PORT);
+        routing->socketSendPacket(buffer, size, getIpFromString(BROADCAST_STR), MONITOR_PORT);
 
         delete buffer;
     }
