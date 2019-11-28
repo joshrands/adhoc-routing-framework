@@ -70,6 +70,8 @@ void REM::updateLocalModels()
     // clear pair monitoring data and update with new 
     pairMonitoringData.clear();
 
+    routing->resetLinks();
+
     auto it = localRssModels.begin();
     while (it != localRssModels.end())
     {
@@ -79,7 +81,11 @@ void REM::updateLocalModels()
             data.pairIp = it->first;
             data.rss = it->second.getDataPoint(getCurrentTimeMS());
 
-            pairMonitoringData[m_parentIp].push_back(data);
+            if (data.rss > RSS_OUT_OF_RANGE)
+            {
+                pairMonitoringData[m_parentIp].push_back(data);
+                routing->addExistingLink(data.pairIp);
+            }
         }
 
         it++;

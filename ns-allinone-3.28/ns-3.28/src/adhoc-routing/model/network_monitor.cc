@@ -21,8 +21,9 @@ NetworkMonitor::NetworkMonitor(IP_ADDR nodeIp)
         cout << "[DEBUG]: New monitoring service for Node " << m_parentIp << endl;
 
     // start thread for local data monitoring 
-    localUpdateThread = thread(runLocalModelUpdateThread, this, &(this->localUpdateMutex));
-    localUpdateThread.detach();
+    // start this thread for hardware implementations... 
+//    localUpdateThread = thread(runLocalModelUpdateThread, this, &(this->localUpdateMutex));
+//    localUpdateThread.detach();
 }
 
 NetworkMonitor::~NetworkMonitor()

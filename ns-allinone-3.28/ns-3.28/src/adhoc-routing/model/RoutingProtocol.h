@@ -16,6 +16,8 @@
 #include <iostream>
 #include <sstream>
 #include <math.h>
+#include <vector>
+#include <mutex>
 
 #include "aodv_defines.h"
 
@@ -63,6 +65,7 @@ protected:
 
 };
 
+static mutex globalMux;
 
 /* Routing Protocol base class */
 class RoutingProtocol
@@ -82,7 +85,19 @@ public:
 	// abstract function to be overwritten by child class 
 	virtual int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
 
+	// as there a link between this node and dest? 
+	virtual bool linkExists(IP_ADDR dest);
+	// function to reset the neighbors of this node to none 
+	void resetLinks();
+	// add this ip address to this list of current 1 hop neighbors 
+	void addExistingLink(IP_ADDR node);
+
+//	mutex m_linkMutex;
+
 protected:
+	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
+	vector<IP_ADDR> m_neighbors;
+
 	RoutingTable* table;	
 
 	uint32_t ipAddress;

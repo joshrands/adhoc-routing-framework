@@ -7,6 +7,7 @@
 namespace ns3 {
 
 /* ... */
+// TODO: Create a helper with ns3 aodv and sim rem 
 
 }
 

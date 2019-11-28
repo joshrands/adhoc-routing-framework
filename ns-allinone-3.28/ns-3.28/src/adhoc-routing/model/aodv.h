@@ -69,7 +69,6 @@ public:
 
 	// Network Monitoring
 	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port);
-	virtual bool linkExists(IP_ADDR dest);
 	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
 	virtual void getOneHopNeighbors();
 
@@ -87,8 +86,6 @@ protected:
 	uint32_t sequenceNum;
 	// node rreq id. Incremented by one during route discovery
 	uint32_t rreqID;
-	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
-	vector<IP_ADDR> m_neighbors;
 	// aodv routing table
 	AODVRoutingTable* m_aodvTable;
 	// current packet id index
