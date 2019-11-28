@@ -432,30 +432,6 @@ void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,
     }
 }
 
-bool AODV::linkExists(IP_ADDR dest) {
-    if (MONITOR_DEBUG)
-        cout << "[DEBUG]: Checking if link exists from "
-             << getStringFromIp(getIp()) << " to " << getStringFromIp(dest)
-             << endl;
-
-    // update current list of one hop neighbors
-    getOneHopNeighbors();
-
-    for (IP_ADDR ip : m_neighbors) {
-        if (dest == ip) {
-            if (MONITOR_DEBUG)
-                cout << "[DEBUG]: Link exists!" << endl;
-
-            return true;
-        }
-    }
-
-    if (MONITOR_DEBUG)
-        cout << "[DEBUG]: Link does not exist." << endl;
-
-    return false;
-}
-
 bool AODV::attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest) {
     if (MONITOR_DEBUG)
         cout << "[DEBUG]: Attempting local repair from broken link "
@@ -466,7 +442,9 @@ bool AODV::attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest) {
     return false;
 }
 
-void AODV::getOneHopNeighbors() {}
+void AODV::getOneHopNeighbors() {
+
+}
 
 void AODV::logRoutingTable() {
     ofstream logFile;
@@ -512,8 +490,7 @@ int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest,
                                int port) {
     for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++) {
         if ((dest == m_physicalNeighbors.at(i)->getIp() ||
-             dest == getIpFromString(BROADCAST))
-         && (MONITOR_PORT != port))
+             dest == getIpFromString(BROADCAST)))
         {
             // send packet to this node
             AODVTest::lastReceive = m_physicalNeighbors.at(i)->getIp();
@@ -525,6 +502,7 @@ int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest,
         }
         else 
         {
+            cout << getStringFromIp(dest) << " from " << getStringFromIp(this->ipAddress) << endl;
             if (AODV_DEBUG)
                 cout << "[DEBUG]: Testing sending monitoring packet..." << endl;
         }

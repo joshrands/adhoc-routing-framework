@@ -94,4 +94,41 @@ RoutingProtocol::RoutingProtocol()
 
 }
 
+bool RoutingProtocol::linkExists(IP_ADDR dest) {
+    if (MONITOR_DEBUG)
+        cout << "[DEBUG]: Checking if link exists from "
+             << getStringFromIp(getIp()) << " to " << getStringFromIp(dest)
+             << endl;
 
+	globalMux.lock();
+    for (IP_ADDR ip : m_neighbors) {
+        if (dest == ip) {
+            if (MONITOR_DEBUG)
+                cout << "[DEBUG]: Link exists!" << endl;
+
+			globalMux.unlock();
+            return true;
+        }
+    }
+
+	globalMux.unlock();
+
+    if (MONITOR_DEBUG)
+        cout << "[DEBUG]: Link does not exist." << endl;
+
+    return false;
+}
+
+void RoutingProtocol::resetLinks()
+{
+	globalMux.lock();
+	m_neighbors.clear();
+	globalMux.unlock();
+}
+
+void RoutingProtocol::addExistingLink(IP_ADDR node)
+{
+	globalMux.lock();
+	m_neighbors.push_back(node);
+	globalMux.unlock();
+}

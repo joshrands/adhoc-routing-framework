@@ -8,6 +8,10 @@ Author: Josh Rands
 
 ## To Do
 
+1. Make update local models abstract? Or at least make time match current system some how... 
+2. Update aodv get neighbors when local models are updated
+3. Move aodv updateNeighbors to generic NetworkMonitor
+
 ### Bugs
 
 0. Aodv's decodeReceivedPacket does not care about ports... if a data packet is sent with 0x01 as the first byte it will be classified as a RREQ message. 
