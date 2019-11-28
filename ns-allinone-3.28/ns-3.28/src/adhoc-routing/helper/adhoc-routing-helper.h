@@ -5,6 +5,8 @@
 #include "ns3/adhoc_routing.h"
 #include "ns3/defines.h"
 #include "ns3/node.h"
+#include "ns3/socket.h"
+#include <map>
 
 namespace ns3 {
 
@@ -16,8 +18,13 @@ public:
     // default constructor initializes everything 
     AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp);
 
+    static int AdHocSendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source);
+    void receivePacket (Ptr<Socket> socket);
+
 protected:
     Ptr<Node> m_node;
+
+    static std::map<IP_ADDR, Ptr<Node>> m_existingNodes;
 
 };
 

@@ -35,7 +35,7 @@ class Application;
 class Packet;
 class Address;
 class Time;
-
+class AdHocRoutingHelper;
 
 /**
  * \ingroup network
@@ -57,6 +57,9 @@ class Time;
 class Node : public Object
 {
 public:
+  IP_ADDR m_nodeIp;
+  AdHocRoutingHelper* m_AdHocRoutingHelper;
+
   /**
    * \brief Get the type ID.
    * \return the object TypeId

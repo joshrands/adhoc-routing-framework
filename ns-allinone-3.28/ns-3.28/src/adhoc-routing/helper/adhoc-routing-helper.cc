@@ -1,7 +1,6 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include "adhoc-routing-helper.h"
-#include "ns3/socket.h"
 #include "ns3/udp-socket-factory.h"
 #include "ns3/packet.h"
 #include "ns3/ipv4-header.h"
@@ -11,9 +10,13 @@
 
 namespace ns3 {
 
-int AdHocSendPacket(Ptr<Node> sourceNode, Ptr<Node> destNode, 
-                    char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
+std::map<IP_ADDR, Ptr<Node>> AdHocRoutingHelper::m_existingNodes;
+
+int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
 {
+    Ptr<Node> sourceNode = AdHocRoutingHelper::m_existingNodes[source];
+    Ptr<Node> destNode = AdHocRoutingHelper::m_existingNodes[dest];
+
     if (dest == getIpFromString(BROADCAST_STR))
     {
         // set destination to broadcast  
@@ -60,47 +63,52 @@ int AdHocSendPacket(Ptr<Node> sourceNode, Ptr<Node> destNode,
 
     return 0;
 }
-void AdHocReceivePacket (Ptr<Socket> socket)
+void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
 {
-/*
-  Ptr<Packet> packet;
-  while (packet = socket->Recv ())
+    Ptr<Packet> packet;
+    while (packet = socket->Recv ())
     {
-      NS_LOG_UNCOND ("Received a packet on Node " + to_string(socket->GetNode()->GetId()));
-      Ipv4Header header;
-      packet->RemoveHeader(header);
+        Ipv4Header header;
+        packet->RemoveHeader(header);
 
-      if (NS3_DEBUG)
-        cout << "Source = " << header.GetSource() << endl;
+        uint32_t length = packet->GetSize();
+        uint8_t* packetBuffer = (uint8_t*)(malloc(length));
 
-      uint32_t length = packet->GetSize();
-      uint8_t* packetBuffer = (uint8_t*)(malloc(length));
+        packet->CopyData(packetBuffer, length);
+        
+        Ptr<Ipv4> ipv4 =  socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
+        Ipv4Address addr = header.GetSource();// ipv4->GetAddress (1, 0).GetLocal ();  
+        uint16_t port = InetSocketAddress::ConvertFrom(addr).GetPort();  
 
-      packet->CopyData(packetBuffer, length);
-      
-      Ptr<Ipv4> ipv4 =  socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
-      Ipv4Address addr = header.GetSource();// ipv4->GetAddress (1, 0).GetLocal ();  
-      
-      // add aodv object 
-      uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
-      addr.Serialize(ipBuf);
+        // add aodv object 
+        uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
+        addr.Serialize(ipBuf);
 
-      IP_ADDR source;
-      memcpy(&(source),(ipBuf),4);
+        IP_ADDR source;
+        memcpy(&(source),(ipBuf),4);
 
-      //aodvMap[socket->GetNode()]->decodeReceivedPacketBuffer((char*)(packetBuffer), length, source);
+        pair_data data;
+        // TODO: Fill pair data 
+        data.pairIp = source;
+        data.rss = -50;
+
+        socket->GetNode()->m_AdHocRoutingHelper->receivePacketWithPairData((char*)(packetBuffer), length, source, port, data);
     }
-*/
 }
 
 AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp)
 {
     m_node = node;
+    m_node->m_AdHocRoutingHelper = this;
+
+    AdHocRoutingHelper::m_existingNodes[nodeIp] = node;
 
     // create a routing protocol 
     AODVSim* aodv = new AODVSim(nodeIp);
     this->routing = aodv;
     std::cout << "[WARNING]: Must override AODV simSocketSend" << std::endl;
+    aodv->simSocketSendPacket = &AdHocSendPacket;
+    std::cout << "[INFO]: Override successful." << std::endl;
 
     // create network monitoring 
     REMSim* rem = new REMSim();
@@ -109,7 +117,7 @@ AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp)
     this->monitor = rem;
     std::cout << "[WARNING]: Must override REM getSimulatedBattery and getSimulatedTime" << std::endl;
 
-    std::cout << "[WARNING]: Use AdHocRoutingHelper send and receive functions." << std::endl;
+    std::cout << "[WARNING]: Use AdHocRoutingHelper sendPacket and receivePacket functions." << std::endl;
 }
 
 }
