@@ -6,6 +6,8 @@
 #include "ns3/ipv4-header.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/ipv4.h"
+#include "ns3/simulator.h"
+#include "ns3/inet-socket-address.h"
 #include <iostream>
 
 namespace ns3 {
@@ -63,6 +65,7 @@ int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, 
 
     return 0;
 }
+
 void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
 {
     Ptr<Packet> packet;
@@ -77,10 +80,18 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         packet->CopyData(packetBuffer, length);
         
         Ptr<Ipv4> ipv4 =  socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
-        Ipv4Address addr = header.GetSource();// ipv4->GetAddress (1, 0).GetLocal ();  
-        uint16_t port = InetSocketAddress::ConvertFrom(addr).GetPort();  
+
+/*        Address address;
+        socket->GetPeerName (address);
+        InetSocketAddress iaddr = InetSocketAddress::ConvertFrom (address);
+
+        std::cout << "Received one packet!  Socket: " << iaddr.GetIpv4 () << " port: " << iaddr.GetPort ();
+        uint16_t port = iaddr.GetPort(); 
+*/
+        std::cout << "Received data on port " << socket->m_port << std::endl;
 
         // add aodv object 
+        Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal ();  
         uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
         addr.Serialize(ipBuf);
 
@@ -92,8 +103,18 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         data.pairIp = source;
         data.rss = -50;
 
-        socket->GetNode()->m_AdHocRoutingHelper->receivePacketWithPairData((char*)(packetBuffer), length, source, port, data);
+        socket->GetNode()->m_AdHocRoutingHelper->receivePacketWithPairData((char*)(packetBuffer), length, source, socket->m_port, data);
     }
+}
+
+uint32_t AdHocRoutingHelper::getNs3SimulatedTimeMS()
+{
+    return (uint32_t)Simulator::Now().GetMilliSeconds();
+}
+
+double AdHocRoutingHelper::getNs3SimulatedBattery(IP_ADDR nodeIp)
+{
+    return 100;
 }
 
 AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp)
@@ -111,11 +132,17 @@ AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp)
     std::cout << "[INFO]: Override successful." << std::endl;
 
     // create network monitoring 
-    REMSim* rem = new REMSim();
-    rem->initialize(nodeIp);
+    REMSim* rem = new REMSim(nodeIp);
+    rem->getSimulatedBatteryLevel = &(AdHocRoutingHelper::getNs3SimulatedBattery);
+    rem->getSimulatedTime = &(AdHocRoutingHelper::getNs3SimulatedTimeMS);
     rem->routing = aodv;
+
+    rem->initialize(nodeIp);
     this->monitor = rem;
     std::cout << "[WARNING]: Must override REM getSimulatedBattery and getSimulatedTime" << std::endl;
+    std::cout << "[INFO]: Override successful." << std::endl;
+
+    std::cout << "[WARNING]: Must start a recurring event to call monitor->updateLocalModels" << std::endl;
 
     std::cout << "[WARNING]: Use AdHocRoutingHelper sendPacket and receivePacket functions." << std::endl;
 }

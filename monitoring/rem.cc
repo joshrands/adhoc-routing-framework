@@ -7,6 +7,7 @@
 void REM::initialize(IP_ADDR parentIp)
 {
     m_parentIp = parentIp;
+    simStartTime = this->getCurrentTimeMS();
 
     if (REM_DEBUG)
         cout << "[DEBUG]: Initializing REM monitoring service for node " << getStringFromIp(m_parentIp) << endl;

@@ -13,8 +13,8 @@
 class REMSim : public REM 
 {
 public:
-    REMSim() : REM() { simStartTime = getCurrentTimeMS(); }
-    REMSim(IP_ADDR parentIp) : REM(parentIp) { simStartTime = getCurrentTimeMS(); }
+    REMSim() : REM() { }
+    REMSim(IP_ADDR parentIp) : REM(parentIp) { }
 
     double getCurrentBatteryLevel() override;
 
