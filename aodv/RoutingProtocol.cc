@@ -100,18 +100,18 @@ bool RoutingProtocol::linkExists(IP_ADDR dest) {
              << getStringFromIp(getIp()) << " to " << getStringFromIp(dest)
              << endl;
 
-	globalMux.lock();
+//	globalMux.lock();
     for (IP_ADDR ip : m_neighbors) {
         if (dest == ip) {
             if (MONITOR_DEBUG)
                 cout << "[DEBUG]: Link exists!" << endl;
 
-			globalMux.unlock();
+//			globalMux.unlock();
             return true;
         }
     }
 
-	globalMux.unlock();
+//	globalMux.unlock();
 
     if (MONITOR_DEBUG)
         cout << "[DEBUG]: Link does not exist." << endl;

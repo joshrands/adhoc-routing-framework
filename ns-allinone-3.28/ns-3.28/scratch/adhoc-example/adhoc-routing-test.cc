@@ -29,6 +29,7 @@
 #define maxSpeed_mpers    10
 #define xSize_m           500
 #define ySize_m           500
+#define LOCAL_MONITOR_INTERVAL  2
 
 #define NUM_NODES         10
 
@@ -71,6 +72,19 @@ void testAdHoc()
   Simulator::Schedule(Seconds(1.0), &testAdHoc);
 
   delete buffer;
+}
+
+void localMonitoring()
+{
+  map<Ptr<Node>, AdHocRoutingHelper*> adhocMap;
+  auto it = adhocMap.begin();
+  while (it != adhocMap.end())
+  {
+    it->second->monitor->updateLocalModels();
+    it++;
+  }
+
+  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
 }
 
 int main (int argc, char *argv[])
@@ -189,8 +203,11 @@ int main (int argc, char *argv[])
     IP_ADDR ip;
     memcpy(&(ip),(ipBuf),4);
 
+    nodes.Get(i)->m_nodeIp = ip;
     nodeMap[ip] = nodes.Get(i); 
+ 
     adhocMap[nodes.Get(i)] = new AdHocRoutingHelper(nodes.Get(i), ip);
+    nodes.Get(i)->m_AdHocRoutingHelper = adhocMap[nodes.Get(i)]; 
   }
 
   // Tracing
@@ -198,6 +215,7 @@ int main (int argc, char *argv[])
 //                       c, packetSize, numPackets, Seconds(1));
 
   Simulator::Schedule(Seconds(1.0), &testAdHoc);// &(aodvArray[1]->socketSendPacket), buffer, msg.length() + 5, aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
+  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
 
   Simulator::Stop (Seconds (duration + 10.0));
   Simulator::Run ();

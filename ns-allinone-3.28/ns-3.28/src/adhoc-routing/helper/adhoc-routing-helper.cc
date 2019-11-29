@@ -90,17 +90,19 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
 */
         std::cout << "Received data on port " << socket->m_port << std::endl;
 
-        // add aodv object 
-        Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal ();  
+        // add aodv object
+        Ipv4Address addr = header.GetSource(); 
         uint8_t* ipBuf = (uint8_t*)(malloc(4)); 
         addr.Serialize(ipBuf);
 
         IP_ADDR source;
         memcpy(&(source),(ipBuf),4);
 
+        std::cout << "Node " << getStringFromIp(socket->GetNode()->m_nodeIp) << " from Node " << getStringFromIp(source) << std::endl;
+
         pair_data data;
         // TODO: Fill pair data 
-        data.pairIp = source;
+        data.pairIp = source; 
         data.rss = -50;
 
         socket->GetNode()->m_AdHocRoutingHelper->receivePacketWithPairData((char*)(packetBuffer), length, source, socket->m_port, data);
