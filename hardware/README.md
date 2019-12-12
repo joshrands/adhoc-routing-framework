@@ -6,10 +6,17 @@ Hardware implementation of the Ad-hoc On demand Distance Vector routing protocol
 
 ## To-Do
 0. Add signal strength metric monitoring on packet receive 
+<<<<<<< HEAD
 2. Currently data packets that are for us are just printed out by AODV
     - We should create sperate functions for data from AODV, DATA, MONITOR 
     - We need to store data packets that aren't meant for us
 3. Add monitoring socket for monitor data
+=======
+1. Change test to show PASS FAIL on left hand side
+    i. Maybe look at coloring...
+2. Comment code
+3. Change transmission power using ioctl
+>>>>>>> be5df44df0646c2a8a71d9c9f37adaf21ebf5bb1
 
 ## How to test this code:
 0. In a terminal, cd into the hardware directory

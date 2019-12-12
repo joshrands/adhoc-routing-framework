@@ -1,11 +1,12 @@
 
 #include "rem.h"
-#include "../aodv/aodv.h"
+#include "aodv.h"
 
 #include <assert.h>
 #include "string.h"
 #include <cmath>
 #include <iostream>
+#include <thread>
 
 using namespace std;
 
@@ -25,7 +26,8 @@ void test(bool condition, string desc)
 void test_test();
 void test_battery_model();
 void test_rss_model();
-void test_rem();
+void test_packet_encode_decode();
+void test_local_update_thread();
 
 int main (int argc, char *argv[]) 
 {	
@@ -34,7 +36,8 @@ int main (int argc, char *argv[])
 	test_test();
 	test_battery_model();
 	test_rss_model();
-	test_rem();
+	test_packet_encode_decode();
+	test_local_update_thread();
 
 	cout << "[TESTS]: TESTS COMPLETE." << endl;
 
@@ -97,58 +100,54 @@ void test_rss_model()
 	cout << "[TESTS]: RSS model test complete." << endl;
 }
 
-void test_rem()
+void test_packet_encode_decode()
 {
 	IP_ADDR node1 = getIpFromString("192.168.0.1");
-	REMTest rem1;
-	// create a routing protocol 
-	AODVTest aodv1(node1);
-
-	rem1.routing = &aodv1;
-	rem1.initialize(node1);
-
 	IP_ADDR node2 = getIpFromString("192.168.0.2");
-	REMTest rem2; 
-	AODVTest aodv2(node2); 
 
-	rem2.routing = &aodv2;
-	rem2.initialize(node2);
+	REMTest remTest;
+	remTest.initialize(node1);
 
-	// connect nodes! 
-	aodv1.addNeighbor(&aodv2);
-	aodv2.addNeighbor(&aodv1);
+	// TODO: Add warnings if no routing protocol has been assigned... 
+	AODVTest aodvTest(node1);
+	remTest.routing = &aodvTest;
 
-	// test neighbors should not be detected yet 
-	test(rem1.isNodeOneHopNeighbor(node2) == false, "Node 2 should not be detected as a neighbor yet");
-	test(rem2.isNodeOneHopNeighbor(node1) == false, "Node 1 should not be detected as a neighbor yet");
+	// add data points 
+	// battery = 50 at time 0
+	remTest.updateLocalBatteryModel(remTest.getCurrentBatteryLevel());
+	remTest.runClock();
+	remTest.updateLocalBatteryModel(remTest.getCurrentBatteryLevel());
+	remTest.runClock();
+	remTest.updateLocalBatteryModel(remTest.getCurrentBatteryLevel());
+	remTest.runClock();
+	remTest.updateLocalBatteryModel(remTest.getCurrentBatteryLevel());
+	remTest.runClock();
 
-	// generate a battery model on node 1
-	for (int i = 0; i < 3; i++)
-	{
-		rem1.updateLocalBatteryModel(rem1.getCurrentBatteryLevel());
-		rem1.runClock();
-		rem1.drainBattery();	
-		rem2.updateLocalBatteryModel(rem2.getCurrentBatteryLevel());
-		rem2.runClock();
-		rem2.drainBattery();
+	REMModelPacket modelPacket = remTest.localBatteryModel.createREMModelPacket();
+	int length = sizeof(modelPacket);
+	char* buffer = (char*)(malloc(length));
+	memcpy(buffer, &(modelPacket), length);
 
-		// send hello messages! 
-		string msg = "Hello!";
-		char* buffer = (char*)(malloc(msg.length()));
-		memcpy(buffer, &(msg[0]), msg.length());
+	REMTest rem;
+	rem.initialize(node2);
 
-		aodv1.sendPacket(buffer, msg.length(), node2);
-		aodv2.sendPacket(buffer, msg.length(), node1);
-	}
+	AODVTest aodv(node2);
+	rem.routing = &aodv;
 
-	// both nodes should have received each others models 
+	rem.handleMonitoringPacketBuffer(buffer, length, node1, MONITOR_PORT);
 
-	// test neighbors should not be detected yet 
-	test(rem1.isNodeOneHopNeighbor(node2) == true, "Node 2 should be detected as a neighbor");
-	test(rem2.isNodeOneHopNeighbor(node1) == true, "Node 1 should be detected as a neighbor");
+	test(rem.getBatteryLevel(node1) == remTest.getCurrentBatteryLevel(), "Received network packet test: " + to_string(rem.getBatteryLevel(node1)));
 
-	test(rem1.getBatteryLevel(node2) == 94, "Node 1 assumed battery level of node 2: " + to_string(rem1.getBatteryLevel(node2)));
-	test(rem2.getBatteryLevel(node1) == 94, "Node 2 assumed battery level of node 1: " + to_string(rem2.getBatteryLevel(node1)));
+	cout << "[TESTS]: Packet encode decode tests complete." << endl;
+}
 
-	cout << "[TESTS]: REM tests complete." << endl;
+void test_local_update_thread()
+{
+	REMTest rem(getIpFromString("192.168.0.1"));
+	AODVTest aodv("192.168.0.1");
+	rem.routing = &aodv;
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(5000));
+
+	cout << "[TESTS]: Local update thread tests complete." << endl;
 }

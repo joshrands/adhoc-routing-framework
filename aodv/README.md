@@ -7,10 +7,13 @@ Abstract implementation of the Ad-hoc On demand Distance Vector routing protocol
 Modeled after RFC 3561: https://www.ietf.org/rfc/rfc3561.txt
 
 ## To-Do
-0. Change Sequence number duplicate RREQ check to check set of past received sequences
 1. Add ttl for sent packets and remove packets after time  
 2. Create function for sending all buffered packets for a destination IP 
 3. Create a function for creating new bufferedPacket in map 
+
+## Latest Features
+- Changed sequence number for duplicate RREQ to check set of past received sequences
+
 
 ## How to test this code:
 1. In a terminal, cd into the aodv directory

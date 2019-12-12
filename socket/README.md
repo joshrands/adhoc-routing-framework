@@ -8,8 +8,8 @@ which will be stored in a circular queue which overwrites the oldest data in the
 ## To-Do
 0. Add rssi metric monitoring to message class 
     - ioctl failed, look into packet sniffing (libpcap)
-2. Rework code to make Message a struct and remove Endpoint
-4. Comment code
+1. Rework code to make Message a struct and remove Endpoint
+2. Comment code
 
 ## How to test this code:
 0. In a terminal, cd into the socket directory

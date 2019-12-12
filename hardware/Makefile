@@ -11,8 +11,10 @@
 CXX = g++
 LD = g++
 LIB = ar
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK -Wall
-LDFLAGS = -g -pthread -I../socket/ -I../aodv/ -Wall
+INC_DIRS = -I../aodv -I../socket -I../
+
+CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK -Wall ${INC_DIRS}
+LDFLAGS = -g -pthread -I../socket/ -I../aodv/ -Wall ${INC_DIRS}
 LIBFLAGS = -cvq 
 
 #
@@ -25,7 +27,7 @@ OBJ_LIB_FILES = hardware_aodv.o ../aodv/*.o ../socket/*.o
 STATIC_LIBRARIES = ../socket/libsocket.a ../aodv/libaodv.a
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
-INC_FILES = hardware_aodv.h hardware_defines.h../defines.h
+INC_FILES = hardware_aodv.h hardware_defines.h defines.h
 
 SUBDIRS = ../aodv ../socket
 
