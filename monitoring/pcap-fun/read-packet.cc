@@ -1,12 +1,25 @@
 
 #include <iostream>
 
+#include <stdio.h>
+#include <pcap.h>
+
 using namespace std;
 
-int main()
+int main(int argc, char *argv[])
 {
-    cout << "Let's test some pcap stuff!" << endl;
+        pcap_t *handle;
+		char *dev, errbuf[PCAP_ERRBUF_SIZE];
 
-    return 0;
+        handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
+        if (handle == NULL) 
+        {
+            fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
+            return(2);
+        }
+
+        printf("Device: %s\n", dev);
+
+        return(0);
+
 }
-
