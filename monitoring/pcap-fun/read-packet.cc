@@ -10,8 +10,11 @@ int main(int argc, char *argv[])
 {
         pcap_t *handle;
 		char *dev, errbuf[PCAP_ERRBUF_SIZE];
+		
+        dev = argv[1];
 
         handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
+
         if (handle == NULL) 
         {
             fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
