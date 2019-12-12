@@ -23,17 +23,22 @@
  */
 
 #include "udp_socket.h"
-#include <cstring>
-#include <errno.h>
 using std::memset;
 
-UDPSocket::UDPSocket() : messages(UDP_QUEUE_SIZE) {}
+
+UDPSocket::UDPSocket() : messages(UDP_QUEUE_SIZE), Socket() {
+}
+
+UDPSocket::~UDPSocket(){ 
+  close(sockfd); 
+}
 
 bool UDPSocket::init(void) { 
   if(UDP_DEBUG){
     printf("[DEBUG]: Initializing udp socket\n");
   }
-  return initSocket(SOCK_DGRAM); 
+  bool result = initSocket(SOCK_DGRAM);
+  return result;
 }
 
 // Server initialization
@@ -63,6 +68,7 @@ bool UDPSocket::bindToPort(int port) {
   if(UDP_DEBUG){
     printf("[DEBUG]: Successful binding of udp socket to port %d\n", port);
   }
+
   return true;
 }
 
@@ -72,7 +78,6 @@ bool UDPSocket::joinMulticastGroup(const char *address) {
   // Set up group address
   mreq.imr_multiaddr.s_addr = inet_addr(address);
   mreq.imr_interface.s_addr = htonl(INADDR_ANY);
-  
 
   return setOption(IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 }
@@ -114,7 +119,7 @@ int UDPSocket::sendTo(char *buffer, int length, uint32_t dest, int port) {
   return sendTo(remote, buffer, length);
 }
 
-int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {
+int UDPSocket::receiveFrom(Endpoint &sender, char *buffer, int length) {
   // -1 if unsuccessful, else number of bytes received
   
   if (sockfd < 0){
@@ -124,10 +129,10 @@ int UDPSocket::receiveFrom(Endpoint &remote, char *buffer, int length) {
     return -1;
   }
   
-  remote.resetAddress();
-  socklen_t remoteHostLen = sizeof(remote.remoteHost);
+  sender.resetAddress();
+  socklen_t remoteHostLen = sizeof(sender.remoteHost);
   return recvfrom(sockfd, buffer, length, 0,
-                  (struct sockaddr *)&remote.remoteHost, &remoteHostLen);
+                  (struct sockaddr *)&sender.remoteHost, &remoteHostLen);
 }
 
 void UDPSocket::receiveFromPortThread() {
@@ -135,15 +140,23 @@ void UDPSocket::receiveFromPortThread() {
   // queue
   while (true) {
     char *buffer = (char *)malloc(MAXLINE * sizeof(char));
-    Endpoint client;
-    int n = receiveFrom(client, buffer, MAXLINE);
+    Endpoint sender;
+    int n = receiveFrom(sender, buffer, MAXLINE);
     if (n <= 0) {
       continue;
     }
     buffer[n] = '\0';
-    messages.push(Message(client, buffer, n));
-    // Need to find out why this is neccesary
-    
+
+    // Collect signal strength put in map
+    struct iw_statistics stats;
+    struct iwreq req;
+    memset(&stats, 0, sizeof(stats));
+    memset(&req, 0, sizeof(iwreq));
+    sprintf(req.ifr_name, INTERFACE_NAME);
+    req.u.data.pointer = &stats;
+    req.u.data.length = sizeof(iw_statistics);
+    int level = (stats.qual.updated & IW_QUAL_DBM)? -1 :stats.qual.level;
+    messages.push(Message(sender, buffer, n, level));
   }
 }
 

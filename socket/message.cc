@@ -1,9 +1,10 @@
 #include "message.h"
 
-Message::Message(Endpoint end, char* data, int length){
+Message::Message(Endpoint end, char* data, int length, int bitrate){
     this->end = end;
     this->data = data;
     this->length = length;
+    this->bitrate = bitrate;
 }
 
 uint32_t  Message::getAddressI(void) const{
@@ -26,11 +27,15 @@ char* Message::getData(void){
 }
 
 
-int Message::getPort(void){
+int Message::getPort(void) const{
     return end.getPort();
 }
 
 
 Endpoint& Message::getEndpoint(void){
     return end;
+}
+
+int Message::getBitrate(void) const{
+    return bitrate;
 }

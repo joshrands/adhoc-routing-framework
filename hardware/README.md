@@ -9,6 +9,7 @@ Hardware implementation of the Ad-hoc On demand Distance Vector routing protocol
 1. Change test to show PASS FAIL on left hand side
     i. Maybe look at coloring...
 2. Comment code
+3. Change transmission power using ioctl
 
 ## How to test this code:
 0. In a terminal, cd into the hardware directory
