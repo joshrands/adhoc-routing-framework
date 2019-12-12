@@ -82,8 +82,8 @@ int HardwareAODV::socketSendPacket(char *buffer, int length, IP_ADDR dest, int p
 // Class methods
 int HardwareAODV::handlePackets(){
     Message message;
-    int count = 0;
-    int count_data = 0;
+    unsigned int count = 0;
+    unsigned int count_data = 0;
     if(HARDWARE_DEBUG) printf("[DEBUG]: Handling received packets from AODV\n");
     while(aodvSocket->getMessage(message)){
         if(HARDWARE_DEBUG){
