@@ -562,13 +562,13 @@ int main(int argc, char **argv)
 
     // TRY the following: 
     // DLT_PRISM_HEADER, DLT_IEEE802_11_RADIO, DLT_IEEE802_11_RADIO_AVS
-    if(pcap_set_datalink(handle, DLT_IEEE802_11_RADIO_AVS) == -1) {
+    if(pcap_set_datalink(handle, DLT_IEEE802_11_RADIO) == -1) {
         printf("Couldn't set datalink type %s: %s\n", dev, pcap_geterr(handle));
     }
 
     /* make sure we're capturing on an Ethernet device [2] */
 //    if (pcap_datalink(handle) != DLT_EN10MB) {
-    if (pcap_datalink(handle) != DLT_IEEE802_11_RADIO_AVS) {
+    if (pcap_datalink(handle) != DLT_IEEE802_11_RADIO) {
         fprintf(stderr, "%s is not an 802_11 Radio\n", dev);
         exit(EXIT_FAILURE);
     }

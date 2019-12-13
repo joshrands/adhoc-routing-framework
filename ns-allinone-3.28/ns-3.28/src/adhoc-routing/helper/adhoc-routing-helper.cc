@@ -8,6 +8,7 @@
 #include "ns3/ipv4.h"
 #include "ns3/simulator.h"
 #include "ns3/inet-socket-address.h"
+#include "ns3/tag.h"
 #include <iostream>
 
 namespace ns3 {
@@ -71,6 +72,9 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
     Ptr<Packet> packet;
     while (packet = socket->Recv ())
     {
+        // get rss tag 
+        WifiTag
+
         Ipv4Header header;
         packet->RemoveHeader(header);
 
