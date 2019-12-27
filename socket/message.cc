@@ -1,10 +1,10 @@
 #include "message.h"
 
-Message::Message(Endpoint end, char* data, int length, int bitrate){
+Message::Message(Endpoint end, char* data, int length, int rssi){
     this->end = end;
     this->data = data;
     this->length = length;
-    this->bitrate = bitrate;
+    this->rssi = rssi;
 }
 
 uint32_t  Message::getAddressI(void) const{
@@ -36,6 +36,6 @@ Endpoint& Message::getEndpoint(void){
     return end;
 }
 
-int Message::getBitrate(void) const{
-    return bitrate;
+int Message::getRssi(void) const{
+    return rssi;
 }
