@@ -8,6 +8,8 @@ test
 /.vscode
 do-adhoc
 /hardware_testing/pi
+/monitoring/pcap-fun/read-packet
+
 
 # Prerequisites
 *.d

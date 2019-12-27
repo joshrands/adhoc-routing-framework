@@ -8,6 +8,7 @@
 #include "ns3/ipv4.h"
 #include "ns3/simulator.h"
 #include "ns3/inet-socket-address.h"
+#include "ns3/tag.h"
 #include <iostream>
 
 namespace ns3 {
@@ -74,6 +75,10 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         Ipv4Header header;
         packet->RemoveHeader(header);
 
+        // get rss data from packet 
+        WifiTag tag;
+        packet->PeekPacketTag(tag);
+
         uint32_t length = packet->GetSize();
         uint8_t* packetBuffer = (uint8_t*)(malloc(length));
 
@@ -103,7 +108,10 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         pair_data data;
         // TODO: Fill pair data 
         data.pairIp = source; 
-        data.rss = -50;
+        data.rss = tag.GetRssValue();
+
+        std::cout << "RSS: " << tag.GetRssValue() << std::endl;
+        std::cout << "RSS: " << data.rss << std::endl;
 
         socket->GetNode()->m_AdHocRoutingHelper->receivePacketWithPairData((char*)(packetBuffer), length, source, socket->m_port, data);
     }
