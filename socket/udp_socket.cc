@@ -107,7 +107,7 @@ int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
                 sizeof(remote.remoteHost));
   if(returnVal < 0){
     int errsv = errno;
-    printf("[ERROR] Could not send packet %s to %d\n", packet, remote.getAddressI());
+    printf("[ERROR] Could not send packet %s to %d\n", packet, remote.getAddressC());
     printf("[ERROR] %d\n", errsv);
   }
   return returnVal;
@@ -155,7 +155,7 @@ void UDPSocket::receiveFromPortThread() {
     req.u.data.length = sizeof(iw_statistics);  // Set pointers
     // Pull in data
     if(ioctl(sockfd, SIOCGIWSTATS, &req) == -1){
-      fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get TX strength\n", strerror(errno));
+      fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get RSS\n", strerror(errno));
     }
     int level = stats.qual.level; //
     
