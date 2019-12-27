@@ -5,7 +5,9 @@
 
 #define UDP_DEBUG DEBUG && 1
 #define SOCKET_DEBUG DEBUG && 1
+
 #define UDP_QUEUE_SIZE 20
-#define INTERFACE_NAME "wlp3s0"
+#define INTERFACE_NAME "lo"
+#define TX_PWR 10
 
 #endif

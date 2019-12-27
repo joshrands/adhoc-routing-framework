@@ -228,6 +228,14 @@ int main() {
 
     printf("________________________________\n\n");
 
+     // Test change transmission power
+    {
+        UDPSocket socket;
+        socket.bindToPort(8070);
+        test(socket.setTransmissionPower(TX_PWR), (string) "Can change transmission power of socket/interface");
+    }
+    printf("________________________________\n\n");
+
     // Test messages can be sent
     {
         // Create receiving socket

@@ -55,3 +55,41 @@ bool Socket::getOption(int level, int optname, void *optval, socklen_t *optlen) 
   return (getsockopt(sockfd, level, optname, optval, optlen) < 0) ? false : true;
 }
 void Socket::sclose() { close(sockfd); }
+
+int Socket::getTransmissionPower(){
+  // Structs for quering transmission power
+  struct iw_statistics stats;
+  struct iwreq req;
+  // Get transmission power
+  memset(&stats, 0, sizeof(stats)); // clear old data
+  memset(&req, 0, sizeof(iwreq));   // clear old data
+  sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
+  req.u.data.pointer = &stats; // Set pointers
+  req.u.data.length = sizeof(iw_statistics);  // Set pointers
+  // Pull in data
+  if(ioctl(sockfd, SIOCGIWTXPOW, &req) == -1){
+    fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get TX strength\n", strerror(errno));
+    return -1;
+  }
+  return req.u.txpower.value;   
+}
+
+bool Socket::setTransmissionPower(int txPwr){
+  // Structs for setting transmission power
+  struct iw_statistics stats;
+  struct iwreq req;
+  // Set transmission signal strength
+  memset(&stats, 0, sizeof(stats)); // clear old data
+  memset(&req, 0, sizeof(iwreq));   // clear old data
+  sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
+  req.u.data.pointer = &stats; // Set pointers
+  req.u.data.length = sizeof(iw_statistics);  // Set pointers
+  req.u.txpower.value = txPwr;
+  // Pull in data
+  if(ioctl(sockfd, SIOCSIWTXPOW, &req) == -1){
+    fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to set TX strength\n", strerror(errno));
+    return false;
+  }
+  // Check change was performed   
+  return getTransmissionPower() == txPwr;
+}

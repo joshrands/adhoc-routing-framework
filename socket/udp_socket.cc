@@ -40,45 +40,6 @@ bool UDPSocket::init(void) {
   }
   bool result = initSocket(SOCK_DGRAM);
 
-  /*
-  // Get transmission signal strength
-  memset(&stats, 0, sizeof(stats)); // clear old data
-  memset(&req, 0, sizeof(iwreq));   // clear old data
-  sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
-  req.u.data.pointer = &stats; // Set pointers
-  req.u.data.length = sizeof(iw_statistics);  // Set pointers
-  // Pull in data
-  if(ioctl(sockfd, SIOCGIWTXPOW, &req) == -1){
-    fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get TX strength\n", strerror(errno));
-  }   
-  if(UDP_DEBUG){
-    printf("[DEBUG]: Before change TXS is %d dBm\n", req.u.txpower.value);
-  }
-  // Set transmission signal strength
-  memset(&stats, 0, sizeof(stats)); // clear old data
-  memset(&req, 0, sizeof(iwreq));   // clear old data
-  sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
-  req.u.data.pointer = &stats; // Set pointers
-  req.u.data.length = sizeof(iw_statistics);  // Set pointers
-  req.u.txpower.value = 10;
-  // Pull in data
-  if(ioctl(sockfd, SIOCSIWTXPOW, &req) == -1){
-    fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to set TX strength\n", strerror(errno));
-  }   
-  // Get transmission signal strength
-  memset(&stats, 0, sizeof(stats)); // clear old data
-  memset(&req, 0, sizeof(iwreq));   // clear old data
-  sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
-  req.u.data.pointer = &stats; // Set pointers
-  req.u.data.length = sizeof(iw_statistics);  // Set pointers
-  // Pull in data
-  if(ioctl(sockfd, SIOCGIWTXPOW, &req) == -1){
-    fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get TX strength\n", strerror(errno));
-  }   
-  if(UDP_DEBUG){
-    printf("[DEBUG]: TXS is now %d dBm\n", req.u.txpower.value);
-  }
-  */
   return result;
 }
 
@@ -189,19 +150,6 @@ void UDPSocket::receiveFromPortThread() {
       continue;
     }
     buffer[n] = '\0';
-
-    // TODO: REMOVE OR FIX Collect signal strength (print)
-    memset(&stats, 0, sizeof(stats)); // clear old data
-    memset(&req, 0, sizeof(iwreq));   // clear old data
-    sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
-    req.u.data.pointer = &stats; // Set pointers
-    req.u.data.length = sizeof(iw_statistics);  // Set pointers
-    // Pull in data
-    if(ioctl(sockfd, SIOCGIWSTATS, &req) == -1){
-      fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get wireless stats \n", strerror(errno));
-    }   
-    printf("[TESTING SOME SHIT]: RSS is  %d\n", stats.qual.level);
-
 
     messages.push(Message(sender, buffer, n));
   }

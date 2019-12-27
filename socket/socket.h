@@ -33,7 +33,14 @@
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <sys/ioctl.h>
 #include <unistd.h>
+#include <linux/wireless.h>
+#include <cstring>
+#include <errno.h>
+#include <utility>
+
+#include "socket_defines.h"
 
 #define MAXLINE 1024
 
@@ -68,6 +75,22 @@ public:
   /*! Close the socket
    */
   void sclose();
+
+  /*!
+   * @brief Get the Transmission Power of the interface
+   * 
+   * @return transmission power in dBm or -1 on error
+   */
+  int getTransmissionPower();
+
+  /*!
+   * @brief Set the Transmission Power of the interface
+   * 
+   * @param txPwr
+   * @return true if set correctly
+   * @return false if unable to set or set correctly
+   */
+  bool setTransmissionPower(int txPwr);
 
 protected:
   int sockfd;
