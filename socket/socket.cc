@@ -39,7 +39,7 @@ bool Socket::initSocket(int type) {
 
   int fd = socket(AF_INET, type, 0);
   if (fd < 0) {
-    perror("[ERROR]: socket creation failed\n");
+    perror("[ERROR]: Socket creation failed\n");
     return false;
   }
   sockfd = fd;

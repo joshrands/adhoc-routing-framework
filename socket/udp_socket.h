@@ -138,6 +138,10 @@ public:
 private:
   // To hold threaded messages
   SafeCircularQueue<Message> messages;
+  // Structs for quering signal strength
+  struct iw_statistics stats;
+  struct iwreq req;
+
 };
 
 #endif

@@ -34,10 +34,51 @@ UDPSocket::~UDPSocket(){
 }
 
 bool UDPSocket::init(void) { 
+  // Call socket init
   if(UDP_DEBUG){
     printf("[DEBUG]: Initializing udp socket\n");
   }
   bool result = initSocket(SOCK_DGRAM);
+
+  /*
+  // Get transmission signal strength
+  memset(&stats, 0, sizeof(stats)); // clear old data
+  memset(&req, 0, sizeof(iwreq));   // clear old data
+  sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
+  req.u.data.pointer = &stats; // Set pointers
+  req.u.data.length = sizeof(iw_statistics);  // Set pointers
+  // Pull in data
+  if(ioctl(sockfd, SIOCGIWTXPOW, &req) == -1){
+    fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get TX strength\n", strerror(errno));
+  }   
+  if(UDP_DEBUG){
+    printf("[DEBUG]: Before change TXS is %d dBm\n", req.u.txpower.value);
+  }
+  // Set transmission signal strength
+  memset(&stats, 0, sizeof(stats)); // clear old data
+  memset(&req, 0, sizeof(iwreq));   // clear old data
+  sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
+  req.u.data.pointer = &stats; // Set pointers
+  req.u.data.length = sizeof(iw_statistics);  // Set pointers
+  req.u.txpower.value = 10;
+  // Pull in data
+  if(ioctl(sockfd, SIOCSIWTXPOW, &req) == -1){
+    fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to set TX strength\n", strerror(errno));
+  }   
+  // Get transmission signal strength
+  memset(&stats, 0, sizeof(stats)); // clear old data
+  memset(&req, 0, sizeof(iwreq));   // clear old data
+  sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
+  req.u.data.pointer = &stats; // Set pointers
+  req.u.data.length = sizeof(iw_statistics);  // Set pointers
+  // Pull in data
+  if(ioctl(sockfd, SIOCGIWTXPOW, &req) == -1){
+    fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get TX strength\n", strerror(errno));
+  }   
+  if(UDP_DEBUG){
+    printf("[DEBUG]: TXS is now %d dBm\n", req.u.txpower.value);
+  }
+  */
   return result;
 }
 
@@ -47,7 +88,7 @@ bool UDPSocket::bindToPort(int port) {
     printf("[DEBUG]: Binding udp socket to port %d\n", port);
   }
   if(sockfd < 0){
-    if (!initSocket(SOCK_DGRAM))
+    if (!init())
       return false;
   }
 
@@ -93,7 +134,7 @@ bool UDPSocket::setBroadcasting(bool broadcast) {
 // -1 if unsuccessful, else number of bytes written
 int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
   if(UDP_DEBUG){
-    printf("[DEBUG]: Sending %s to %s via UDP\n", packet, remote.getAddressC());
+    printf("[DEBUG]: Sending %s to %s\n", packet, remote.getAddressC());
   }
   if (sockfd < 0) {
     if(UDP_DEBUG){
@@ -107,7 +148,7 @@ int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
                 sizeof(remote.remoteHost));
   if(returnVal < 0){
     int errsv = errno;
-    printf("[ERROR] Could not send packet %s to %d\n", packet, remote.getAddressI());
+    printf("[ERROR] Could not send packet %s to %s\n", packet, remote.getAddressC());
     printf("[ERROR] %d\n", errsv);
   }
   return returnVal;
@@ -119,6 +160,7 @@ int UDPSocket::sendTo(char *buffer, int length, uint32_t dest, int port) {
   return sendTo(remote, buffer, length);
 }
 
+// TODO, change to return a message ???, maybe I don't know
 int UDPSocket::receiveFrom(Endpoint &sender, char *buffer, int length) {
   // -1 if unsuccessful, else number of bytes received
   
@@ -131,6 +173,7 @@ int UDPSocket::receiveFrom(Endpoint &sender, char *buffer, int length) {
   
   sender.resetAddress();
   socklen_t remoteHostLen = sizeof(sender.remoteHost);
+  
   return recvfrom(sockfd, buffer, length, 0,
                   (struct sockaddr *)&sender.remoteHost, &remoteHostLen);
 }
@@ -147,7 +190,19 @@ void UDPSocket::receiveFromPortThread() {
     }
     buffer[n] = '\0';
 
-    // Collect signal strength put in map
+    // TODO: REMOVE OR FIX Collect signal strength (print)
+    memset(&stats, 0, sizeof(stats)); // clear old data
+    memset(&req, 0, sizeof(iwreq));   // clear old data
+    sprintf(req.ifr_name, INTERFACE_NAME); // set interface name
+    req.u.data.pointer = &stats; // Set pointers
+    req.u.data.length = sizeof(iw_statistics);  // Set pointers
+    // Pull in data
+    if(ioctl(sockfd, SIOCGIWSTATS, &req) == -1){
+      fprintf(stderr, "[ioctl]: [ERROR]: threw error (%s) when trying to get wireless stats \n", strerror(errno));
+    }   
+    printf("[TESTING SOME SHIT]: RSS is  %d\n", stats.qual.level);
+
+
     messages.push(Message(sender, buffer, n));
   }
 }

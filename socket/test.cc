@@ -26,9 +26,9 @@ void test(bool condition, string desc)
 
 void test(bool condition, char *desc) {
     if (condition) {
-        cout << GREEN << "[PASS]: " << desc << endl;
+        cout << GREEN << "[PASS]: " << desc << END;
     } else
-        cout << RED << "[FAIL]: " << desc <<endl;
+        cout << RED << "[FAIL]: " << desc << END;
 }
 
 bool getYesNo(string message) {
