@@ -197,6 +197,7 @@ int main (int argc, char *argv[])
   ipv4.SetBase ("192.168.1.0", "255.255.255.0");
   ipv4.Assign (devices);
 
+  vector<Vector> currentPositions;
   for(int i = 0; i < numNodes; i++){
     Ptr<Socket> routeSink = Socket::CreateSocket (nodes.Get (i), UdpSocketFactory::GetTypeId ());
     InetSocketAddress localRouting = InetSocketAddress (Ipv4Address::GetAny (), ROUTING_PORT);
@@ -230,6 +231,11 @@ int main (int argc, char *argv[])
  
     adhocMap[nodes.Get(i)] = new AdHocRoutingHelper(nodes.Get(i), ip);
     nodes.Get(i)->m_AdHocRoutingHelper = adhocMap[nodes.Get(i)]; 
+
+    Vector pos = nodes.Get(i)->GetObject<RandomWaypointMobilityModel>()->GetPosition();
+    if (DEBUG)
+      cout << "[DEBUG]: Node " << i << " at " << pos.x << ", " << pos.y << endl;
+    currentPositions.push_back(pos);
   }
 
   // Tracing
@@ -238,6 +244,8 @@ int main (int argc, char *argv[])
 
   Simulator::Schedule(Seconds(1.0), &testAdHoc);// &(aodvArray[1]->socketSendPacket), buffer, msg.length() + 5, aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
   Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
+  // Drain battery
+  Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);
 
   Simulator::Stop (Seconds (duration + 10.0));
   Simulator::Run ();
