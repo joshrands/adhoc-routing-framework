@@ -2603,6 +2603,8 @@ WifiPhy::StartReceivePacket (Ptr<Packet> packet,
     }
 }
 
+#include <iostream>
+
 void
 WifiPhy::EndReceive (Ptr<Packet> packet, WifiPreamble preamble, MpduType mpdutype, Ptr<InterferenceHelper::Event> event)
 {
@@ -2621,7 +2623,8 @@ WifiPhy::EndReceive (Ptr<Packet> packet, WifiPreamble preamble, MpduType mpdutyp
                     ", snr(dB)=" << RatioToDb (snrPer.snr) << ", per=" << snrPer.per << ", size=" << packet->GetSize ());
 
 			// add RSS information tag to packet
-      uint32_t rss = RatioToDb(event->GetRxPowerW()) + 30;
+      double rss = RatioToDb(event->GetRxPowerW()) + 30;
+//      std::cout << "Packet RSS : " << rss << std::endl;
 
       WifiTag tag;
       tag.SetRssValue(rss);

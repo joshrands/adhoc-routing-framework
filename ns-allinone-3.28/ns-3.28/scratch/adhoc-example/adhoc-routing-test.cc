@@ -110,6 +110,9 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::WifiRemoteStationManager::NonUnicastMode",
                       StringValue (phyMode));
 
+  Packet::EnableChecking();
+  Packet::EnablePrinting();
+
   nodes.Create (numNodes);
 
   // The below set of helpers will help us to put together the wifi NICs we want

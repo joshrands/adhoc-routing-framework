@@ -89,11 +89,11 @@ public:
   virtual void Print(std::ostream &os) const;
 
   // getter for wifi tag
-  void SetRssValue(uint32_t value);
-  uint32_t GetRssValue(void) const;
+  void SetRssValue(double value);
+  double GetRssValue(void) const;
 
 private:
-  uint32_t m_Rss;
+  double m_Rss;
 };
 
 } // namespace ns3
