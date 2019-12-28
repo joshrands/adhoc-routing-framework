@@ -38,6 +38,10 @@
 #include "ns3/wifi-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/packet.h"
+#include "ns3/basic-energy-source-helper.h"
+#include "ns3/basic-energy-source.h"
+
+#include "battery-drain.h"
 
 #include <iostream>
 
@@ -46,6 +50,7 @@ using namespace ns3;
 NodeContainer nodes;
 map<Ptr<Node>, AdHocRoutingHelper*> adhocMap;
 map< IP_ADDR, Ptr<Node> > nodeMap;
+EnergySourceContainer energySources;
 
 void ReceiveCallback(Ptr<Socket> socket)
 {
@@ -144,6 +149,20 @@ int main (int argc, char *argv[])
   // Set it to adhoc mode
   wifiMac.SetType ("ns3::AdhocWifiMac");
   NetDeviceContainer devices = wifi.Install (wifiPhy, wifiMac, nodes);
+
+  /* ADD ENERGY MODEL */
+  BasicEnergySourceHelper basicSourceHelper;
+  // configure energy source
+  basicSourceHelper.Set("BasicEnergySourceInitialEnergyJ", DoubleValue(500.0));
+  // install source
+  energySources = basicSourceHelper.Install(nodes);
+  // device energy model
+  WifiRadioEnergyModelHelper radioEnergyHelper;
+  // configure radio energy model
+  radioEnergyHelper.Set("TxCurrentA", DoubleValue(0.0174));
+  // install device model
+  DeviceEnergyModelContainer deviceModels = radioEnergyHelper.Install(devices, energySources);
+  /********************/
 
   // Note that with FixedRssLossModel, the positions below are not
   // used for received signal strength.
