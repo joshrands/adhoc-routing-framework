@@ -9,7 +9,7 @@ using namespace std;
 
 int main() {
 	int id = 0;
-	string file = "sc_orbits.txt";
+	string file = "sc_orbits_test3.txt";
 	LOS test(id, file);
 	// cout << test.fileName << endl;
 
@@ -20,6 +20,15 @@ int main() {
 
 	test.scalePositions(2);
 	cout << "Asteroid radius is: " << test.asteroid_radius << endl;
+
+	double relativePositionInfo[4];
+	test.distanceBetweenSC(1, 3, relativePositionInfo);
+	double distance = relativePositionInfo[3];
+	cout << "Distance between s/c is:" << distance << endl;
+	cout << "x:" << relativePositionInfo[0] << endl;
+	cout << "y:" << relativePositionInfo[1] << endl;
+	cout << "z:" << relativePositionInfo[2] << endl;
+
 
 	return 0;
 }
