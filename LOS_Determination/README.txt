@@ -11,7 +11,7 @@ Visual Studios has a handful of files that it created when the code was being de
 These have been omitted.
 
 There are 4 files:
-- testProgram -   This file runs a series of tests to ensure the program is working properly.
+- verificationTests.cpp -   This file runs a series of tests to ensure the program is working properly.
 - LOS.h -         This header file declares a class and a struct that will be used heavily. Functions are defined in defineLOS.cpp
 - defineLOS.cpp - This file is the real meat of this small project. Functions declared in LOS.h are defined here
 - sc_orbits.txt - This text file has all of the 3D position vectors over time for each spacecraft (including carrier)
