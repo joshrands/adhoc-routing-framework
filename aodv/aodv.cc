@@ -43,18 +43,19 @@ AODV::~AODV() {
     delete this->m_aodvTable;
     m_aodvTable = NULL;
 
+
     for (map<IP_ADDR, queue<pair<char *, int>>>::iterator it =
              rreqPacketBuffer.begin();
          it != rreqPacketBuffer.end(); ++it) {
         // remove all packets from this queue
+        
         queue<pair<char *, int>> packetQueue = it->second;
+        
         while (packetQueue.size() > 0) {
+            packetQueue.pop();
             pair<char *, int> package = packetQueue.front();
             delete package.first;
-
-            packetQueue.pop();
         }
-        this->rreqPacketBuffer.erase(it->first);
     }
 }
 
@@ -452,7 +453,7 @@ void AODV::logRoutingTable() {
                  ios::out);
 
     if (logFile.is_open())
-        logFile << "AODV Log for node " << this->getIp() << endl;
+        logFile << "AODV Log for node " << getStringFromIp(this->getIp()) << endl;
 
     // check if there are any entries
     if (this->getTable()->getInternalAODVTable().size() == 0) {
@@ -464,13 +465,12 @@ void AODV::logRoutingTable() {
 
     logFile << "DESTINATION IP : NEXT HOP : TOTAL HOPS : STATUS" << endl;
 
-    for (it = this->getTable()->getInternalAODVTable().begin();
-         it != this->getTable()->getInternalAODVTable().end(); it++) {
-        logFile << getStringFromIp(it->first) << " : "
-                << getStringFromIp(it->second.nextHop) << " : "
-                << to_string(it->second.hopCount);
+    for (auto it : this->getTable()->getInternalAODVTable()) {
+        logFile << getStringFromIp(it.first) << " : "
+                << getStringFromIp(it.second.nextHop) << " : "
+                << to_string(it.second.hopCount);
 
-        if (getTable()->getIsRouteActive(it->first))
+        if (getTable()->getIsRouteActive(it.first))
             logFile << " : ACTIVE" << endl;
         else
             logFile << " : INACTIVE" << endl;
@@ -478,8 +478,7 @@ void AODV::logRoutingTable() {
 
     logFile.close();
 
-    while (logFile.is_open())
-        ;
+    while (logFile.is_open());
 }
 
 int AODVTest::globalPacketCount = 0;
