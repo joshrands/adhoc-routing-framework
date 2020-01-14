@@ -54,7 +54,7 @@ public:
 	 * @brief Sets the function to be called when data is received 
 	 * @param callback function to call on the data
 	 */
-	void setDataCallback(bool (*callback)(char*, int));
+	void setDataCallback(void (*callback)(char*, int));
 
 	// RREQ - Route Request 
 	RREQHelper rreqHelper;
@@ -99,7 +99,7 @@ protected:
 	// map of destination and recently sent packets (packets will time out after a short time) 
 	map<IP_ADDR, queue<packet>> unackedPacketBuffer;
 	// data received callback. Handles the logic of what to do once a data packet is received
-	bool (*data_callback)(char*, int) = nullptr;
+	void (*data_callback)(char*, int) = nullptr;
 };
 
 /* AODVTest class

@@ -115,6 +115,10 @@ void AODV::handleData(char *packet, int length, IP_ADDR source) {
         logRoutingTable();
 }
 
+void AODV::setDataCallback(void (*callback)(char*, int)){
+    data_callback = callback;
+}
+
 void AODV::sendPacket(char *packet, int length, IP_ADDR finalDestination,
                       IP_ADDR origIP) {
     // by default this node is the originator

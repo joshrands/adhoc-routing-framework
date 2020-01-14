@@ -11,6 +11,8 @@ const string RED = "\033[1;31m";
 const string GREEN = "\033[1;32m";
 const string END = "\033[0m\n";
 
+char* received;
+
 void test(bool condition, string desc)
 {
 	if (condition)
@@ -27,6 +29,8 @@ void test_aodv_rreq();
 void test_aodv_loop_prevention();
 void test_aodv_do_nothing();
 void test_aodv_link_break();
+void test_aodv_data_callback();
+void test_callback(char*, int);
 
 int main (int argc, char *argv[]) 
 {	
@@ -109,6 +113,7 @@ void test_aodv()
 	test_aodv_loop_prevention();
 	test_aodv_do_nothing();
 	test_aodv_link_break();
+	test_aodv_data_callback();
 }
 
 void test_aodv_rreq_simple()
@@ -367,5 +372,36 @@ void test_aodv_link_break()
 	node2.logRoutingTable();
 	node3.logRoutingTable();
 	node4.logRoutingTable();
+}
 
+void test_callback(char* data, int length){
+	received = (char*)malloc(length-8);
+	for(int i = 9; i < length;i++){
+		received[i-9] = data[i];
+	}
+}
+
+void test_aodv_data_callback(){
+	AODVTest node0(getIpFromString("192.168.1.0"));
+	AODVTest node1(getIpFromString("192.168.1.1"));
+	node1.setDataCallback(test_callback);
+	node0.addNeighbor(&node1);
+	node1.addNeighbor(&node0);
+
+	// send a packet from node 0 to node 3
+	string msg = "Hello node 1! From node 0";
+	int length = msg.length();
+	char* buffer = (char*)(malloc(length));
+	for (int i = 0; i < length; i++)
+		buffer[i] = msg.at(i);
+
+	node0.sendPacket(buffer, length, node1.getIp());	
+
+	delete buffer;
+
+	bool same = true;
+	for(int i = 0; i < msg.length(); i++){
+		same = same && (msg.at(i) == received[i]);
+	}
+	test(same, "Callback function for data works");
 }
