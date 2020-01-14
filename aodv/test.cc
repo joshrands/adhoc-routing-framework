@@ -165,7 +165,6 @@ void test_aodv_rreq_forwarding()
 	rreq = node4.rreqHelper.createForwardRREQ(rreq, node3.getIp());
 
 	// Create RREP! 
-
 	test(rreq.hopCount == 4, "rreq.hopCount == 4");
 
 	// check routing table update 

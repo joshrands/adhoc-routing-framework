@@ -59,7 +59,7 @@ AODV::~AODV() {
     }
 }
 
-void AODV::receivePacket(char *packet, int length, IP_ADDR source) {
+void AODV::handleData(char *packet, int length, IP_ADDR source) {
     // get final destination
     IP_ADDR finalDestination;
     memcpy(&finalDestination, &(packet[1]), 4);
@@ -68,7 +68,14 @@ void AODV::receivePacket(char *packet, int length, IP_ADDR source) {
 
     if (this->getIp() == finalDestination) {
         // packet has reached its final destination!
-        receivedPackets.emplace_back(pair<char *, int>(packet, length));
+        // call callback, if available
+        if(data_callback != nullptr){
+            data_callback(packet, length);
+        }else if(AODV_DEBUG){
+            printf("[DEBUG]: Data callback is not set, no operations performed\n");
+        }
+
+        // log AODV packet
         if (AODV_PRINT_PACKET) {
             cout << "[PACKET]: Node " << getStringFromIp(this->getIp())
                  << " received packet: " << endl;
@@ -234,7 +241,7 @@ void AODV::decodeReceivedPacketBuffer(char *buffer, int length,
     else if (DATA_PORT == port) 
     {
         // on data port! receive packet like normal  
-        receivePacket(buffer, length, source);
+        handleData(buffer, length, source);
     }
     else 
     {

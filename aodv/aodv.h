@@ -40,15 +40,21 @@ public:
 	AODV(IP_ADDR ip);
 	~AODV();
 
-	// handle received data. if not in routing table, attempt local fix and then RERR 
-	void receivePacket(char* packet, int length, IP_ADDR source);
 	// try to send data to a destination - the next hop is determined from the routing table  
 	void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP = -1);
 
-//	static int ROUTING_PORT;
+	//	static int ROUTING_PORT;
 
 	// decode a received packet buffer from UPD port 654
 	void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source, int port);
+
+	// handle received data. if not in routing table, attempt local fix and then RERR 
+	void handleData(char* packet, int length, IP_ADDR source);
+	/*!
+	 * @brief Sets the function to be called when data is received 
+	 * @param callback function to call on the data
+	 */
+	void setDataCallback(bool (*callback)(char*, int));
 
 	// RREQ - Route Request 
 	RREQHelper rreqHelper;
@@ -92,8 +98,8 @@ protected:
 	uint32_t packetIdCount;	
 	// map of destination and recently sent packets (packets will time out after a short time) 
 	map<IP_ADDR, queue<packet>> unackedPacketBuffer;
-	// store received data packets which are for this ip
-	vector<pair<char*, int>> receivedPackets;
+	// data received callback. Handles the logic of what to do once a data packet is received
+	bool (*data_callback)(char*, int) = nullptr;
 };
 
 /* AODVTest class
