@@ -29,11 +29,19 @@ void test(bool condition, char *desc) {
         cout << RED << "[FAIL]: " << desc <<endl;
 }
 
+void print_callback(char* data, int length){
+    printf("[CALLBACK]: ");
+    for(int i = 0; i < length; i++){
+        printf("%c", data[i]);
+    }
+    printf("\n");
+}
 
 int main() {
     // Test initialization and ports
     {
         HardwareAODV haodv(getIpFromString("127.0.0.1"));
+        haodv.setDataCallback(print_callback);
         char *msg = (char *)(malloc(16));
         string message = "Hello World!";
         memcpy(msg, &message, 16);
@@ -42,10 +50,6 @@ int main() {
         haodv.sendPacket(msg, 16, getIpFromString("127.0.0.2"));
 
         haodv.handlePackets();
-        for (auto packet : haodv.getDataPackets()) {
-            printPacket(stdout, packet.getData(), packet.getLength());
-            printf("\n");
-        }
     }
 
     printf("________________________________\n\n");

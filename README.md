@@ -7,10 +7,11 @@ Classes designed for physical implementation and simulated implementation of an 
 Author: Josh Rands
 
 ## To Do
-
 1. Make update local models abstract? Or at least make time match current system some how... 
 2. Update aodv get neighbors when local models are updated
 3. Move aodv updateNeighbors to generic NetworkMonitor
+4. Create ROS Node Wrapper
+5. Implement hardware monitoring
 
 ### Bugs
 

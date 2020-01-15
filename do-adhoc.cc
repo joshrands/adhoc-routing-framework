@@ -8,10 +8,19 @@
 
 using namespace std;
 
+void print_callback(char* data, int length){
+    printf("[ADHOC]: ");
+    for(int i = 0; i < length; i++){
+        printf("%c", data[i]);
+    }
+    printf("\n");
+}
+
 int main(){
     // This might be a double negative right now...
 //    ROUTING_PORT = 13415;
     HardwareAODV haodv(inet_addr("192.168.1.1"));
+    haodv.setDataCallback(print_callback);
 
     string message = "Hello World!";
     char buffer[200];
@@ -36,13 +45,5 @@ int main(){
         if(handleCount > 0){
             printf("Handled %d AODV packets\n", handleCount);
         }
-        // get data packets
-        printf("Received data:\n");
-        for(auto packet : haodv.getDataPackets()){
-            printPacket(stdout, packet.getData(), packet.getLength());
-            printf(" from %s\n", getStringFromIp(packet.getAddressI()));
-        }
-        
-
     }
 }

@@ -48,13 +48,6 @@ public:
      * @return -1 if no packets or the number of packets handled
      */
     int handlePackets();
-
-    /*!
-     * @brief Returns one of the packets on the data socket
-     * 
-     * @return vector of received packets
-     */
-    vector<Message> getDataPackets();
 };
 
 /*!

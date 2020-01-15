@@ -6,10 +6,7 @@ UDP Sockets and helper classes. Sockets can have threaded listening on a port wh
 which will be stored in a circular queue which overwrites the oldest data in the queue
 
 ## To-Do
-0. Add rssi metric monitoring to message class 
-    - ioctl failed, look into packet sniffing (libpcap)
-1. Rework code to make Message a struct and remove Endpoint
-2. Comment code
+0. Rework code to make Message a struct and remove Endpoint
 
 ## How to test this code:
 0. In a terminal, cd into the socket directory
