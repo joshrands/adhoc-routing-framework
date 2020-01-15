@@ -8,6 +8,21 @@ Author: Josh Rands
 
 ## To Do
 
+### Overhaul
+
+Planned overhaul of code architecture:
+
+AdHocRouting - wrapper for sending and receive packets on the network
+
+Monitoring - handle the monitoring of the network and links for routing 
+
+RoutingProtocol - send and recieve packets using underlying routing protocol and also deliver to the correct Port (Transport layer) 
+
+Update AdhocRouting receive packet to use high level abstract receive packet of member routing protocol 
+  - adhoc-routing-helper receive packet should be in AODVSim handlePackets
+
+### Other Things
+
 1. Make update local models abstract? Or at least make time match current system some how... 
 2. Update aodv get neighbors when local models are updated
 3. Move aodv updateNeighbors to generic NetworkMonitor
