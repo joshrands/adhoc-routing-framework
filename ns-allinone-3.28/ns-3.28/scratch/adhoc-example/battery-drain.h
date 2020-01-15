@@ -1,6 +1,7 @@
 #include <iostream>
 #include "ns3/vector.h"
 #include "ns3/random-waypoint-mobility-model.h"
+#include "ns3/basic-energy-source.h"
 
 using namespace std;
 using namespace ns3;

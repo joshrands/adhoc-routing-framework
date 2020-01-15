@@ -10,6 +10,8 @@
 #include "ns3/inet-socket-address.h"
 #include "ns3/tag.h"
 #include "ns3/udp-header.h"
+#include "ns3/basic-energy-source.h"
+
 #include <iostream>
 
 namespace ns3 {

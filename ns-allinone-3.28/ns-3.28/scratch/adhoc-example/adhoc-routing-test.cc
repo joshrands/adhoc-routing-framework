@@ -39,7 +39,6 @@
 #include "ns3/internet-module.h"
 #include "ns3/packet.h"
 #include "ns3/basic-energy-source-helper.h"
-#include "ns3/basic-energy-source.h"
 
 #include "battery-drain.h"
 
@@ -74,7 +73,7 @@ void testAdHoc()
   IP_ADDR dest = it->first;
   adhoc->sendPacket(buffer, msg.length(), dest); 
 
-  Simulator::Schedule(Seconds(1.0), &testAdHoc);
+  Simulator::Schedule(Seconds(2.0), &testAdHoc);
 
   delete buffer;
 }
