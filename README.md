@@ -12,6 +12,7 @@ Author: Josh Rands
 3. Move aodv updateNeighbors to generic NetworkMonitor
 4. Create ROS Node Wrapper
 5. Implement hardware monitoring
+6. Implement GPS LOS for network monitoring
 
 ### Bugs
 

@@ -96,8 +96,6 @@ protected:
 	AODVRoutingTable* m_aodvTable;
 	// current packet id index
 	uint32_t packetIdCount;	
-	// map of destination and recently sent packets (packets will time out after a short time) 
-	map<IP_ADDR, queue<packet>> unackedPacketBuffer;
 	// data received callback. Handles the logic of what to do once a data packet is received
 	void (*data_callback)(char*, int) = nullptr;
 };

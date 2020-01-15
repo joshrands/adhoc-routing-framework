@@ -7,6 +7,9 @@ Abstract implementation of network monitoring for virtual and physical environme
 ## To-Do
 0. Start a thread for locally available network monitoring 
 1. Add call to store RSS in routing receive packet 
+2. Create abstraction for models
+3. Implement hello monitoring
+4. Implement hardware rem
 
 ## How to test this code:
 1. In a terminal, cd into the aodv directory

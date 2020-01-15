@@ -7,16 +7,14 @@ Abstract implementation of the Ad-hoc On demand Distance Vector routing protocol
 Modeled after RFC 3561: https://www.ietf.org/rfc/rfc3561.txt
 
 ## To-Do
-1. Add ttl for sent packets and remove packets after time  
+1. Add ttl for sent packets and remove packets after time 
+ - so that packets can be recovered in case of RERR 
+ - Use circular queue
 2. Create function for sending all buffered packets for a destination IP 
 3. Create a function for creating new bufferedPacket in map 
 4. Increase generalization for data_callback
 
 ## Questions
-1. Is [this](aodv.h:100) being used? 
-2. What needs to be [here](aodv.cc:147)?
-3. ttl and remove packets (what about using circular queue)?
-4. no link checking, how/when do we implement this?
 
 ## Latest Features
 - Changed sequence number for duplicate RREQ to check set of past received sequences

@@ -98,8 +98,7 @@ void AODV::handleData(char *packet, int length, IP_ADDR source) {
 
             logFile.close();
 
-            while (logFile.is_open())
-                ;
+            while (logFile.is_open());
         }
 
         return;
@@ -278,8 +277,7 @@ void AODV::handleRREQ(char *buffer, int length, IP_ADDR source) {
 
     // 3. should we generate a rrep? are we the final destination?
     if (rreqHelper.shouldGenerateRREP(rreq)) {
-        // generate a rreq message from this rreq
-        // TODO: Implement this
+        // generate a rrep message from this rreq
         if (RREP_DEBUG)
             cout << "[DEBUG]: Generating RREP message..." << endl;
 
