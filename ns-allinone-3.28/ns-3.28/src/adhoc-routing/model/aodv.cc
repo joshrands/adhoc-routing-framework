@@ -110,6 +110,8 @@ void AODV::receivePacket(char *packet, int length, IP_ADDR source) {
 
 void AODV::sendPacket(char *packet, int length, IP_ADDR finalDestination,
                       IP_ADDR origIP) {
+    cout << "[ORIG]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
+
     // by default this node is the originator
     if (-1 == signed(origIP))
         origIP = getIp();
@@ -138,7 +140,7 @@ void AODV::sendPacket(char *packet, int length, IP_ADDR finalDestination,
             // finding a route
             // TODO: send a RERR
 
-            return;
+//            return;
         }
 
         if (AODV_DEBUG)
@@ -406,7 +408,20 @@ void AODV::handleRERR(char *buffer, int length, IP_ADDR source) {
 void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,
                       int length, IP_ADDR origIP, int port) {
     // first try to fix the link locally
-    if (true == attemptLocalRepair(brokenLink, finalDest)) {
+    if (origIP == getIp())
+    {
+        // this is the first node.. do RREQ
+        rreqPacket rreq = this->rreqHelper.createRREQ(finalDest);
+
+        // start a thread for THIS rreq and wait for a response
+        if (RREQ_RETRIES) {
+            thread waitForResponse(retryRouteRequestIfNoRREP, this, rreq,
+                                   RREQ_RETRIES);
+            waitForResponse.detach();
+        }
+        broadcastRREQBuffer(rreq);
+    }
+    else if (true == attemptLocalRepair(brokenLink, finalDest)) {
         if (MONITOR_DEBUG)
             cout << "[DEBUG]: Broken link repaired locally! Sending packet..."
                  << endl;
@@ -428,6 +443,8 @@ void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,
 
         // TODO: ADD PACKET TO PACKET BUFFER QUEUE
         socketSendPacket(packet, sizeof(rerr), nextHop, ROUTING_PORT);
+
+        delete packet;
     }
 }
 
