@@ -58,6 +58,7 @@ void ReceiveCallback(Ptr<Socket> socket)
 
 void testAdHoc()
 {
+  std::cout << "[TEST]: Sending message from node 1 to node 3" << std::endl;
   // Test sending from node 1 to node 3
   string msg = "Hello friend!";
   uint32_t length = msg.length();
