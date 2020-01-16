@@ -25,8 +25,8 @@
 #define TRANS_POWER       10
 #define RX_GAIN           10
 
-#define minSpeed_mpers    3
-#define maxSpeed_mpers    10
+#define minSpeed_mpers    0.5
+#define maxSpeed_mpers    1
 #define xSize_m           500
 #define ySize_m           500
 #define LOCAL_MONITOR_INTERVAL  0.1
@@ -58,7 +58,7 @@ void ReceiveCallback(Ptr<Socket> socket)
 
 void testAdHoc()
 {
-  std::cout << "[TEST]: Sending message from node 1 to node 3" << std::endl;
+  std::cout << "[TEST]: Sending message from node 1 to node 2" << std::endl;
   // Test sending from node 1 to node 3
   string msg = "Hello friend!";
   uint32_t length = msg.length();

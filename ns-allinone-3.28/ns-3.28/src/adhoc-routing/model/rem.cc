@@ -82,8 +82,12 @@ void REM::updateLocalModels()
             data.pairIp = it->first;
             data.rss = it->second.getDataPoint(getCurrentTimeMS());
 
+            std::cout << "link rss: " << to_string(data.rss) << std::endl;
             if (data.rss > RSS_OUT_OF_RANGE)
             {
+                if (MONITOR_DEBUG)
+                    std::cout << "[REM]: Adding link to node " << to_string(data.pairIp) << std::endl;
+
                 pairMonitoringData[m_parentIp].push_back(data);
                 routing->addExistingLink(data.pairIp);
             }
