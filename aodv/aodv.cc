@@ -426,7 +426,7 @@ void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,
 
         // send reverse rerr to originator
         IP_ADDR nextHop = getTable()->getNextHop(origIP);
-        cout << "Next hop for rerr = " << getStringFromIp(nextHop) << endl;
+        cout << "[DEBUG]: Next hop for rerr to " << getStringFromIp(origIP) << " = " << getStringFromIp(nextHop) << endl;
 
         // TODO: ADD PACKET TO PACKET BUFFER QUEUE
         socketSendPacket(packet, sizeof(rerr), nextHop, ROUTING_PORT);

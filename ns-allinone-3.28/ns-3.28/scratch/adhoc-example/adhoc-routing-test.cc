@@ -29,7 +29,7 @@
 #define maxSpeed_mpers    10
 #define xSize_m           500
 #define ySize_m           500
-#define LOCAL_MONITOR_INTERVAL  2
+#define LOCAL_MONITOR_INTERVAL  0.1
 
 #define NUM_NODES         10
 
@@ -81,7 +81,6 @@ void testAdHoc()
 
 void localMonitoring()
 {
-  map<Ptr<Node>, AdHocRoutingHelper*> adhocMap;
   auto it = adhocMap.begin();
   while (it != adhocMap.end())
   {

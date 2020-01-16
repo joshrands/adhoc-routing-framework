@@ -1,2 +1,2 @@
-g++ -o read-packet read-packet.cc -lpcap -std=c++11 
+g++ -o sniffex sniffex.cc -lpcap -std=c++11 
 
