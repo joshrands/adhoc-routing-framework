@@ -74,8 +74,6 @@ public:
 	// default constructor
 	RoutingProtocol();
 
-//	static int DATA_PORT;
-
 	virtual void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP) = 0;
 	virtual void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source, int port) = 0;
 
@@ -91,8 +89,6 @@ public:
 	void resetLinks();
 	// add this ip address to this list of current 1 hop neighbors 
 	void addExistingLink(IP_ADDR node);
-
-//	mutex m_linkMutex;
 
 protected:
 	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc

@@ -29,6 +29,7 @@ public:
      * @param p the port to add
      */
     void addPort(Port* p);
+    
     /**
      * @brief removes a port from the routing protocol
      * 

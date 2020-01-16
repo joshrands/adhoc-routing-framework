@@ -79,7 +79,9 @@ void RoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop)
 	else
 	{
 		// no entry, create new 
-		cout << "Creating new entry" << endl;
+		if(TABLE_DEBUG){
+			cout << "[TABLE]: [DEBUG]: Creating new entry" << endl;
+		}
 		TableInfo info;
 		info.dest = dest;
 		info.nextHop = nextHop;
@@ -89,32 +91,26 @@ void RoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop)
 	}
 }
 
-RoutingProtocol::RoutingProtocol()
-{
+RoutingProtocol::RoutingProtocol(){
 
 }
 
 bool RoutingProtocol::linkExists(IP_ADDR dest) {
     if (MONITOR_DEBUG)
-        cout << "[DEBUG]: Checking if link exists from "
+        cout << "[ROUTING]: [DEBUG]: Checking if link exists from "
              << getStringFromIp(getIp()) << " to " << getStringFromIp(dest)
              << endl;
 
-//	globalMux.lock();
     for (IP_ADDR ip : m_neighbors) {
         if (dest == ip) {
             if (MONITOR_DEBUG)
-                cout << "[DEBUG]: Link exists!" << endl;
-
-//			globalMux.unlock();
+                cout << "[ROUTING]: [DEBUG]: Link exists!" << endl;
             return true;
         }
     }
 
-//	globalMux.unlock();
-
     if (MONITOR_DEBUG)
-        cout << "[DEBUG]: Link does not exist." << endl;
+        cout << "[ROUTING]: [DEBUG]: Link does not exist." << endl;
 
     return false;
 }

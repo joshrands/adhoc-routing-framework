@@ -19,5 +19,6 @@
 #define RERR_DEBUG          DEBUG && 1 && GLOBAL_AODV_DEBUG
 #define TABLE_DEBUG         DEBUG && 1 && GLOBAL_AODV_DEBUG
 #define MONITOR_DEBUG       DEBUG && 1 && GLOBAL_AODV_DEBUG
+#define ROUTING_DEBUG       DEBUG && 1 && GLOBAL_AODV_DEBUG
 
 #endif

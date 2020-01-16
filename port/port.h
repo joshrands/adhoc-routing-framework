@@ -42,7 +42,7 @@ public:
      * @param data char array of data
      * @param length the length of the data
      */
-    virtual void handlePacket(char* data, int length) = 0;
+    virtual void handlePacket(char* data, int length, IP_ADDR source) = 0;
 
     // Getters + Setters
     /**
