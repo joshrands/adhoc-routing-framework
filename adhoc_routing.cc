@@ -3,8 +3,8 @@
 void AdHocRouting::receivePacketWithPairData(char* packet, int length, IP_ADDR source, int port, pair_data pairData)
 {
     this->updatePairData(pairData);
-    if (pairData.rss <= RSS_OUT_OF_RANGE)
-        return;
+   
+    monitor->updateLocalModels();
 
     if (MONITOR_PORT == port)
     {

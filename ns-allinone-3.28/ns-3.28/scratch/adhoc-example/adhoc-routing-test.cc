@@ -25,11 +25,11 @@
 #define TRANS_POWER       10
 #define RX_GAIN           10
 
-#define minSpeed_mpers    0.5
-#define maxSpeed_mpers    1
+#define minSpeed_mpers    3
+#define maxSpeed_mpers    5
 #define xSize_m           500
 #define ySize_m           500
-#define LOCAL_MONITOR_INTERVAL  0.1
+#define LOCAL_MONITOR_INTERVAL  2
 
 #define NUM_NODES         10
 
@@ -54,6 +54,30 @@ EnergySourceContainer energySources;
 void ReceiveCallback(Ptr<Socket> socket)
 {
     AdHocRoutingHelper::receivePacket(socket);
+}
+
+void initialHellos()
+{
+  std::cout << "[TEST]: Initial hellos!" << std::endl; 
+
+  auto it = nodeMap.begin();
+  while (it != nodeMap.end())
+  {
+
+    string msg = "Hello all!";
+    uint32_t length = msg.length();
+    char* buffer = (char*)(malloc(length));
+    for (uint32_t i = 0; i < length; i++)
+          buffer[i] = msg.at(i);
+    // send data from first node to last node 
+    AdHocRoutingHelper* adhoc = adhocMap[it->second];
+    IP_ADDR dest = getIpFromString(BROADCAST_STR); 
+    adhoc->routing->socketSendPacket(buffer, msg.length(), dest, DATA_PORT); 
+
+    delete buffer;
+
+    it++;
+  }
 }
 
 void testAdHoc()
@@ -241,7 +265,11 @@ int main (int argc, char *argv[])
 //  Simulator::Schedule (Seconds (1.0), &GenerateTraffic,
 //                       c, packetSize, numPackets, Seconds(1));
 
-  Simulator::Schedule(Seconds(1.0), &testAdHoc);// &(aodvArray[1]->socketSendPacket), buffer, msg.length() + 5, aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
+  Simulator::Schedule(Seconds(1.0), &initialHellos);
+  Simulator::Schedule(Seconds(2.0), &initialHellos);
+  Simulator::Schedule(Seconds(3.0), &initialHellos);
+
+  Simulator::Schedule(Seconds(5.0), &testAdHoc);// &(aodvArray[1]->socketSendPacket), buffer, msg.length() + 5, aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
   Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
   // Drain battery
   Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);
