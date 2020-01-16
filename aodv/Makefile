@@ -21,7 +21,7 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libaodv.a
-OBJ_LIB_FILES = RoutingProtocol.o aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o send_packet.o aodv_sim.o
+OBJ_LIB_FILES = routing_protocol.o aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o send_packet.o aodv_sim.o
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
 INC_FILES = ${TARGET}.h RoutingProtocol.h aodv.h aodv_rreq.h aodv_rrep.h aodv_rerr.h aodv_routing_table.h send_packet.h aodv_sim.h aodv_params.h defines.h network_monitor.h monitor_info.h
