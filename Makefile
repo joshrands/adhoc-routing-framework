@@ -18,7 +18,7 @@ LIBFLAGS = -cvq
 
 # You should be able to add object files here without changing anything else
 TARGET = do-adhoc
-OBJ_LIB_FILES = hardware/hardware_aodv.o adhoc/adhoc_routing.o #$(socket/*.o)
+OBJ_LIB_FILES = hardware/hardware_aodv.o adhoc/adhoc_routing.o
 
 STATIC_LIBRARIES = hardware/libhardware.a adhoc/libadhoc.a
 

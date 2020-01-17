@@ -11,6 +11,9 @@
  * Date: 9/4/2019
  ********************************/
 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <map> 
 #include <stdint.h>
 #include <iostream>
@@ -19,9 +22,13 @@
 #include <vector>
 #include <mutex>
 
-#include "aodv_defines.h"
+#include "adhoc_defines.h"
+#include "port.h"
 
 using namespace std;
+
+// Classes that aren't built yet but will be
+class Port;
 
 // get a 32 bit ip address from a string
 IP_ADDR getIpFromString(string ipStr);
@@ -40,8 +47,7 @@ public:
 
 
 /* Routing Table class */
-class RoutingTable
-{
+class RoutingTable{
 public:
 	// default constructor 
 	RoutingTable();
@@ -68,13 +74,20 @@ protected:
 static mutex globalMux;
 
 /* Routing Protocol base class */
-class RoutingProtocol
-{
+class RoutingProtocol {
 public: 
 	// default constructor
 	RoutingProtocol();
 
 	virtual void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP) = 0;
+	/**
+     * @brief This function is called by adhocRouting to give the port its data
+     * 
+     * @param data char array of data
+     * @param length the length of the data
+     
+    virtual void handlePacket(char* data, int length, IP_ADDR source) = 0;
+	*/
 	virtual void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source, int port) = 0;
 
 	const uint32_t getIp() { return ipAddress; }

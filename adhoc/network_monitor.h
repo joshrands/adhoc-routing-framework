@@ -1,3 +1,6 @@
+#ifndef NETWORKMONITOR_H
+#define NETWORKMONITOR_H
+
 /*********************************
  * network_monitor.h
  *
@@ -6,15 +9,14 @@
  * Author: Josh Rands
  * Date: 10/28/2019
  ********************************/
-
-#include "monitor_info.h"
-#include "monitor_defines.h"
-
 #include <vector>
 #include <map>
 #include <thread>
 #include <chrono>
 #include <mutex>
+
+#include "monitor_info.h"
+#include "adhoc_defines.h"
 
 using namespace std;
 class NetworkMonitor
@@ -74,3 +76,5 @@ protected:
 };
 
 void runLocalModelUpdateThread(NetworkMonitor* monitor, mutex* mux);
+
+#endif

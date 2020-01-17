@@ -20,12 +20,11 @@ LIBFLAGS = ru
 # You should be able to add object files here without changing anything else
 #
 LIB_NAME = libadhoc.a
-OBJ_LIB_FILES = adhoc_routing.o port.o ../aodv/*.o ../monitoring/*.o
+OBJ_LIB_FILES = adhoc_routing.o port.o routing_protocol.o send_packet.o network_monitor.o
 OBJ_FILES = ${OBJ_LIB_FILES}
 
-INC_FILES = adhoc_routing.h port.h
+INC_FILES = adhoc_routing.h port.h routing_protocol.h send_packet.h network_monitor.h adhoc_defines.h
 
-SUBDIRS = ../aodv ../monitoring
 
 #
 # Any libraries we might need.
@@ -33,9 +32,6 @@ SUBDIRS = ../aodv ../monitoring
 LIBRARYS = -lpthread
 
 ${LIB_NAME} : ${OBJ_FILES}
-	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir; \
-	done
 	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES}
 	rm -f "*.o"
 

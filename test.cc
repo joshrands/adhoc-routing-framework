@@ -2,7 +2,9 @@
 #include <assert.h>
 #include "string.h"
 
-#include "adhoc_routing.h"
+#include "adhoc/adhoc_routing.h"
+#include "rem/rem.h"
+#include "aodv/aodv.h"
 
 #include <cmath>
 
@@ -58,7 +60,7 @@ void test_adhoc()
 	rem1.initialize(node1);
 
 	// create adhoc routing object 
-	AdHocRouting adhoc1;
+	AdhocRouting adhoc1;
 	adhoc1.monitor = &rem1;
 	adhoc1.routing = &aodv1;
 
@@ -70,7 +72,7 @@ void test_adhoc()
 	rem2.routing = &aodv2;
 	rem2.initialize(node2);
 
-	AdHocRouting adhoc2;
+	AdhocRouting adhoc2;
 	adhoc2.monitor = &rem2;
 	adhoc2.routing = &aodv2;
 

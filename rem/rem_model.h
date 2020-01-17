@@ -1,4 +1,5 @@
-#pragma once 
+#ifndef REMMODEL_H
+#define REMMODEL_H
 /*********************************
  * rem_model.h
  *
@@ -14,7 +15,7 @@
 #include "rem_parameters.h"
 #include "monitor_defines.h"
 #include "rem_packet.h"
-#include "../aodv/routing_protocol.h"
+#include "../adhoc/routing_protocol.h"
 
 #include <vector>
 #include <iostream>
@@ -154,3 +155,4 @@ private:
     void performRegression(vector<double> times, vector<double> values, vector<double> wAvgs); // perform a regression on the data provided
 };
 
+#endif

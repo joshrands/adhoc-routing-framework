@@ -20,15 +20,13 @@ LIBFLAGS = -cvq
 # You should be able to add object files here without changing anything else
 #
 TARGET = test
-LIB_NAME = libmonitoring.a
-OBJ_LIB_FILES = rem.o rem_model.o network_monitor.o rem_sim.o ../aodv/*.o
-
-STATIC_LIBRARIES = ../aodv/libaodv.a
+LIB_NAME = librem.a
+OBJ_LIB_FILES = rem.o rem_model.o rem_sim.o ../aodv/*.o ../adhoc/*.o
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h monitor_defines.h network_monitor.h RoutingProtocol.h defines.h rem_sim.h
+INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h monitor_defines.h rem_sim.h
 
-SUBDIRS = ../aodv 
+SUBDIRS = ../aodv ../adhoc
 
 all: ${TARGET}
 

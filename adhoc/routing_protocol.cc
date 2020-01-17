@@ -6,8 +6,6 @@
 
 using namespace std;
 
-//int RoutingProtocol::DATA_PORT = 5555;
-
 IP_ADDR getIpFromString(string ipStr)
 {
 	IP_ADDR ip;
@@ -38,14 +36,6 @@ RoutingTable::RoutingTable()
 
 RoutingTable::~RoutingTable()
 {
-/*	map<IP_ADDR, TableInfo*>::iterator it;
-
-	for ( it = this->table.begin(); it != this->table.end(); it++ )
-	{
-		cout << "Found allocated memory" << endl;
-		delete (it->second);
-	}
-*/
 	this->table.empty();
 }
 
@@ -53,14 +43,13 @@ IP_ADDR RoutingTable::getNextHop(const IP_ADDR dest)
 {
 	IP_ADDR nextHop;
 
-	if (this->table.count(dest))
+	if (this->table.count(dest)) // Entry exists
 	{
-//		cout << "Entry exists." << endl;
+		
 		nextHop = table[dest].nextHop;
 	}
-	else
+	else // Table entry does not exist
 	{
-//		cout << "Table entry does not exist." << endl;
 		nextHop = 0;
 	}
 

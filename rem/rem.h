@@ -1,3 +1,6 @@
+#ifndef REM_H
+#define REM_H
+
 /*********************************
  * rem.h
  *
@@ -8,7 +11,7 @@
  * Date: 10/28/2019
  ********************************/
 
-#include "network_monitor.h"
+#include "../adhoc/network_monitor.h"
 #include "rem_model.h"
 
 #include <vector>
@@ -92,3 +95,4 @@ protected:
     uint32_t getCurrentTimeMS() override;
 
 };
+#endif

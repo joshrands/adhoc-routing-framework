@@ -2,15 +2,16 @@
 #define ADHOC_ROUTING_H
 
 #include <vector>
-#include "../aodv/routing_protocol.h"
-#include "../monitoring/network_monitor.h"
-#include "port.h"
+#include "routing_protocol.h"
+#include "network_monitor.h"
 
 using namespace std;
 
 // class to combine routing and monitoring 
 
 class Port;
+class RoutingProtocol;
+class NetworkMonitor;
 
 class AdhocRouting{
 private:

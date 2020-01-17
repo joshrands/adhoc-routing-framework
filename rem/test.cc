@@ -1,12 +1,11 @@
-
-#include "rem.h"
-#include "aodv.h"
-
 #include <assert.h>
-#include "string.h"
 #include <cmath>
 #include <iostream>
 #include <thread>
+
+#include "string.h"
+#include "rem.h"
+#include "../aodv/aodv.h"
 
 using namespace std;
 
