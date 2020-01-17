@@ -13,7 +13,7 @@
 #define RSS_OUT_OF_RANGE        -90
 
 #include "rem_parameters.h"
-#include "monitor_defines.h"
+#include "rem_defines.h"
 #include "rem_packet.h"
 #include "../adhoc/routing_protocol.h"
 

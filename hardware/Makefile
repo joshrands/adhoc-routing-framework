@@ -22,10 +22,10 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libhardware.a
-OBJ_LIB_FILES = hardware_aodv.o ../aodv/*.o ../socket/*.o ../adhoc/*.o
+OBJ_LIB_FILES = hardware_aodv.o hardware_adhoc.o hardware_rem.o ../aodv/*.o ../socket/*.o ../adhoc/*.o
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
-INC_FILES = hardware_aodv.h hardware_defines.h hardware_defines.h
+INC_FILES = hardware_aodv.h hardware_defines.h hardware_adhoc.h hardware_rem.h
 
 SUBDIRS = ../aodv ../socket ../adhoc
 

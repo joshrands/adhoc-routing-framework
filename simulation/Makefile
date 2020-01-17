@@ -19,33 +19,29 @@ LIBFLAGS = -cvq
 #
 # You should be able to add object files here without changing anything else
 #
-TARGET = test
-LIB_NAME = librem.a
-OBJ_LIB_FILES = rem.o rem_model.o ../aodv/*.o ../adhoc/*.o
+LIB_NAME = libsim.a
+OBJ_LIB_FILES = rem_sim.o aodv_sim.o ../aodv/*.o ../adhoc/*.o ../rem/*.o
 
-OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h monitor_defines.h
+OBJ_FILES = ${OBJ_LIB_FILES} 
+INC_FILES = rem_sim.h aodv_sim.h
 
-SUBDIRS = ../aodv ../adhoc
+SUBDIRS = ../aodv ../adhoc ../rem
 
-all: ${TARGET}
+#
+# Any libraries we might need.
+#
+LIBRARYS = -lpthread
 
-${TARGET}: ${OBJ_FILES}
-	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir; \
-	done
-	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
-	rm test.o
+${LIB_NAME} : ${OBJ_FILES}
 	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES}
 	rm -f "*.o"
 
 %.o : %.cc ${INC_FILES}
-	${CXX} -c ${CXXFLAGS} -o $@ $<
+	${CXX} -c ${CXXFLAGS}  -o $@ $< 
 
-run:
-	make 
-	./test
-
+#
+# Please remember not to submit objects or binarys.
+#
 clean:
+	rm -f core ${LIB_NAME} ${OBJ_FILES}
 	rm -f "*.o"
-	rm -f core ${TARGET} ${OBJ_FILES} ${LIB_NAME}
