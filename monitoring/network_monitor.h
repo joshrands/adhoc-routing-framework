@@ -8,7 +8,7 @@
  ********************************/
 
 #include "monitor_info.h"
-#include "defines.h"
+#include "monitor_defines.h"
 
 #include <vector>
 #include <map>

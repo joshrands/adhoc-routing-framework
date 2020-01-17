@@ -30,6 +30,8 @@ INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h monitor_
 
 SUBDIRS = ../aodv 
 
+all: ${TARGET}
+
 ${TARGET}: ${OBJ_FILES}
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir; \
@@ -37,6 +39,7 @@ ${TARGET}: ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
 	rm test.o
 	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES}
+	rm -f "*.o"
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} -o $@ $<
@@ -46,4 +49,5 @@ run:
 	./test
 
 clean:
+	rm -f "*.o"
 	rm -f core ${TARGET} ${OBJ_FILES} ${LIB_NAME}

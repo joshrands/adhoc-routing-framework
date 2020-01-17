@@ -12,7 +12,7 @@
 
 // include for routing table 
 // TODO: Pull routing table out of RoutingProtocol.h
-#include "RoutingProtocol.h"
+#include "routing_protocol.h"
 #include "aodv_packets.h"
 
 

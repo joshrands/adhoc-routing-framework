@@ -27,7 +27,7 @@ OBJ_LIB_FILES = hardware_aodv.o ../aodv/*.o ../socket/*.o
 STATIC_LIBRARIES = ../socket/libsocket.a ../aodv/libaodv.a
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
-INC_FILES = hardware_aodv.h hardware_defines.h defines.h
+INC_FILES = hardware_aodv.h hardware_defines.h hardware_defines.h
 
 SUBDIRS = ../aodv ../socket
 

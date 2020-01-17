@@ -2,12 +2,17 @@
 #define ADHOC_ROUTING_H
 
 #include <vector>
-#include "../aodv/RoutingProtocol.h"
+#include "../aodv/routing_protocol.h"
 #include "../monitoring/network_monitor.h"
-#include "../port/port.h"
+#include "port.h"
+
+using namespace std;
 
 // class to combine routing and monitoring 
-class AdHocRouting{
+
+class Port;
+
+class AdhocRouting{
 private:
     void _init();
 
@@ -17,10 +22,10 @@ protected:
 
 public:
     // Constructor
-    AdHocRouting();
-    AdHocRouting(RoutingProtocol*);
-    AdHocRouting(NetworkMonitor*);
-    AdHocRouting(RoutingProtocol*, NetworkMonitor*);
+    AdhocRouting();
+    AdhocRouting(RoutingProtocol*);
+    AdhocRouting(NetworkMonitor*);
+    AdhocRouting(RoutingProtocol*, NetworkMonitor*);
 
     // Functions
     /**
@@ -61,4 +66,4 @@ public:
     NetworkMonitor* monitor; // The network monitor to use, decides who are connected
 };
 
-#endif;
+#endif

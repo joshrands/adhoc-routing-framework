@@ -1,40 +1,40 @@
 #include "adhoc_routing.h"
 
 // Private
-void AdHocRouting::_init(){
+void AdhocRouting::_init(){
     routing = nullptr;
     monitor = nullptr;
 }
 
 // Constructors
-AdHocRouting::AdHocRouting(){
+AdhocRouting::AdhocRouting(){
     _init();
 }
 
-AdHocRouting::AdHocRouting(RoutingProtocol* routing){
+AdhocRouting::AdhocRouting(RoutingProtocol* routing){
     _init();
     this->routing = routing;
 }
 
-AdHocRouting::AdHocRouting(NetworkMonitor* monitor){
+AdhocRouting::AdhocRouting(NetworkMonitor* monitor){
     _init();
     this->monitor = monitor;
 }
 
-AdHocRouting::AdHocRouting(RoutingProtocol* routing, NetworkMonitor* monitor){
+AdhocRouting::AdhocRouting(RoutingProtocol* routing, NetworkMonitor* monitor){
     _init();
     this->routing = routing;
     this->monitor = monitor;
 }
 
-void AdHocRouting::addPort(Port* p){
-    p->setAdHocRouting(this);
+void AdhocRouting::addPort(Port* p){
+    p->setAdhocRouting(this);
     this->ports.push_back(p);
 }
 
-void AdHocRouting::removePort(Port* p){
+void AdhocRouting::removePort(Port* p){
     for(int i = 0; i < ports.size(); i ++){
-        if(ports.at(i) = p){
+        if(ports.at(i) == p){
             ports.erase(ports.begin()+i);
         }
     }
