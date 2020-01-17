@@ -3,7 +3,7 @@
 // Private Functions
 void Port::_init(){
     this->portId = -1;
-    this->adhocRouting = nullptr;
+    this->routingProtocol = nullptr;
 }
 
 // Constructors
@@ -16,15 +16,15 @@ Port::Port(int portId){
     this->portId = portId;
 }
 
-Port::Port(int portId, AdhocRouting* adhocRouting){
+Port::Port(int portId, RoutingProtocol* routingProtocol){
     _init();
     this->portId = portId;
-    this->adhocRouting = adhocRouting;
+    this->routingProtocol = routingProtocol;
 }
 
 // Getters + Setters
-void Port::setAdhocRouting(AdhocRouting* adhocRouting){
-    this->adhocRouting = adhocRouting;
+void Port::setRoutingProtocol(RoutingProtocol* routingProtocol){
+    this->routingProtocol = routingProtocol;
 }
 
 void Port::setPortId(int portId){

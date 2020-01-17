@@ -41,37 +41,16 @@ public:
 	AODV(IP_ADDR ip);
 	~AODV();
 
-	// handle received data. if not in routing table, attempt local fix and then RERR 
-	void receivePacket(char* packet, int length, IP_ADDR source);
-	// try to send data to a destination - the next hop is determined from the routing table  
-	void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP = -1);
-
-//	static int ROUTING_PORT;
-
-	// decode a received packet buffer from UPD port 654
-	void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source, int port);
-
-	// RREQ - Route Request 
-	RREQHelper rreqHelper;
-	// broadcast rreq to all neighbors
-	void broadcastRREQBuffer(rreqPacket rreq);
-	// make a decision on a received rreq packet using the rreq helper 
-	void handleRREQ(char* buffer, int length, IP_ADDR source);
-
-	// RREP - Route Reply
-	RREPHelper rrepHelper;
-	// handle a received rrep message 
-	void handleRREP(char* buffer, int length, IP_ADDR source);
-
-	// RERR - Route Error
-	RERRHelper rerrHelper;
-	// handle a received rerr message 
-	void handleRERR(char* buffer, int length, IP_ADDR source);
-
-	// Network Monitoring
-	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port);
-	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
-	virtual void getOneHopNeighbors();
+	/**
+     * @brief Send a packet to a given ip address using a specified port
+     * 
+     * @param portId the port number to use
+     * @param packet the packet to send
+     * @param length the length of the packet
+     * @param dest 
+     * @param origIP 
+     */
+    void sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP = -1);
 
 	// output the current contents of the routing table 
 	void logRoutingTable();
@@ -79,8 +58,25 @@ public:
 	// get the routing table 
 	AODVRoutingTable* getTable() { return m_aodvTable; } 
 
-	// map of rreq ids and their corresponding packet to be sent once the route is established
-	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
+	// Virtual functions
+    /**
+     * @brief Handles the receiving or processing of all packets
+     * @brief when implementing this should query each of the sockets corresponding to each port
+     * @brief and then "give" the data to each port
+     * TODO: By creating a Socket base class we could implement this code and avoid the above req. 
+     * 
+     */
+    virtual void handlePackets() = 0;
+
+	// Network Monitoring
+	// attempt to repair the link and then send the packet to its destination
+	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port);
+	// attempt to repair the link
+	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
+	// get the next door neighbors in the network
+	virtual void getOneHopNeighbors();
+	// as there a link between this node and dest? 
+	virtual bool linkExists(IP_ADDR dest);
 
 protected:
 	// node sequence number. MUST increment on a route discovery
@@ -91,10 +87,40 @@ protected:
 	AODVRoutingTable* m_aodvTable;
 	// current packet id index
 	uint32_t packetIdCount;	
-	// map of destination and recently sent packets (packets will time out after a short time) 
-	map<IP_ADDR, queue<packet>> unackedPacketBuffer;
-	// store received data packets which are for this ip
-	vector<pair<char*, int>> receivedPackets;
+	// map of rreq ids and their corresponding packet to be sent once the route is established
+	// TODO: Fix up for port stuff
+	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
+
+	// Functions
+	// handle received data. If not in routing table, attempt local fix and then RERR 
+	void _routePacket(char *buffer, int length, IP_ADDR source, int port);
+	void _routePacket(char *buffer, int length, IP_ADDR source, Port* p);
+	// handle data for AODV
+	void _handleAODVPacket(char *buffer, int length, IP_ADDR source);
+
+	// Send the data over a socket
+	int _socketSendPacket(char *buffer, int length, IP_ADDR dest, Port* p);
+
+	// Virtual Functions
+	virtual int _socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
+
+private:
+	// RREQ - Route Request 
+	RREQHelper rreqHelper;
+	// broadcast rreq to all neighbors
+	void _broadcastRREQBuffer(rreqPacket rreq);
+	// make a decision on a received rreq packet using the rreq helper 
+	void _handleRREQ(char* buffer, int length, IP_ADDR source);
+
+	// RREP - Route Reply
+	RREPHelper rrepHelper;
+	// handle a received rrep message 
+	void _handleRREP(char* buffer, int length, IP_ADDR source);
+
+	// RERR - Route Error
+	RERRHelper rerrHelper;
+	// handle a received rerr message 
+	void _handleRERR(char* buffer, int length, IP_ADDR source);
 };
 
 /* AODVTest class

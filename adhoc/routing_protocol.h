@@ -79,37 +79,73 @@ public:
 	// default constructor
 	RoutingProtocol();
 
-	virtual void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP) = 0;
-	/**
-     * @brief This function is called by adhocRouting to give the port its data
+	    // Functions
+    /**
+     * @brief adds a port to the routing protocol and sets the ports adhocRouting member
      * 
-     * @param data char array of data
+     * @param p the port to add
+     */
+    void addPort(Port* p);
+    
+    /**
+     * @brief removes a port from the routing protocol
+     * 
+     * @param p the port to remove
+     */
+    void removePort(Port* p);
+
+	/**
+     * @brief Send a packet to a given ip address using a specified port
+     * 
+     * @param p the port to use
+     * @param data the data to send
      * @param length the length of the data
-     
-    virtual void handlePacket(char* data, int length, IP_ADDR source) = 0;
-	*/
-	virtual void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source, int port) = 0;
+     * @param dest 
+     * @param origIP 
+     */
+    void sendPacket(Port* p, char* data, int length, IP_ADDR dest, IP_ADDR origIP = -1);
 
-	const uint32_t getIp() { return ipAddress; }
-	void setIp(const uint32_t ip) { ipAddress = ip; }
-
-	// abstract function to be overwritten by child class 
-	virtual int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
-
+    // Virtual Functions
+	/**
+     * @brief Send a packet to a given ip address using a specified port
+     * 
+     * @param p the port to use
+     * @param data the data to send
+     * @param length the length of the data
+     * @param dest 
+     * @param origIP 
+     */
+    virtual void sendPacket(int portId, char* data, int length, IP_ADDR dest, IP_ADDR origIP = -1) = 0;
+    /**
+     * @brief Handles the receiving or processing of all packets
+     * @brief when implementing this should query each of the sockets corresponding to each port
+     * @brief and then "give" the data to each port
+     * TODO: By creating a Socket base class we could implement this code and avoid the above req. 
+     * 
+     */
+    virtual void handlePackets() = 0;
+	
 	// as there a link between this node and dest? 
 	virtual bool linkExists(IP_ADDR dest);
 	// function to reset the neighbors of this node to none 
 	void resetLinks();
 	// add this ip address to this list of current 1 hop neighbors 
 	void addExistingLink(IP_ADDR node);
+	
+	// Getters and Setters
+	const uint32_t getIp() { return ipAddress; }
+	void setIp(const uint32_t ip) { ipAddress = ip; }
 
 protected:
 	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
 	vector<IP_ADDR> m_neighbors;
-
 	RoutingTable* table;	
-
 	uint32_t ipAddress;
+	vector<Port*> ports;
+
+	// Functions
+	virtual void _buildPort(Port*) = 0;
+
 };
 
 #endif

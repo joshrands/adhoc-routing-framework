@@ -1,9 +1,9 @@
 #ifndef PORT_H
 #define PORT_H
 
-#include "adhoc_routing.h"
+#include "routing_protocol.h"
 
-class AdhocRouting;
+class RoutingProtocol;
 
 class Port{
 private:
@@ -11,7 +11,7 @@ private:
     int portId; // The port number messages will be received and sent from
 
 protected:
-    AdhocRouting* adhocRouting; // AdHocRouting member
+    RoutingProtocol* routingProtocol; // AdHocRouting member
 
 public:
     // Constructor
@@ -34,7 +34,8 @@ public:
      * @param portId the port number 
      * @param adhocRouting the routing protocol
      */
-    Port(int portId, AdhocRouting* adhocRouting);
+    Port(int portId, RoutingProtocol* adhocRouting);
+    
     // Destructor
 
     // Functions
@@ -48,11 +49,11 @@ public:
 
     // Getters + Setters
     /**
-     * @brief Set the Ad Hoc Routing object
+     * @brief Set the Routing Protocol object
      * 
-     * @param adhocRouting 
+     * @param routingProtocol 
      */
-    void setAdhocRouting(AdhocRouting* adhocRouting);
+    void setRoutingProtocol(RoutingProtocol* routingProtocol);
     /**
      * @brief Set the Port Id object
      * 

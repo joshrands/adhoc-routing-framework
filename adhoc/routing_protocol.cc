@@ -84,6 +84,10 @@ RoutingProtocol::RoutingProtocol(){
 
 }
 
+void RoutingProtocol::sendPacket(Port* p, char* data, int length, IP_ADDR dest, IP_ADDR origIP){
+	sendPacket(p->getPortId(), data, length, dest, origIP);
+}
+
 bool RoutingProtocol::linkExists(IP_ADDR dest) {
     if (MONITOR_DEBUG)
         cout << "[ROUTING]: [DEBUG]: Checking if link exists from "

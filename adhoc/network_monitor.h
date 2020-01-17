@@ -19,8 +19,7 @@
 #include "adhoc_defines.h"
 
 using namespace std;
-class NetworkMonitor
-{
+class NetworkMonitor{
 public:
     NetworkMonitor();
     NetworkMonitor(IP_ADDR nodeIp);
