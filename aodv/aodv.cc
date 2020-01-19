@@ -407,7 +407,10 @@ void AODV::handleRERR(char *buffer, int length, IP_ADDR source) {
 
 void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,
                       int length, IP_ADDR origIP, int port) {
+    // this function will try to repair the link, but if fail it will generate a RERR
+    // brokenLink is the link that is unreachable, finalDest is the final destination, and origIP is who sent this message
     // first try to fix the link locally
+    cout << "IP TEST: " << origIP << " : " << getIp() << endl;
     if (origIP == getIp())
     {
         // this is the first node.. do RREQ
