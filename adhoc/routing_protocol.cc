@@ -39,6 +39,7 @@ RoutingTable::~RoutingTable()
 	this->table.empty();
 }
 
+
 IP_ADDR RoutingTable::getNextHop(const IP_ADDR dest)
 {
 	IP_ADDR nextHop;
@@ -84,6 +85,26 @@ RoutingProtocol::RoutingProtocol(){
 
 }
 
+void RoutingProtocol::addPort(Port* p){
+	if(ports.count(p->getPortId()) == 0){
+		if(ROUTING_DEBUG){
+			printf("[ROUTING]: [DEBUG]: Adding port %d\n",p->getPortId());
+		}
+		ports[p->getPortId()] = p;
+		_buildPort(p);
+	}
+}
+
+void RoutingProtocol::removePort(Port* p){
+	if(ports.count(p->getPortId())){
+		if(ROUTING_DEBUG){
+			printf("[ROUTING]: [DEBUG]: Removing port %d\n",p->getPortId());
+		}
+		ports.erase(p->getPortId());
+		_destroyPort(p);
+	}
+}
+
 void RoutingProtocol::sendPacket(Port* p, char* data, int length, IP_ADDR dest, IP_ADDR origIP){
 	sendPacket(p->getPortId(), data, length, dest, origIP);
 }
@@ -115,7 +136,7 @@ void RoutingProtocol::resetLinks()
 	globalMux.unlock();
 }
 
-void RoutingProtocol::addExistingLink(IP_ADDR node)
+void RoutingProtocol::addLink(IP_ADDR node)
 {
 	globalMux.lock();
 	m_neighbors.push_back(node);

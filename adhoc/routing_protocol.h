@@ -14,7 +14,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <map> 
+#include <unordered_map> 
+#include <map>
 #include <stdint.h>
 #include <iostream>
 #include <sstream>
@@ -125,26 +126,54 @@ public:
      */
     virtual void handlePackets() = 0;
 	
-	// as there a link between this node and dest? 
+    /**
+     * @brief is there a link between this node and dest? 
+     * 
+     * @param dest ip address of destination
+     * @return true link exits
+     * @return false link does not exist
+     */
 	virtual bool linkExists(IP_ADDR dest);
-	// function to reset the neighbors of this node to none 
+    /**
+     * @brief function to reset the neighbors of this node to none 
+     * 
+     */
 	void resetLinks();
-	// add this ip address to this list of current 1 hop neighbors 
-	void addExistingLink(IP_ADDR node);
+    /**
+     * @brief add this ip address to this list of current 1 hop neighbors 
+     * 
+     * @param node ip address to add
+     */
+	void addLink(IP_ADDR node);
+    
 	
 	// Getters and Setters
+    /**
+     * @brief Get the Ip object
+     * 
+     * @return const uint32_t 
+     */
 	const uint32_t getIp() { return ipAddress; }
+    /**
+     * @brief Set the Ip object
+     * 
+     * @param ip 
+     */
 	void setIp(const uint32_t ip) { ipAddress = ip; }
 
 protected:
 	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
 	vector<IP_ADDR> m_neighbors;
+    // A table of how to send messages to each IP Address
 	RoutingTable* table;	
+    // The ip address of the cimputer this routing protocol is running on
 	uint32_t ipAddress;
-	vector<Port*> ports;
+    // The list of ports that can send and receive messages using this routing protocol
+	unordered_map<int, Port*> ports;
 
 	// Functions
 	virtual void _buildPort(Port*) = 0;
+    virtual void _destroyPort(Port*) = 0;
 
 };
 

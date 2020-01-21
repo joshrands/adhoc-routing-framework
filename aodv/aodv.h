@@ -24,12 +24,10 @@
 #include <functional>
 #include <queue>
 
-struct packet
-{
+struct BufferedPacket{
+	int portId;
 	char* buffer;
-	uint32_t length;
-	uint32_t id;
-	uint16_t ttl;
+	int length;
 };
 
 class AODV : public RoutingProtocol
@@ -47,10 +45,18 @@ public:
      * @param portId the port number to use
      * @param packet the packet to send
      * @param length the length of the packet
-     * @param dest 
-     * @param origIP 
+     * @param dest the destination ip address
+     * @param origIP IP address where the packet was from
      */
-    void sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP = -1);
+    virtual void sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP = -1);
+	
+	// Network Monitoring
+	// attempt to repair the link and then send the packet to its destination
+	virtual void repairLink(int port, IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP);
+	// attempt to repair the link
+	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
+	// get the next door neighbors in the network
+	virtual void getOneHopNeighbors();
 
 	// output the current contents of the routing table 
 	void logRoutingTable();
@@ -58,7 +64,7 @@ public:
 	// get the routing table 
 	AODVRoutingTable* getTable() { return m_aodvTable; } 
 
-	// Virtual functions
+	// Pure Virtual functions
     /**
      * @brief Handles the receiving or processing of all packets
      * @brief when implementing this should query each of the sockets corresponding to each port
@@ -68,16 +74,7 @@ public:
      */
     virtual void handlePackets() = 0;
 
-	// Network Monitoring
-	// attempt to repair the link and then send the packet to its destination
-	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port);
-	// attempt to repair the link
-	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
-	// get the next door neighbors in the network
-	virtual void getOneHopNeighbors();
-	// as there a link between this node and dest? 
-	virtual bool linkExists(IP_ADDR dest);
-
+	
 protected:
 	// node sequence number. MUST increment on a route discovery
 	uint32_t sequenceNum;
@@ -89,22 +86,8 @@ protected:
 	uint32_t packetIdCount;	
 	// map of rreq ids and their corresponding packet to be sent once the route is established
 	// TODO: Fix up for port stuff
-	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
+	map<IP_ADDR, queue<BufferedPacket>> rreqPacketBuffer;
 
-	// Functions
-	// handle received data. If not in routing table, attempt local fix and then RERR 
-	void _routePacket(char *buffer, int length, IP_ADDR source, int port);
-	void _routePacket(char *buffer, int length, IP_ADDR source, Port* p);
-	// handle data for AODV
-	void _handleAODVPacket(char *buffer, int length, IP_ADDR source);
-
-	// Send the data over a socket
-	int _socketSendPacket(char *buffer, int length, IP_ADDR dest, Port* p);
-
-	// Virtual Functions
-	virtual int _socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) = 0;
-
-private:
 	// RREQ - Route Request 
 	RREQHelper rreqHelper;
 	// broadcast rreq to all neighbors
@@ -121,49 +104,41 @@ private:
 	RERRHelper rerrHelper;
 	// handle a received rerr message 
 	void _handleRERR(char* buffer, int length, IP_ADDR source);
-};
 
-/* AODVTest class
- * For testing AODV with unit tests. */
-class AODVTest : public AODV
-{
-public: 	
-	// debugging values 
-	static int globalPacketCount;
-	static IP_ADDR lastNode; 
-	static IP_ADDR lastReceive;
+	// Functions
+	/**
+	 * @brief Routes packets to its target destination in the network. It is meant for non-routing packets. Packet should still have header.
+	 * 
+	 * @param portId the port id to send from/to
+	 * @param buffer the data to be sent, needs to contain the AODV header
+	 * @param length the length of that data
+	 */
+	void _routePacket(int portId, char *buffer, int length);
+	/**
+	 * @brief Routes packets to its target destination in the network. It is meant for non-routing packets.
+	 * 
+	 * @param port the port class to send from/to
+	 * @param buffer the data to be sent, needs to contain the AODV header
+	 * @param length the length of that data
+	 */
+	void _routePacket(Port* p, char *buffer, int length);
 
-	AODVTest(IP_ADDR ip) : AODV(ip) {}
-	AODVTest(const char* ip) : AODV(ip) {}
-	~AODVTest() { m_physicalNeighbors.clear(); }
+	// handle data for AODV
+	void _handleAODVPacket(char *buffer, int length, IP_ADDR source);
 
-	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
+	// Send the data over a socket
+	int _socketSendPacket(Port* port, char *buffer, int length, IP_ADDR dest);
 
-	// Network Monitoring 
-
-	// add/remove node to neighbor list
-	void addNeighbor(AODVTest* node);
-	void removeNeighbor(AODVTest* node);
-
-	// return true if node is neighbor
-	bool isNeighbor(AODVTest node);
-
-	// see if packet was put in queue
-	bool packetInRreqBuffer(IP_ADDR dest);
-
-private:
-	vector<AODVTest*> m_physicalNeighbors;
-
-};
-
-class AODVMonitorTest : public AODVTest 
-{
-public:
-	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) override;
+	// Virtual Functions
+	virtual int _socketSendPacket(int portId, char *buffer, int length, IP_ADDR dest) = 0;
+	virtual void _buildPort(Port*) = 0;
+    virtual void _destroyPort(Port*) = 0;
 
 };
 
 // retry the route request message if you don't receive one
 void retryRouteRequestIfNoRREP(AODV* aodv, rreqPacket sendRREQ, int numberOfRetriesRemaining);
+
+
 
 #endif

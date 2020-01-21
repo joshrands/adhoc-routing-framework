@@ -1,8 +1,101 @@
-#include "aodv.h"
+#include "test.h"
 #include "../adhoc/send_packet.h"
 
-#include <assert.h>
+//#include <assert.h>
 #include "string.h"
+
+// AODV TEST CLASS
+
+int AODVTest::globalPacketCount = 0;
+IP_ADDR AODVTest::lastNode = 0;
+IP_ADDR AODVTest::lastReceive = 0;
+
+int AODVTest::_socketSendPacket(int port, char *buffer, int length, IP_ADDR dest) {
+    for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++) {
+        if ((dest == m_physicalNeighbors.at(i)->getIp() ||
+             dest == getIpFromString(BROADCAST_STR)))
+        {
+            // send packet to this node
+            AODVTest::lastReceive = m_physicalNeighbors.at(i)->getIp();
+            AODVTest::lastNode = getIp();
+            AODVTest::globalPacketCount++;
+
+			// Create QueuedPacket
+			QueuedPacket p = {buffer, length, port, this->ipAddress};
+			// Add to neighbors queue
+            m_physicalNeighbors.at(i)->packetQueue.push(p);
+			// Have it handle that packet
+			m_physicalNeighbors.at(i)->handlePackets();
+        }
+        else 
+        {	
+			// TODO: implement this part
+            cout << getStringFromIp(dest) << " from " << getStringFromIp(this->ipAddress) << endl;
+            if (AODV_DEBUG)
+                cout << "[DEBUG]: Testing sending monitoring packet..." << endl;
+        }
+    }
+
+    return 0;
+}
+
+void AODVTest::addNeighbor(AODVTest *node) {
+    this->m_neighbors.push_back(node->getIp());
+    this->m_physicalNeighbors.push_back(node);
+}
+
+void AODVTest::removeNeighbor(AODVTest *node) {
+    for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++) {
+        if (node->getIp() == m_physicalNeighbors.at(i)->getIp()) {
+            m_neighbors.erase(m_neighbors.begin() + i);
+            m_physicalNeighbors.erase(m_physicalNeighbors.begin() + i);
+        }
+    }
+}
+
+bool AODVTest::isNeighbor(AODVTest node) {
+    for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++) {
+        if (node.getIp() == m_physicalNeighbors.at(i)->getIp())
+            return true;
+    }
+
+    return false;
+}
+
+bool AODVTest::packetInRreqBuffer(IP_ADDR dest) {
+    return (rreqPacketBuffer.count(dest));
+}
+
+void AODVTest::handlePackets(){
+	while(!packetQueue.empty()){
+		QueuedPacket p = packetQueue.front();
+		// Pop the packet off the queue
+		packetQueue.pop();
+		if(p.portId == ROUTING_PORT){
+			_handleAODVPacket(p.data, p.length, p.source);
+		}else{
+			// Get Header section
+			IP_ADDR finalDestination;
+			memcpy(&finalDestination, &(p.data[1]), 4);
+			if (this->getIp() == finalDestination) {
+				char* data_part = p.data+HEADER_SIZE; // Get only the data part of the packet
+				ports[p.portId]->handlePacket(data_part, p.length, p.source);
+			}else{
+				_routePacket(p.portId, p.data, p.length);
+			}
+		}
+	}
+}
+
+void AODVTest::_buildPort(Port*){
+
+}
+
+void AODVTest::_destroyPort(Port*){
+	
+}
+
+// AODV TESTING
 
 // Very cheap testing framework
 using namespace std;
@@ -27,10 +120,16 @@ void test_aodv_rreq();
 void test_aodv_loop_prevention();
 void test_aodv_do_nothing();
 void test_aodv_link_break();
+void test_aodv_rreq_simple();
+void test_aodv_rreq_buffer();
+void test_aodv_rreq_forwarding();
+void test_aodv_no_route();
+void test_aodv_rreq_to_rrep();
 
 int main (int argc, char *argv[]) 
 {	
 	cout << "[TESTS]: Running tests..." << endl;	
+
 
 	test_test();
 	test_inet_addr();
@@ -104,10 +203,10 @@ void test_routing_table()
 }
 
 void test_aodv()
-{
+{	
+	test_aodv_do_nothing();
 	test_aodv_rreq();
 	test_aodv_loop_prevention();
-	test_aodv_do_nothing();
 	test_aodv_link_break();
 }
 
@@ -120,7 +219,7 @@ void test_aodv_rreq_simple()
 	IP_ADDR dest = getIpFromString("192.168.0.21");
 
 	// create a rreq packet to destination
-	rreqPacket rreq = aodv.rreqHelper.createRREQ(dest);
+	rreqPacket rreq = aodv.getRREQHelper()->createRREQ(dest);
 
 	test(rreq.type == 0x01, "rreq.type == 0x01");
 	test(rreq.hopCount == 0, "rreq.hopCount == 0");
@@ -131,8 +230,9 @@ void test_aodv_rreq_simple()
 
 	// try a rreq for a different destination 
 	dest = getIpFromString("192.168.0.22");
-	rreq = aodv.rreqHelper.createRREQ(dest);
+	rreq = aodv.getRREQHelper()->createRREQ(dest);
 
+	printf("rreqID: %d\n", rreq.rreqID);
 	test(rreq.rreqID == 2, "rreq.rreqID == 2");
 	test(rreq.origSeqNum == 2, "rreq.origSeqNum == 2");	
 
@@ -153,19 +253,18 @@ void test_aodv_rreq_forwarding()
 	AODVTest node4 = AODVTest(getIpFromString("192.168.0.4"));
 
 	// create a rreq from node 0 to node 4
-	rreqPacket rreq = node0.rreqHelper.createRREQ(node4.getIp());
+	rreqPacket rreq = node0.getRREQHelper()->createRREQ(node4.getIp());
 
 	// rreq received by node1 from node0 
-	rreq = node1.rreqHelper.createForwardRREQ(rreq, node0.getIp());
+	rreq = node1.getRREQHelper()->createForwardRREQ(rreq, node0.getIp());
 	// rreq received by node2 from node1
-	rreq = node2.rreqHelper.createForwardRREQ(rreq, node1.getIp());
+	rreq = node2.getRREQHelper()->createForwardRREQ(rreq, node1.getIp());
 	// req received by node3 from node2
-	rreq = node3.rreqHelper.createForwardRREQ(rreq, node2.getIp());
+	rreq = node3.getRREQHelper()->createForwardRREQ(rreq, node2.getIp());
 	// final hop count increment... 
-	rreq = node4.rreqHelper.createForwardRREQ(rreq, node3.getIp());
+	rreq = node4.getRREQHelper()->createForwardRREQ(rreq, node3.getIp());
 
 	// Create RREP! 
-
 	test(rreq.hopCount == 4, "rreq.hopCount == 4");
 
 	// check routing table update 
@@ -186,21 +285,22 @@ void test_aodv_rreq_buffer()
 	IP_ADDR dest = getIpFromString("192.168.0.21");
 
 	AODVTest aodv(orig);
+	Port* printPort = new  PrintPort(8080);
+	aodv.addPort(printPort);
 
-	rreqPacket rreq = aodv.rreqHelper.createRREQ(dest);
+	rreqPacket rreq = aodv.getRREQHelper()->createRREQ(dest);
 	char* buffer = (char*)(malloc(sizeof(rreq))); 
-	buffer = aodv.rreqHelper.createRREQBuffer(rreq);
+	buffer = aodv.getRREQHelper()->createRREQBuffer(rreq);
 
 	rreqPacket receivedRREQ;
-	receivedRREQ = aodv.rreqHelper.readRREQBuffer(buffer);
+	receivedRREQ = aodv.getRREQHelper()->readRREQBuffer(buffer);
 
 	// Send a message to an unavailable location
 	char message []="Hello World\0";
-	aodv.sendPacket(message, 13, dest);
-	assert(aodv.packetInRreqBuffer(dest));
+	aodv.sendPacket(printPort->getPortId(), message, 13, dest);
+	test(aodv.packetInRreqBuffer(dest), "Packet successfully added to RREQ Buffer");
 
 	// "Find route"
-
 	cout << "[TESTS]: Test aodv rreq buffer complete." << endl;
 
 	delete buffer;
@@ -214,6 +314,11 @@ void test_aodv_rreq_to_rrep()
 	AODVTest node1(getIpFromString("192.168.1.1"));
 	AODVTest node2(getIpFromString("192.168.1.2"));
 	AODVTest node3(getIpFromString("192.168.1.3"));
+	Port* printPort = new  PrintPort(8080);
+	node0.addPort(printPort);
+	node1.addPort(printPort);
+	node2.addPort(printPort);
+	node3.addPort(printPort);
 
 	// set up neighbors
 	node0.addNeighbor(&node1);
@@ -233,7 +338,7 @@ void test_aodv_rreq_to_rrep()
 	for (int i = 0; i < length; i++)
 		buffer[i] = msg.at(i);
 
-	node0.sendPacket(buffer, length, node3.getIp());	
+	node0.sendPacket(printPort->getPortId(), buffer, length, node3.getIp());	
 
 	delete buffer;
 
@@ -242,7 +347,7 @@ void test_aodv_rreq_to_rrep()
 	node2.logRoutingTable();
 	node3.logRoutingTable();
 
-	cout << "[TESTS]: Test aodv rreq to rrep complete." << endl;
+	test(true, "Test aodv rreq to rrep complete");
 }
 
 void test_aodv_loop_prevention()
@@ -252,6 +357,14 @@ void test_aodv_loop_prevention()
 	AODVTest node2(getIpFromString("192.168.1.2"));
 	AODVTest node3(getIpFromString("192.168.1.3"));
 	AODVTest node4(getIpFromString("192.168.1.4"));
+	
+	Port* printPort = new  PrintPort(8080);
+	node0.addPort(printPort);
+	node1.addPort(printPort);
+	node2.addPort(printPort);
+	node3.addPort(printPort);
+	node4.addPort(printPort);
+	
 
 	// assign neighbors, creating a loop
 	node0.addNeighbor(&node1);
@@ -278,7 +391,7 @@ void test_aodv_loop_prevention()
 	for (int i = 0; i < length; i++)
 		buffer[i] = msg.at(i);
 
-	node0.sendPacket(buffer, length, node4.getIp());
+	node0.sendPacket(printPort->getPortId(), buffer, length, node4.getIp());
 
 	node0.logRoutingTable();
 	node1.logRoutingTable();
@@ -286,7 +399,7 @@ void test_aodv_loop_prevention()
 	node3.logRoutingTable();
 	node4.logRoutingTable();
 
-	cout << "[TESTS]: Test aodv loop prevention passed" << endl;
+	test(true, "Test aodv loop prevention passed");
 
 	delete buffer;
 }
@@ -294,7 +407,7 @@ void test_aodv_loop_prevention()
 void test_aodv_rreq_no_route()
 {
 	// TODO: Add this test 
-	cout << "[WARNING]: Aodv can NOT handle no possible route." << endl;
+	test(false, "[WARNING]: Aodv can NOT handle no possible route.");
 }
 
 void test_aodv_rreq()
@@ -313,6 +426,14 @@ void test_aodv_link_break()
 	AODVTest node2(getIpFromString("192.168.1.2"));
 	AODVTest node3(getIpFromString("192.168.1.3"));
 	AODVTest node4(getIpFromString("192.168.1.4"));
+
+	Port* printPort = new  PrintPort(8080);
+	node0.addPort(printPort);
+	node1.addPort(printPort);
+	node2.addPort(printPort);
+	node3.addPort(printPort);
+	node4.addPort(printPort);
+	
 
 	// assign neighbors, creating a loop
 	node0.addNeighbor(&node1);
@@ -341,9 +462,9 @@ void test_aodv_link_break()
 	for (int i = 0; i < length; i++)
 		buffer[i] = msg.at(i);
 
-	node0.sendPacket(buffer, length, node4.getIp());
+	node0.sendPacket(printPort->getPortId(), buffer, length, node4.getIp());
 
-	node0.sendPacket(buffer, length, node4.getIp());
+	node0.sendPacket(printPort->getPortId(), buffer, length, node4.getIp());
 	delete buffer;
 
 	test(AODVTest::lastReceive == node4.getIp(), "Last received packet was by node 4");
@@ -352,13 +473,13 @@ void test_aodv_link_break()
 	node4.removeNeighbor(&node2);
 	node2.removeNeighbor(&node4);
 
-	node0.sendPacket(buffer, length, node4.getIp());
+	node0.sendPacket(printPort->getPortId(), buffer, length, node4.getIp());
 //	node0.sendPacket(buffer, length, node4.getIp());
 
 	// FAILING this test is okay because if links break we will consider those packets lost...
 	test(AODVTest::lastReceive == node4.getIp(), "Last received packet was node " + getStringFromIp(AODVTest::lastReceive) + " not node 4");
 
-	node0.sendPacket(buffer, length, node4.getIp());
+	node0.sendPacket(printPort->getPortId(), buffer, length, node4.getIp());
 	test(AODVTest::lastReceive == node4.getIp(), "Last received packet was node " + getStringFromIp(AODVTest::lastReceive));
 
 	cout << "[TESTS]: Test aodv link break passed" << endl;
