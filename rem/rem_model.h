@@ -10,7 +10,7 @@
  * Date: 10/28/2019
  ********************************/
 
-#define RSS_OUT_OF_RANGE        -90
+#define RSS_OUT_OF_RANGE        -95
 
 #include "rem_parameters.h"
 #include "rem_defines.h"

@@ -10,7 +10,6 @@
 #include "ns3/inet-socket-address.h"
 #include "ns3/tag.h"
 #include "ns3/udp-header.h"
-#include "ns3/basic-energy-source.h"
 
 #include <iostream>
 
@@ -130,7 +129,9 @@ uint32_t AdHocRoutingHelper::getNs3SimulatedTimeMS()
 
 double AdHocRoutingHelper::getNs3SimulatedBattery(IP_ADDR nodeIp)
 {
-    return 100;
+    // get the battery level of node ip
+    Ptr<Node> node = m_existingNodes[nodeIp];
+    return node->m_battery;
 }
 
 AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp)

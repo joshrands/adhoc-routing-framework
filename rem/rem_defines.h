@@ -7,7 +7,7 @@
 #include "../defines.h"
 #include "../aodv/aodv_defines.h"
 
-#define REM_DEBUG   		DEBUG && 1
+#define REM_DEBUG   		DEBUG && 0
 #define BATTERY_DEBUG       DEBUG && 1
 #define RSS_DEBUG           DEBUG && 1
 
