@@ -52,7 +52,7 @@ class RoutingTable{
 public:
 	// default constructor 
 	RoutingTable();
-	~RoutingTable();
+	virtual ~RoutingTable();
 
 	const uint16_t DEFAULT_TTL = 1800; // 1800 seconds = 30 minutes 
 
@@ -104,7 +104,7 @@ public:
      * @param dest 
      * @param origIP 
      */
-    void sendPacket(Port* p, char* data, int length, IP_ADDR dest, IP_ADDR origIP = -1);
+    bool sendPacket(Port* p, char* data, int length, IP_ADDR dest, IP_ADDR origIP = -1);
 
     // Virtual Functions
 	/**
@@ -115,16 +115,19 @@ public:
      * @param length the length of the data
      * @param dest 
      * @param origIP 
+     * 
+     * @returns Whether or not the packet was sent
      */
-    virtual void sendPacket(int portId, char* data, int length, IP_ADDR dest, IP_ADDR origIP = -1) = 0;
+    virtual bool sendPacket(int portId, char* data, int length, IP_ADDR dest, IP_ADDR origIP = -1) = 0;
     /**
      * @brief Handles the receiving or processing of all packets
      * @brief when implementing this should query each of the sockets corresponding to each port
      * @brief and then "give" the data to each port
      * TODO: By creating a Socket base class we could implement this code and avoid the above req. 
      * 
+     * @returns the number of handled packets
      */
-    virtual void handlePackets() = 0;
+    virtual int handlePackets() = 0;
 	
     /**
      * @brief is there a link between this node and dest? 
@@ -144,6 +147,7 @@ public:
      * 
      * @param node ip address to add
      */
+    // TODO: Make add link a boolean
 	void addLink(IP_ADDR node);
     
 	

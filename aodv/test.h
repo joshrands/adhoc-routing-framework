@@ -21,7 +21,7 @@ public:
 	AODVTest(const char* ip) : AODV(ip) {}
 	~AODVTest() { m_physicalNeighbors.clear(); }
 
-    void handlePackets();
+    int handlePackets() override;
 
 	// Network Monitoring 
 
@@ -43,9 +43,9 @@ public:
     }
 
 protected:
-    int _socketSendPacket(int port, char *buffer, int length, IP_ADDR dest) override;
-	void _buildPort(Port*);
-    void _destroyPort(Port*);
+    bool _socketSendPacket(int port, char *buffer, int length, IP_ADDR dest) override;
+	void _buildPort(Port*) override;
+    void _destroyPort(Port*) override;
 
 private:
 	vector<AODVTest*> m_physicalNeighbors;
@@ -55,7 +55,7 @@ private:
 class AODVMonitorTest : public AODVTest 
 {
 protected:
-	int _socketSendPacket(int port, char *buffer, int length, IP_ADDR dest) override;
+	bool _socketSendPacket(int port, char *buffer, int length, IP_ADDR dest) override;
 
 };
 

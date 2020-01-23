@@ -61,7 +61,7 @@ AODV::~AODV() {
 /******************************
  * Public Functions
  ******************************/
-void AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP) {
+bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP) {
     // by default this node is the originator
     if (-1 == signed(origIP))
         origIP = getIp();
@@ -108,7 +108,7 @@ void AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
         }
         _broadcastRREQBuffer(rreq);
 
-        return;
+        return true;
     }
 
     if (AODV_DEBUG)
@@ -455,8 +455,8 @@ void AODV::_handleAODVPacket(char *buffer, int length, IP_ADDR source){
     }
 }
 
-int AODV::_socketSendPacket(Port* p, char *buffer, int length, IP_ADDR dest){
-    _socketSendPacket(p->getPortId(), buffer, length, dest);
+bool AODV::_socketSendPacket(Port* p, char *buffer, int length, IP_ADDR dest){
+    return _socketSendPacket(p->getPortId(), buffer, length, dest);
 }
 
 /******************************

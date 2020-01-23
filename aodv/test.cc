@@ -10,7 +10,7 @@ int AODVTest::globalPacketCount = 0;
 IP_ADDR AODVTest::lastNode = 0;
 IP_ADDR AODVTest::lastReceive = 0;
 
-int AODVTest::_socketSendPacket(int port, char *buffer, int length, IP_ADDR dest) {
+bool AODVTest::_socketSendPacket(int port, char *buffer, int length, IP_ADDR dest) {
     for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++) {
         if ((dest == m_physicalNeighbors.at(i)->getIp() ||
              dest == getIpFromString(BROADCAST_STR)))
@@ -36,7 +36,7 @@ int AODVTest::_socketSendPacket(int port, char *buffer, int length, IP_ADDR dest
         }
     }
 
-    return 0;
+    return true;
 }
 
 void AODVTest::addNeighbor(AODVTest *node) {
@@ -66,7 +66,8 @@ bool AODVTest::packetInRreqBuffer(IP_ADDR dest) {
     return (rreqPacketBuffer.count(dest));
 }
 
-void AODVTest::handlePackets(){
+int AODVTest::handlePackets(){
+	int count = packetQueue.size();
 	while(!packetQueue.empty()){
 		QueuedPacket p = packetQueue.front();
 		// Pop the packet off the queue
@@ -85,6 +86,7 @@ void AODVTest::handlePackets(){
 			}
 		}
 	}
+	return count;
 }
 
 void AODVTest::_buildPort(Port*){

@@ -7,6 +7,7 @@
 #include <thread>
 #include <time.h>
 #include <utility>
+#include "../aodv/test.h"
 
 using namespace std;
 
@@ -34,23 +35,39 @@ int main() {
     // Test initialization and ports
     {
         HardwareAODV haodv(getIpFromString("127.0.0.1"));
+        PrintPort* printPort = new PrintPort(DATA_PORT);
+        haodv.addPort(printPort);
+
         char *msg = (char *)(malloc(16));
         string message = "Hello World!";
         memcpy(msg, &message, 16);
 
-        haodv.sendPacket(msg, 16, getIpFromString("127.0.0.2"));
-        haodv.sendPacket(msg, 16, getIpFromString("127.0.0.2"));
-
+        haodv.sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.2"));
+        haodv.sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.2"));
         haodv.handlePackets();
-        for (auto packet : haodv.getDataPackets()) {
-            printPacket(stdout, packet.getData(), packet.getLength());
-            printf("\n");
-        }
+        delete printPort;
     }
 
     printf("________________________________\n\n");
     // Test messages can be sent
-    {}
+    {
+        RoutingProtocol* haodv = new HardwareAODV(getIpFromString("127.0.0.1"));
+        PrintPort* printPort = new PrintPort(DATA_PORT);
+        haodv->addPort(printPort);
+
+        char *msg = (char *)(malloc(16));
+        string message = "Hello World!";
+        memcpy(msg, &message, 16);
+
+        haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.2"));
+        haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.2"));
+        haodv->handlePackets();
+        haodv->removePort(printPort);
+        haodv->handlePackets();
+        delete printPort;
+        delete haodv;
+
+    }
 
     printf("________________________________\n\n");
     // Test communication between sockets

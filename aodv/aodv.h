@@ -37,7 +37,7 @@ public:
 	AODV();
 	AODV(const char* ip);
 	AODV(IP_ADDR ip);
-	~AODV();
+	virtual ~AODV();
 
 	/**
      * @brief Send a packet to a given ip address using a specified port
@@ -48,7 +48,8 @@ public:
      * @param dest the destination ip address
      * @param origIP IP address where the packet was from
      */
-    virtual void sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP = -1);
+	//TODO: Actually make this return false on a failure, currently is a silent failure
+    virtual bool sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP = -1) override;
 	
 	// Network Monitoring
 	// attempt to repair the link and then send the packet to its destination
@@ -66,13 +67,10 @@ public:
 
 	// Pure Virtual functions
     /**
-     * @brief Handles the receiving or processing of all packets
-     * @brief when implementing this should query each of the sockets corresponding to each port
-     * @brief and then "give" the data to each port
-     * TODO: By creating a Socket base class we could implement this code and avoid the above req. 
+     * @brief see routing_protocol.h
      * 
      */
-    virtual void handlePackets() = 0;
+    virtual int handlePackets() = 0;
 
 	
 protected:
@@ -127,10 +125,10 @@ protected:
 	void _handleAODVPacket(char *buffer, int length, IP_ADDR source);
 
 	// Send the data over a socket
-	int _socketSendPacket(Port* port, char *buffer, int length, IP_ADDR dest);
+	bool _socketSendPacket(Port* port, char *buffer, int length, IP_ADDR dest);
 
 	// Virtual Functions
-	virtual int _socketSendPacket(int portId, char *buffer, int length, IP_ADDR dest) = 0;
+	virtual bool _socketSendPacket(int portId, char *buffer, int length, IP_ADDR dest) = 0;
 	virtual void _buildPort(Port*) = 0;
     virtual void _destroyPort(Port*) = 0;
 
