@@ -35,7 +35,7 @@ UDPSocket::~UDPSocket(){
 
 bool UDPSocket::init(void) { 
   if(UDP_DEBUG){
-    printf("[DEBUG]: Initializing udp socket\n");
+    printf("[UDP SOCKET]:[DEBUG]: Initializing udp socket\n");
   }
   bool result = initSocket(SOCK_DGRAM);
   return result;
@@ -44,7 +44,7 @@ bool UDPSocket::init(void) {
 // Server initialization
 bool UDPSocket::bindToPort(int port) {
   if(UDP_DEBUG){
-    printf("[DEBUG]: Binding udp socket to port %d\n", port);
+    printf("[UDP SOCKET]:[DEBUG]: Binding udp socket to port %d\n", port);
   }
   if(sockfd < 0){
     if (!initSocket(SOCK_DGRAM))
@@ -61,12 +61,12 @@ bool UDPSocket::bindToPort(int port) {
   if (bind(sockfd, (const struct sockaddr *)&localHost, sizeof(localHost)) < 0) {
     close(sockfd);
     if(UDP_DEBUG){
-      printf("[DEBUG]: Unsuccessful binding of udp socket to port %d\n", port);
+      printf("[UDP SOCKET]:[DEBUG]: Unsuccessful binding of udp socket to port %d\n", port);
     }
     return false;
   }
   if(UDP_DEBUG){
-    printf("[DEBUG]: Successful binding of udp socket to port %d\n", port);
+    printf("[UDP SOCKET]:[DEBUG]: Successful binding of udp socket to port %d\n", port);
   }
 
   return true;
@@ -86,18 +86,18 @@ bool UDPSocket::setBroadcasting(bool broadcast) {
   int option = (broadcast) ? (1) : (0);
   return setOption(SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
   if(UDP_DEBUG){
-    printf("[DEBUG]: Setting udp socket to broadcast mode\n");
+    printf("[UDP SOCKET]:[DEBUG]: Setting udp socket to broadcast mode\n");
   }
 }
 
 // -1 if unsuccessful, else number of bytes written
 int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
   if(UDP_DEBUG){
-    printf("[DEBUG]: Sending %s to %s via UDP\n", packet, remote.getAddressC());
+    printf("[UDP SOCKET]:[DEBUG]: Sending %s to %s via UDP\n", packet, remote.getAddressC());
   }
   if (sockfd < 0) {
     if(UDP_DEBUG){
-      printf("[DEBUG]: sockfd is in error state\n");
+      printf("[UDP SOCKET]:[DEBUG]: sockfd is in error state\n");
     }
     return -1;
   }
@@ -107,8 +107,8 @@ int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
                 sizeof(remote.remoteHost));
   if(returnVal < 0){
     int errsv = errno;
-    printf("[ERROR] Could not send packet %s to %d\n", packet, remote.getAddressI());
-    printf("[ERROR] %d\n", errsv);
+    fprintf(stderr, "[UDP SOCKET]:[ERROR] Could not send packet %s to %d\n", packet, remote.getAddressI());
+    fprintf(stderr, "[UDP SOCKET]:[ERROR] %d\n", errsv);
   }
   return returnVal;
 }
