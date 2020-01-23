@@ -18,7 +18,7 @@ LIBFLAGS = -cvq
 
 # You should be able to add object files here without changing anything else
 TARGET = do-adhoc
-OBJ_LIB_FILES = hardware/hardware_aodv.o adhoc/adhoc_routing.o
+OBJ_LIB_FILES = hardware/hardware_aodv.o
 
 STATIC_LIBRARIES = hardware/libhardware.a adhoc/libadhoc.a
 
@@ -34,7 +34,7 @@ ${TARGET}: #${OBJ_FILES}
 test: 
 	make clean	
 	${CXX} -c ${CXXFLAGS} test.cc -o test.o
-	${LD} ${LDFLAGS} adhoc_routing.o test.o aodv/*.o monitoring/*.o -o test 
+	${LD} ${LDFLAGS} test.o aodv/*.o adhoc/*.o -o test 
 #	./test
 
 test-all:
