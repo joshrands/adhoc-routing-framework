@@ -82,26 +82,27 @@ void RoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop)
 }
 
 RoutingProtocol::RoutingProtocol(){
-
+}
+RoutingProtocol::~RoutingProtocol(){
 }
 
 void RoutingProtocol::addPort(Port* p){
 	if(ports.count(p->getPortId()) == 0){
 		if(ROUTING_DEBUG){
-			printf("[ROUTING]: [DEBUG]: Adding port %d\n",p->getPortId());
+			printf("[ROUTING]:[DEBUG]: Adding port %d\n",p->getPortId());
 		}
 		ports[p->getPortId()] = p;
-		_buildPort(p);
+		this->_buildPort(p);
 	}
 }
 
 void RoutingProtocol::removePort(Port* p){
 	if(ports.count(p->getPortId())){
 		if(ROUTING_DEBUG){
-			printf("[ROUTING]: [DEBUG]: Removing port %d\n",p->getPortId());
+			printf("[ROUTING]:[DEBUG]: Removing port %d\n",p->getPortId());
 		}
+		this->_destroyPort(p);
 		ports.erase(p->getPortId());
-		_destroyPort(p);
 	}
 }
 
@@ -111,20 +112,20 @@ bool RoutingProtocol::sendPacket(Port* p, char* data, int length, IP_ADDR dest, 
 
 bool RoutingProtocol::linkExists(IP_ADDR dest) {
     if (MONITOR_DEBUG)
-        cout << "[ROUTING]: [DEBUG]: Checking if link exists from "
+        cout << "[ROUTING]:[DEBUG]: Checking if link exists from "
              << getStringFromIp(getIp()) << " to " << getStringFromIp(dest)
              << endl;
 
     for (IP_ADDR ip : m_neighbors) {
         if (dest == ip) {
             if (MONITOR_DEBUG)
-                cout << "[ROUTING]: [DEBUG]: Link exists!" << endl;
+                cout << "[ROUTING]:[DEBUG]: Link exists!" << endl;
             return true;
         }
     }
 
     if (MONITOR_DEBUG)
-        cout << "[ROUTING]: [DEBUG]: Link does not exist." << endl;
+        cout << "[ROUTING]:[DEBUG]: Link does not exist." << endl;
 
     return false;
 }

@@ -79,6 +79,8 @@ class RoutingProtocol {
 public: 
 	// default constructor
 	RoutingProtocol();
+    // Destructor
+    virtual ~RoutingProtocol();
 
 	    // Functions
     /**
@@ -168,8 +170,6 @@ public:
 protected:
 	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
 	vector<IP_ADDR> m_neighbors;
-    // A table of how to send messages to each IP Address
-	RoutingTable* table;	
     // The ip address of the cimputer this routing protocol is running on
 	uint32_t ipAddress;
     // The list of ports that can send and receive messages using this routing protocol
@@ -178,7 +178,6 @@ protected:
 	// Functions
 	virtual void _buildPort(Port*) = 0;
     virtual void _destroyPort(Port*) = 0;
-
 };
 
 #endif

@@ -14,8 +14,8 @@
 
 class HardwareAODV : public AODV{
 private:
+    vector<thread> portThreads;
     unordered_map<int, UDPSocket*> portSockets;
-    unordered_map<int, thread> portThreads;
     UDPSocket* aodvSocket;
     thread aodving;
 

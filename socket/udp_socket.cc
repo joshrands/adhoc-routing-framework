@@ -26,10 +26,13 @@
 using std::memset;
 
 
-UDPSocket::UDPSocket() : messages(UDP_QUEUE_SIZE), Socket() {
+UDPSocket::UDPSocket() : Socket(), messages(UDP_QUEUE_SIZE){
 }
 
 UDPSocket::~UDPSocket(){ 
+  if(UDP_DEBUG){
+    printf("[UDP SOCKET]:[DEBUG]: deconstructing udp socket\n");
+  }
   close(sockfd); 
 }
 
@@ -96,8 +99,9 @@ int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
     printf("[UDP SOCKET]:[DEBUG]: Sending %s to %s via UDP\n", packet, remote.getAddressC());
   }
   if (sockfd < 0) {
+    fprintf(stderr, "[UDP SOCKET]:[ERROR]: sockfd is in error state\n");
     if(UDP_DEBUG){
-      printf("[UDP SOCKET]:[DEBUG]: sockfd is in error state\n");
+      fprintf(stderr, "[UDP SOCKET]:[ERROR]: %s\n", strerror(errno));
     }
     return -1;
   }
@@ -106,9 +110,8 @@ int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
                 (const struct sockaddr *)&remote.remoteHost,
                 sizeof(remote.remoteHost));
   if(returnVal < 0){
-    int errsv = errno;
     fprintf(stderr, "[UDP SOCKET]:[ERROR] Could not send packet %s to %d\n", packet, remote.getAddressI());
-    fprintf(stderr, "[UDP SOCKET]:[ERROR] %d\n", errsv);
+    fprintf(stderr, "[UDP SOCKET]:[ERROR]: %s\n", strerror(errno));
   }
   return returnVal;
 }
@@ -121,10 +124,10 @@ int UDPSocket::sendTo(char *buffer, int length, uint32_t dest, int port) {
 
 int UDPSocket::receiveFrom(Endpoint &sender, char *buffer, int length) {
   // -1 if unsuccessful, else number of bytes received
-  
   if (sockfd < 0){
+    fprintf(stderr, "[UDP SOCKET]:[ERROR]: UDP socketfd is in error state while trying to receive packets\n");
     if(UDP_DEBUG){
-      printf("[DEBUG]: UDP socketfd is in error state while trying to receive packets\n");
+      fprintf(stderr, "[UDP SOCKET]:[ERROR]: %s\n", strerror(errno));
     }
     return -1;
   }
@@ -143,7 +146,11 @@ void UDPSocket::receiveFromPortThread() {
     Endpoint sender;
     int n = receiveFrom(sender, buffer, MAXLINE);
     if (n <= 0) {
-      continue;
+      fprintf(stderr, "[UDP SOCKET]:[ERROR]: Receiving data on port failed\n");
+      if(UDP_DEBUG){
+        fprintf(stderr, "[UDP SOCKET]:[ERROR]: %s\n", strerror(errno));
+      }
+      exit(-1);
     }
     buffer[n] = '\0';
 

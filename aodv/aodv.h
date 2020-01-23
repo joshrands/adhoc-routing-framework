@@ -65,14 +65,6 @@ public:
 	// get the routing table 
 	AODVRoutingTable* getTable() { return m_aodvTable; } 
 
-	// Pure Virtual functions
-    /**
-     * @brief see routing_protocol.h
-     * 
-     */
-    virtual int handlePackets() = 0;
-
-	
 protected:
 	// node sequence number. MUST increment on a route discovery
 	uint32_t sequenceNum;
@@ -129,8 +121,6 @@ protected:
 
 	// Virtual Functions
 	virtual bool _socketSendPacket(int portId, char *buffer, int length, IP_ADDR dest) = 0;
-	virtual void _buildPort(Port*) = 0;
-    virtual void _destroyPort(Port*) = 0;
 
 };
 

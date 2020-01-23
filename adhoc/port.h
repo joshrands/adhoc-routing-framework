@@ -37,6 +37,7 @@ public:
     Port(int portId, RoutingProtocol* adhocRouting);
     
     // Destructor
+    virtual ~Port(){}
 
     // Functions
     /**
