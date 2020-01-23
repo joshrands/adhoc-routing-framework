@@ -70,7 +70,6 @@ public:
 	// Network Monitoring
 	void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port);
 	bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
-	void getOneHopNeighbors();
 
 	// output the current contents of the routing table 
 	void logRoutingTable();

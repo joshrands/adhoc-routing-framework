@@ -100,6 +100,7 @@ void AODV::receivePacket(char *packet, int length, IP_ADDR source) {
         // send the packet to final destination - will check routing table
         // strip header and send packet
         // TODO: Most important time to check link state.
+        // TODO: Make this memory cleaner. Allocate new memory? 
         packet += HEADER_SIZE;
         sendPacket(packet, length - HEADER_SIZE, finalDestination, origIP);
     }
@@ -459,10 +460,6 @@ bool AODV::attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest) {
 
     // TODO: Use network monitoring to attempt local repair
     return false;
-}
-
-void AODV::getOneHopNeighbors() {
-
 }
 
 void AODV::logRoutingTable() {
