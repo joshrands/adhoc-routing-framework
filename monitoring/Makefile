@@ -21,14 +21,14 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libmonitoring.a
-OBJ_LIB_FILES = rem.o rem_model.o network_monitor.o rem_sim.o hello_monitor.o ../aodv/*.o
+OBJ_LIB_FILES = hello_monitor.o ../aodv/*.o ../adhoc/*.o
 
 STATIC_LIBRARIES = ../aodv/libaodv.a
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = ${TARGET}.h rem.h rem_model.h rem_packet.h rem_parameters.h hello_monitor.h monitor_defines.h network_monitor.h RoutingProtocol.h defines.h rem_sim.h
+INC_FILES = ${TARGET}.h hello_monitor.h
 
-SUBDIRS = ../aodv 
+SUBDIRS = ../aodv ../adhoc
 
 ${TARGET}: ${OBJ_FILES}
 	for dir in $(SUBDIRS); do \
