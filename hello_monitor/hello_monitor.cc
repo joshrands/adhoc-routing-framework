@@ -1,26 +1,24 @@
 #include "hello_monitor.h"
-#include "monitor_defines.h"
 #include <iostream>
 #include <cstring>
 
 int HelloNeighbors::HELLO_INTERVAL_MS = 1000;
-
-HelloNeighbors::HelloNeighbors(RoutingProtocol* routingProtocol)
-{
-    this->m_parentIp = routingProtocol->getIp();
-    this->m_routing = routingProtocol;
-}
 
 HelloNeighbors::~HelloNeighbors()
 {
 
 }
 
+void HelloNeighbors::handlePacket(char* data, int length, IP_ADDR source)
+{
+    std::cout << "[HELLO][WARNING]: Handle packets not implemented" << std::endl;
+} 
+
 void HelloNeighbors::initializeHellos()
 {
-    if (nullptr == m_routing)
+    if (nullptr == routingProtocol)
     {
-        std::cout << "[ERROR]: HELLO routing protocol not set." << std::endl;
+        std::cout << "[HELLO][ERROR]: HELLO routing protocol not set." << std::endl;
         return;
     }
 }
@@ -28,10 +26,11 @@ void HelloNeighbors::initializeHellos()
 void HelloNeighbors::_updateNeighbors()
 {
     // 1. Update neighbors of routing protocol
-    m_routing->resetLinks();
+    // TODO: Should we add a mux/semaphore here? 
+    routingProtocol->resetLinks();
     for (IP_ADDR link : m_neighbors)
     {
-        m_routing->addExistingLink(link);
+        routingProtocol->addLink(link);
     }
 
     // 2. Clear neighbors for next time period 
@@ -59,7 +58,8 @@ void HelloNeighbors::_broadcastHelloMessage()
     char* buffer = (char*)(malloc(4));
     memcpy(buffer, &m_parentIp, 4);
 
-    m_routing->sendPacket(buffer, 4, getIpFromString(BROADCAST_STR), m_parentIp);
+    // send data on HELLO port
+    routingProtocol->sendPacket(getPortId(), buffer, 4, getIpFromString(BROADCAST_STR), m_parentIp);
 }
 
 void HelloNeighbors::_receiveHelloMessage(IP_ADDR nodeIp)

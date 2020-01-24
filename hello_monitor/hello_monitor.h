@@ -7,20 +7,25 @@
  * Date: 1/19/2019
  ********************************/
 
-#include "RoutingProtocol.h"
+#include "../adhoc/routing_protocol.h"
+#include "../defines.h"
 #include <set>
 
-class HelloNeighbors
+#define HELLO_DEBUG     DEBUG && 1
+
+class HelloNeighbors : public Port
 {
 public:
-    HelloNeighbors(RoutingProtocol* routingProtocol);
+    HelloNeighbors(int portId, RoutingProtocol* routing) : Port(portId, routing) { }
     ~HelloNeighbors();
 
-    // Partner routing protocol where neighbors will be assigned 
-    // Also used for sending periodic hello messages 
-    RoutingProtocol* m_routing;
-    // port number for where to send HELLO messages 
-    int m_port; 
+    /**
+     * @brief This function is called by adhocRouting to give the port its data
+     * 
+     * @param data char array of data
+     * @param length the length of the data
+     */
+    void handlePacket(char* data, int length, IP_ADDR source) override;
 
     static int HELLO_INTERVAL_MS;
 
@@ -54,7 +59,7 @@ protected:
 class HelloTest : public HelloNeighbors
 {
 public: 
-    HelloTest(RoutingProtocol* routing) : HelloNeighbors(routing) { }
+    HelloTest(int portId, RoutingProtocol* routing) : HelloNeighbors(portId, routing) { }
 
 protected:
     bool _sleep(int DURATION_MS);

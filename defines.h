@@ -12,5 +12,6 @@
 #define DATA_PORT           5432
 #define MONITOR_PORT        5123
 #define LOCAL_DATA_UPDATE_RATE_MS 500
+#define HELLO_PORT          5124
 
 #endif

@@ -31,6 +31,7 @@ public:
     void initializeBatteryModel();
     void initializeRssModel(IP_ADDR pairIp);
 
+    // TODO: Change this to handlePackets
     void handleMonitoringPacketBuffer(char* packet, int length, IP_ADDR source, int port) override;
     void updateLocalModels();
 
