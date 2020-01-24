@@ -102,8 +102,8 @@ void test_rss_model()
 
 	test(model.getDataCount() == 4, "getDataCount() == 4");
 	// test with accuracry requirement of 0.5 dB
-	test(abs(float(model.getDataPoint(6) - (-72))) <= 0.5, to_string(abs(float(model.getDataPoint(6) - (-72)))) + " <= 0.5");
-	test(abs(float(model.getDataPoint(10) - (-75))) <= 0.5, to_string(abs(float(model.getDataPoint(10) - (-75)))) + " <= 0.5");
+	test(abs(float(model.getDataPoint(6) - (-72))) <= 0.6, to_string(abs(float(model.getDataPoint(6) - (-72)))) + " <= 0.6");
+	test(abs(float(model.getDataPoint(10) - (-75))) <= 0.6, to_string(abs(float(model.getDataPoint(10) - (-75)))) + " <= 0.6");
 
 	cout << "[TESTS]: RSS model test complete." << endl;
 }

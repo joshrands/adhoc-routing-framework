@@ -49,8 +49,6 @@ int main (int argc, char *argv[])
 void test_test()
 {
 	test(true == true, "true == true");
-	// fail test... 
-	test(true == false, "true == false??? This was supposed to fail :)");
 }
 
 void test_inet_addr()
@@ -329,14 +327,15 @@ void test_aodv_rreq_no_route()
 	for (int i = 0; i < length; i++)
 		buffer[i] = msg.at(i);
 
-	node0.sendPacket(printPort->getPortId(), buffer, length, getIpFromString("192.168.1.4"));
+	test(false, "[WARNING]: Aodv can NOT handle no possible route.");
 
-	delete buffer;
-	delete printPort;
+	node0.sendPacket(printPort->getPortId(), buffer, length, getIpFromString("192.168.1.4"));
 
 	// TODO: Add this test 
 	// TODO: Is this a buffer problem?
-	test(false, "[WARNING]: Aodv can NOT handle no possible route.");
+
+	delete buffer;
+	delete printPort;
 }
 
 void test_aodv_rreq()

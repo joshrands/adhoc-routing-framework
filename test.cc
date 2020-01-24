@@ -40,8 +40,6 @@ int main (int argc, char *argv[])
 void test_test()
 {
 	test(true == true, "true == true");
-	// fail test... 
-	test(true == false, "true == false??? This was supposed to fail :)");
 }
 
 void test_adhoc()
