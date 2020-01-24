@@ -88,7 +88,7 @@ void REM::updateLocalModels()
 //                    std::cout << "[REM]: Adding link to node " << to_string(data.pairIp) << std::endl;
 
                 pairMonitoringData[m_parentIp].push_back(data);
-                routing->addExistingLink(data.pairIp);
+                routing->addLink(data.pairIp);
             }
         }
 
@@ -268,7 +268,7 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
         char* buffer = (char*)(malloc(size));
         memcpy(buffer, &packet, size);
 
-        routing->socketSendPacket(buffer, size, getIpFromString(BROADCAST_STR), MONITOR_PORT);
+        routing->sendPacket(this->getPortId(), buffer, size, getIpFromString(BROADCAST_STR), MONITOR_PORT);
 
         delete buffer;
     }

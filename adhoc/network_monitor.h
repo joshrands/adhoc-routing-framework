@@ -17,13 +17,22 @@
 
 #include "monitor_info.h"
 #include "adhoc_defines.h"
+#include "port.h"
 
 using namespace std;
-class NetworkMonitor{
+class NetworkMonitor : public Port {
 public:
     NetworkMonitor();
     NetworkMonitor(IP_ADDR nodeIp);
     ~NetworkMonitor();
+
+    /**
+     * @brief This function is called by adhocRouting to give the port its data
+     * 
+     * @param data char array of data
+     * @param length the length of the data
+     */
+    void handlePacket(char* data, int length, IP_ADDR source) { handleMonitoringPacketBuffer(data, length, source, MONITOR_PORT); }
 
     virtual void updatePairData(pair_data pairData) = 0;
 

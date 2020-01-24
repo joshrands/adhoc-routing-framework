@@ -22,7 +22,8 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libhardware.a
-OBJ_LIB_FILES = hardware_aodv.o hardware_rem.o ../aodv/*.o ../socket/*.o ../adhoc/*.o
+HARDWARE_OBJ_FILES = hardware_aodv.o hardware_rem.o 
+OBJ_LIB_FILES = ${HARDWARE_OBJ_FILES} ../aodv/*.o ../socket/*.o ../adhoc/*.o
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
 INC_FILES = hardware_aodv.h hardware_defines.h hardware_rem.h
@@ -50,5 +51,5 @@ ${TARGET} : ${OBJ_FILES}
 # Please remember not to submit objects or binarys.
 #
 clean:
-	rm -f core ${TARGET} hardware_aodv.o ${LIB_NAME}
+	rm -f core ${TARGET} ${HARDWARE_OBJ_FILES} ${LIB_NAME}
 	rm -f "*.o"
