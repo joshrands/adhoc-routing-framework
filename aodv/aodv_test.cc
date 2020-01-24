@@ -27,7 +27,8 @@ bool AODVTest::_socketSendPacket(int port, char *buffer, int length, IP_ADDR des
         else 
         {	
 			// TODO: implement this part
-            cout << getStringFromIp(dest) << " from " << getStringFromIp(this->ipAddress) << endl;
+            if (DEBUG)
+                cout << "[DEBUG]: " << getStringFromIp(dest) << " from " << getStringFromIp(this->ipAddress) << endl;
             if (AODV_DEBUG)
                 cout << "[DEBUG]: Testing sending monitoring packet..." << endl;
         }

@@ -36,7 +36,6 @@ int main (int argc, char *argv[])
 {	
 	cout << "[TESTS]: Running tests..." << endl;	
 
-
 	test_test();
 	test_inet_addr();
 	test_routing_table();
@@ -312,7 +311,31 @@ void test_aodv_loop_prevention()
 
 void test_aodv_rreq_no_route()
 {
+	AODVTest node0(getIpFromString("192.168.1.0"));
+	AODVTest node1(getIpFromString("192.168.1.1"));
+
+	// assign neighbors, creating a loop
+	node0.addNeighbor(&node1);
+	node1.addNeighbor(&node0);
+
+	Port* printPort = new  PrintPort(8080);
+	node0.addPort(printPort);
+	node1.addPort(printPort);
+
+	// send a packet from node 0 to non existing node 
+	string msg = "Hello fake node! From node 0";
+	int length = msg.length();
+	char* buffer = (char*)(malloc(length));
+	for (int i = 0; i < length; i++)
+		buffer[i] = msg.at(i);
+
+	node0.sendPacket(printPort->getPortId(), buffer, length, getIpFromString("192.168.1.4"));
+
+	delete buffer;
+	delete printPort;
+
 	// TODO: Add this test 
+	// TODO: Is this a buffer problem?
 	test(false, "[WARNING]: Aodv can NOT handle no possible route.");
 }
 

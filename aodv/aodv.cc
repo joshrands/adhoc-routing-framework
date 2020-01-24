@@ -61,7 +61,8 @@ AODV::~AODV() {
  * Public Functions
  ******************************/
 bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP) {
-    cout << "[ORIG]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
+    if (AODV_DEBUG)
+        cout << "[ORIG]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
 
     // by default this node is the originator
     if (-1 == signed(origIP))
