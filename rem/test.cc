@@ -6,7 +6,7 @@
 #include "string.h"
 #include "rem.h"
 #include "../aodv/aodv.h"
-#include "../aodv/test.h"
+#include "../aodv/aodv_test.h"
 
 using namespace std;
 
