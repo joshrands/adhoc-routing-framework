@@ -49,6 +49,29 @@ void test_test()
 
 void test_hello()
 {
-	AODVTest aodv("192.168.0.1");
-	HelloTest hello(HELLO_PORT, &aodv);
+	// Try to send a packet without HELLO (linkExists should return false)
+	AODVTest aodv1("192.168.0.1");
+	AODVTest aodv2("192.168.0.2");
+
+	aodv1.addPhysicalNeighborOnly(&aodv2);
+	aodv2.addPhysicalNeighborOnly(&aodv1);
+
+	// Add print port for printing received packets 
+	Port* printPort = new  PrintPort(8080);
+	aodv1.addPort(printPort);
+	aodv2.addPort(printPort);
+
+	test(aodv1.isNeighbor(aodv2) == false, "Nodes are not neighbors because no monitoring");
+	test(aodv2.isNeighbor(aodv1) == false, "Nodes are not neighbors because no monitoring");
+
+	HelloTest hello1(HELLO_PORT, &aodv1);
+	HelloTest hello2(HELLO_PORT, &aodv2);
+
+	hello1.sendHellos(1);
+//	hello2.sendHellos(1);
+
+//	aodv1.sendPacket(printPort->getPortId(), buffer, length, aodv2.getIp());
+
+	test(aodv1.isNeighbor(aodv2) == true, "Nodes are neighbors because monitoring!");
+	test(aodv2.isNeighbor(aodv1) == true, "Nodes are neighbors because monitoring!");
 }

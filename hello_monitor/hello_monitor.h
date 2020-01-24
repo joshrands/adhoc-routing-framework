@@ -16,7 +16,7 @@
 class HelloNeighbors : public Port
 {
 public:
-    HelloNeighbors(int portId, RoutingProtocol* routing) : Port(portId, routing) { }
+    HelloNeighbors(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); }
     ~HelloNeighbors();
 
     /**
@@ -30,7 +30,7 @@ public:
     static int HELLO_INTERVAL_MS;
 
     // Initiate sending hello messages
-    void initializeHellos();
+    void sendHellos(int duration_ms);
 
 protected:
     set<IP_ADDR> m_neighbors;
@@ -43,7 +43,7 @@ protected:
     // 5. Update neighbors from received hellos 
     // 6. Wait 1/2 hello interval
     // 7. Repeat
-    void _updateNeighbors();
+    void _updateNeighbors(int remaining_time_ms);
 
     // broadcast a hello message so neighbors can add 
     void _broadcastHelloMessage();

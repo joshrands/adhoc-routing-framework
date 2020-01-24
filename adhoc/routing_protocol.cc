@@ -116,6 +116,12 @@ bool RoutingProtocol::linkExists(IP_ADDR dest) {
              << getStringFromIp(getIp()) << " to " << getStringFromIp(dest)
              << endl;
 
+	// if this is a broadcast, the link always exists.
+	if (getStringFromIp(dest) == BROADCAST_STR)
+	{
+		cout << "[ROUTING]:[DEBUG]: Broadcast link always exists" << endl;
+		return true;
+	}	
     for (IP_ADDR ip : m_neighbors) {
         if (dest == ip) {
             if (MONITOR_DEBUG)

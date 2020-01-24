@@ -12,19 +12,28 @@ HelloNeighbors::~HelloNeighbors()
 void HelloNeighbors::handlePacket(char* data, int length, IP_ADDR source)
 {
     std::cout << "[HELLO][WARNING]: Handle packets not implemented" << std::endl;
+
+    // if a hello message was received from SOURCE, then that is a neighbor! 
+    m_neighbors.insert(source);
 } 
 
-void HelloNeighbors::initializeHellos()
+void HelloNeighbors::sendHellos(int duration_ms)
 {
     if (nullptr == routingProtocol)
     {
         std::cout << "[HELLO][ERROR]: HELLO routing protocol not set." << std::endl;
         return;
     }
+
+    _updateNeighbors(duration_ms);
 }
 
-void HelloNeighbors::_updateNeighbors()
+void HelloNeighbors::_updateNeighbors(int remaining_time_ms)
 {
+    // 0. Should we continue? 
+    if (remaining_time_ms <= 0)
+        return;
+
     // 1. Update neighbors of routing protocol
     // TODO: Should we add a mux/semaphore here? 
     routingProtocol->resetLinks();
@@ -50,13 +59,16 @@ void HelloNeighbors::_updateNeighbors()
     _sleep(HELLO_INTERVAL_MS / 2);
 
     // 7. Repeat
-    _updateNeighbors();
+    _updateNeighbors(remaining_time_ms - HELLO_INTERVAL_MS);
 }
 
 void HelloNeighbors::_broadcastHelloMessage()
 {
     char* buffer = (char*)(malloc(4));
     memcpy(buffer, &m_parentIp, 4);
+
+    if (HELLO_DEBUG)
+        cout << "[DEBUG][HELLO]: Broadcasting hello message from node " << getStringFromIp(m_parentIp) << endl;
 
     // send data on HELLO port
     routingProtocol->sendPacket(getPortId(), buffer, 4, getIpFromString(BROADCAST_STR), m_parentIp);
@@ -74,5 +86,5 @@ void HelloNeighbors::_receiveHelloMessage(IP_ADDR nodeIp)
 bool HelloTest::_sleep(int DURATION_MS)
 {
     if (HELLO_DEBUG)
-        std::cout << "[DEBUG]: Sleeping for " << DURATION_MS << " ms" << std::endl;
+        std::cout << "[HELLO][DEBUG]: Sleeping for " << DURATION_MS << " ms" << std::endl;
 }
