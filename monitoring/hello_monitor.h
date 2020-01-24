@@ -7,14 +7,13 @@
  * Date: 1/19/2019
  ********************************/
 
-#include "network_monitor.h"
 #include "RoutingProtocol.h"
+#include <set>
 
-class HelloNeighbors : public NetworkMonitor
+class HelloNeighbors
 {
 public:
-    HelloNeighbors();
-    HelloNeighbors(IP_ADDR parentIp);
+    HelloNeighbors(RoutingProtocol* routingProtocol);
     ~HelloNeighbors();
 
     // Partner routing protocol where neighbors will be assigned 
@@ -25,6 +24,13 @@ public:
 
     static int HELLO_INTERVAL_MS;
 
+    // Initiate sending hello messages
+    void initializeHellos();
+
+protected:
+    set<IP_ADDR> m_neighbors;
+    IP_ADDR m_parentIp;
+
     // 1. Update neighbors of routing protocol
     // 2. Clear neighbors for next time period 
     // 3. Wait 1/2 hello interval
@@ -32,19 +38,25 @@ public:
     // 5. Update neighbors from received hellos 
     // 6. Wait 1/2 hello interval
     // 7. Repeat
-    void updateNeighbors();
+    void _updateNeighbors();
 
     // broadcast a hello message so neighbors can add 
-    void broadcastHelloMessage();
+    void _broadcastHelloMessage();
     // receive a hello message from a specific node 
-    void receiveHelloMessage(IP_ADDR nodeIp);
+    void _receiveHelloMessage(IP_ADDR nodeIp);
 
     // virtual function for waiting a predetermined interval. This will be implemented different for hardware vs. simulation
     // returns TRUE once complete, FALSE otherwise
-    virtual bool sleep(int DURATION_MS) = 0;
+    virtual bool _sleep(int DURATION_MS) = 0;
+
+};
+
+class HelloTest : public HelloNeighbors
+{
+public: 
+    HelloTest(RoutingProtocol* routing) : HelloNeighbors(routing) { }
 
 protected:
-    vector<IP_ADDR> m_neighbors;
-    IP_ADDR m_parentIp;
+    bool _sleep(int DURATION_MS);
 
 };

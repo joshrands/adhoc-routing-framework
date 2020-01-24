@@ -56,8 +56,6 @@ public:
 	virtual void repairLink(int port, IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP);
 	// attempt to repair the link
 	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
-	// get the next door neighbors in the network
-	virtual void getOneHopNeighbors();
 
 	// output the current contents of the routing table 
 	void logRoutingTable();
