@@ -16,7 +16,6 @@ bool AODVTest::_socketSendPacket(int port, char *buffer, int length, IP_ADDR des
             AODVTest::lastReceive = m_physicalNeighbors.at(i)->getIp();
             AODVTest::lastNode = getIp();
             AODVTest::globalPacketCount++;
-
 			// Create QueuedPacket
 			QueuedPacket p = {buffer, length, port, this->ipAddress};
 			// Add to neighbors queue
@@ -24,8 +23,7 @@ bool AODVTest::_socketSendPacket(int port, char *buffer, int length, IP_ADDR des
 			// Have it handle that packet
 			m_physicalNeighbors.at(i)->handlePackets();
         }
-        else 
-        {	
+        else {	
 			// TODO: implement this part
             if (DEBUG)
                 cout << "[DEBUG]: " << getStringFromIp(dest) << " from " << getStringFromIp(this->ipAddress) << endl;
@@ -67,22 +65,11 @@ bool AODVTest::packetInRreqBuffer(IP_ADDR dest) {
 int AODVTest::handlePackets(){
 	int count = packetQueue.size();
 	while(!packetQueue.empty()){
+        // Get the packet
 		QueuedPacket p = packetQueue.front();
 		// Pop the packet off the queue
 		packetQueue.pop();
-		if(p.portId == ROUTING_PORT){
-			_handleAODVPacket(p.data, p.length, p.source);
-		}else{
-			// Get Header section
-			IP_ADDR finalDestination;
-			memcpy(&finalDestination, &(p.data[1]), 4);
-			if (this->getIp() == finalDestination) {
-				char* data_part = p.data+HEADER_SIZE; // Get only the data part of the packet
-				ports[p.portId]->handlePacket(data_part, p.length, p.source);
-			}else{
-				_routePacket(p.portId, p.data, p.length);
-			}
-		}
+		_handlePacket(p.portId, p.data, p.length, p.source);
 	}
 	return count;
 }

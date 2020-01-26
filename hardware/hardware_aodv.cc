@@ -65,7 +65,7 @@ int HardwareAODV::handlePackets(){
     // Handle packets on the ports
     for(auto socketPair : portSockets){
         while(socketPair.second->getMessage(message)){
-            ports[socketPair.first]->handlePacket(message.getData(), message.getLength(), message.getAddressI());
+            this->_handlePacket(socketPair.first, message.getData(), message.getLength(), message.getAddressI());
             count++;
         }
     }

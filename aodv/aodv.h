@@ -101,7 +101,7 @@ protected:
 	 * @param buffer the data to be sent, needs to contain the AODV header
 	 * @param length the length of that data
 	 */
-	void _routePacket(int portId, char *buffer, int length);
+	virtual void _handlePacket(int portId, char *buffer, int length, IP_ADDR source);
 	/**
 	 * @brief Routes packets to its target destination in the network. It is meant for non-routing packets.
 	 * 
@@ -109,7 +109,7 @@ protected:
 	 * @param buffer the data to be sent, needs to contain the AODV header
 	 * @param length the length of that data
 	 */
-	void _routePacket(Port* p, char *buffer, int length);
+	void _handlePacket(Port* p, char *buffer, int length, IP_ADDR source);
 
 	// handle data for AODV
 	void _handleAODVPacket(char *buffer, int length, IP_ADDR source);
