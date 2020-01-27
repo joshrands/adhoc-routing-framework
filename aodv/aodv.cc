@@ -52,10 +52,9 @@ AODV::~AODV() {
         // remove all packets from this queue
         queue<BufferedPacket> packetQueue = it->second;
         while (packetQueue.size() > 0) {
-            packetQueue.pop();
             BufferedPacket package = packetQueue.front();
-            // TODO: Figure out why this is crashing here.
-//            delete package.buffer;
+            packetQueue.pop();
+            free(package.buffer);
         }
     }
 }
@@ -422,22 +421,38 @@ void AODV::_handleRERR(char *buffer, int length, IP_ADDR source) {
     }
 }
 
-void AODV::_routePacket(int port, char *packet, int length) {
-    // get final destination
-    IP_ADDR finalDestination;
-    memcpy(&finalDestination, &(packet[1]), 4);
-    IP_ADDR origIP;
-    memcpy(&origIP, &(packet[5]), 4);
-    // send the packet to final destination - will check routing table
-    // strip header and send packet
-    // TODO: Most important time to check link state.
-    packet += HEADER_SIZE;
-    sendPacket(port, packet, length - HEADER_SIZE, finalDestination, origIP);
-    packet -= HEADER_SIZE;
+void AODV::_handlePacket(int port, char *packet, int length, IP_ADDR source) {
+    if(port == ROUTING_PORT){
+        _handleAODVPacket(packet, length, source);
+    }else{
+        // get final destination
+        IP_ADDR finalDestination;
+        memcpy(&finalDestination, &(packet[1]), 4);
+        IP_ADDR origIP;
+        memcpy(&origIP, &(packet[5]), 4);
+        if (this->getIp() == finalDestination) {
+            // We are the final destinatin
+            // Have socket handle the packet
+            packet += HEADER_SIZE; // Get only the data part of the packet
+            if(ports.count(port)){
+                ports[port]->handlePacket(packet, length - HEADER_SIZE, source);
+            }else{
+                fprintf(stderr, "[AODV]:[ERROR]: Received packet on port with no port handler\n");
+            }
+            packet -= HEADER_SIZE;
+        }else{
+            // send the packet to final destination - will check routing table
+            // strip header and send packet
+            // TODO: Most important time to check link state.
+            packet += HEADER_SIZE;
+            sendPacket(port, packet, length - HEADER_SIZE, finalDestination, origIP);
+            packet -= HEADER_SIZE;
+        }
+    }
 }
 
-void AODV::_routePacket(Port* p, char *buffer, int length){
-    _routePacket(p->getPortId(), buffer, length);
+void AODV::_handlePacket(Port* p, char *buffer, int length, IP_ADDR source){
+    _handlePacket(p->getPortId(), buffer, length, source);
 }
 
 void AODV::_handleAODVPacket(char *buffer, int length, IP_ADDR source){
