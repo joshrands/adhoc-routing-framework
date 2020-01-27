@@ -37,7 +37,7 @@ public:
 	AODV();
 	AODV(const char* ip);
 	AODV(IP_ADDR ip);
-	virtual ~AODV();
+	~AODV();
 
 	/**
      * @brief Send a packet to a given ip address using a specified port

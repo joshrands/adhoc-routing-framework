@@ -50,8 +50,8 @@ void test_test()
 void test_hello()
 {
 	// Try to send a packet without HELLO (linkExists should return false)
-	AODVTest aodv1("192.168.0.1");
-	AODVTest aodv2("192.168.0.2");
+	AODVTest aodv1(getIpFromString("192.168.0.1"));
+	AODVTest aodv2(getIpFromString("192.168.0.2"));
 
 	aodv1.addPhysicalNeighborOnly(&aodv2);
 	aodv2.addPhysicalNeighborOnly(&aodv1);
@@ -61,17 +61,24 @@ void test_hello()
 	aodv1.addPort(printPort);
 	aodv2.addPort(printPort);
 
-	test(aodv1.isNeighbor(aodv2) == false, "Nodes are not neighbors because no monitoring");
-	test(aodv2.isNeighbor(aodv1) == false, "Nodes are not neighbors because no monitoring");
+	test(aodv1.isNeighbor(&aodv2) == false, "Nodes are not neighbors because no monitoring");
+	test(aodv2.isNeighbor(&aodv1) == false, "Nodes are not neighbors because no monitoring");
 
 	HelloTest hello1(HELLO_PORT, &aodv1);
 	HelloTest hello2(HELLO_PORT, &aodv2);
 
-	hello1.sendHellos(1);
-//	hello2.sendHellos(1);
+	aodv1.addPort(&hello1);
+	aodv2.addPort(&hello2);
 
-//	aodv1.sendPacket(printPort->getPortId(), buffer, length, aodv2.getIp());
+	thread helloThread1(dispatchHello, &hello1, HelloNeighbors::HELLO_INTERVAL_MS*2);
+	helloThread1.join();
+	thread helloThread2(dispatchHello, &hello2, HelloNeighbors::HELLO_INTERVAL_MS*2);
+	helloThread2.join();
 
-	test(aodv1.isNeighbor(aodv2) == true, "Nodes are neighbors because monitoring!");
-	test(aodv2.isNeighbor(aodv1) == true, "Nodes are neighbors because monitoring!");
+	this_thread::sleep_for(chrono::milliseconds(HelloNeighbors::HELLO_INTERVAL_MS*2));
+
+	globalMux.lock();
+	test(aodv2.isNeighbor(&aodv1) == true, "Nodes are neighbors because monitoring!");
+	test(aodv1.isNeighbor(&aodv2) == true, "Nodes are neighbors because monitoring!");
+	globalMux.unlock();
 }

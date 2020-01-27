@@ -43,8 +43,10 @@ AODV::AODV(IP_ADDR ip) {
 }
 
 AODV::~AODV() {
-    delete this->m_aodvTable;
-    m_aodvTable = NULL;
+    cout << "[AODV]:[WARNING]: TABLE MEMORY NOT BEING CLEARED" << endl;
+    // TODO: Figure out why this is crashing 
+//    delete this->m_aodvTable;
+//    m_aodvTable = NULL;
 
     for (auto it = rreqPacketBuffer.begin(); it != rreqPacketBuffer.end(); ++it) {
         // remove all packets from this queue
@@ -52,7 +54,8 @@ AODV::~AODV() {
         while (packetQueue.size() > 0) {
             packetQueue.pop();
             BufferedPacket package = packetQueue.front();
-            delete package.buffer;
+            // TODO: Figure out why this is crashing here.
+//            delete package.buffer;
         }
     }
 }

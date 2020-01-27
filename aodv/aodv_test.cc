@@ -56,9 +56,9 @@ void AODVTest::addPhysicalNeighborOnly(AODVTest* node)
     this->m_physicalNeighbors.push_back(node);
 }
 
-bool AODVTest::isNeighbor(AODVTest node) {
+bool AODVTest::isNeighbor(AODVTest* node) {
     for (uint32_t i = 0; i < m_neighbors.size(); i++) {
-        if (node.getIp() == m_neighbors.at(i))
+        if (node->getIp() == m_neighbors.at(i))
             return true;
     }
 
@@ -83,7 +83,9 @@ int AODVTest::handlePackets(){
 			memcpy(&finalDestination, &(p.data[1]), 4);
 			if (this->getIp() == finalDestination || getStringFromIp(finalDestination) == BROADCAST_STR) {
 				char* data_part = p.data+HEADER_SIZE; // Get only the data part of the packet
-				ports[p.portId]->handlePacket(data_part, p.length, p.source);
+
+                // TODO: Add a test for if the port exists to prevent seg fault
+				ports[p.portId]->handlePacket(data_part, p.length - HEADER_SIZE, p.source);
 			}else{
 				_routePacket(p.portId, p.data, p.length);
 			}

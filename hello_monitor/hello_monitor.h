@@ -16,7 +16,7 @@
 class HelloNeighbors : public Port
 {
 public:
-    HelloNeighbors(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); }
+    HelloNeighbors(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); m_active = true; }
     ~HelloNeighbors();
 
     /**
@@ -32,9 +32,12 @@ public:
     // Initiate sending hello messages
     void sendHellos(int duration_ms);
 
+    bool isActive() { globalMux.lock(); return m_active; globalMux.unlock(); }
+
 protected:
     set<IP_ADDR> m_neighbors;
     IP_ADDR m_parentIp;
+    bool m_active;
 
     // 1. Update neighbors of routing protocol
     // 2. Clear neighbors for next time period 
@@ -65,3 +68,5 @@ protected:
     bool _sleep(int DURATION_MS);
 
 };
+
+void dispatchHello(HelloTest* hello, int duration);

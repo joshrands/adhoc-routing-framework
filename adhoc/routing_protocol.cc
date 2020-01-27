@@ -145,6 +145,8 @@ void RoutingProtocol::resetLinks()
 
 void RoutingProtocol::addLink(IP_ADDR node)
 {
+	if (ROUTING_DEBUG)
+		cout << "[DEBUG]:[ROUTING]: Adding link to node " << getStringFromIp(node) << endl;
 	globalMux.lock();
 	m_neighbors.push_back(node);
 	globalMux.unlock();

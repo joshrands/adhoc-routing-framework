@@ -19,7 +19,7 @@ public:
 
 	AODVTest(IP_ADDR ip) : AODV(ip) {}
 	AODVTest(const char* ip) : AODV(ip) {}
-	~AODVTest() { m_physicalNeighbors.clear(); }
+	~AODVTest() { } 
 
     int handlePackets() override;
 
@@ -31,7 +31,7 @@ public:
     void addPhysicalNeighborOnly(AODVTest* node);
 
 	// return true if node is neighbor
-	bool isNeighbor(AODVTest node);
+	bool isNeighbor(AODVTest* node);
 
 	// see if packet was put in queue
 	bool packetInRreqBuffer(IP_ADDR dest);
