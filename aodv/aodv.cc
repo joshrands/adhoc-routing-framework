@@ -43,8 +43,10 @@ AODV::AODV(IP_ADDR ip) {
 }
 
 AODV::~AODV() {
-    delete this->m_aodvTable;
-    m_aodvTable = NULL;
+    cout << "[AODV]:[WARNING]: TABLE MEMORY NOT BEING CLEARED" << endl;
+    // TODO: Figure out why this is crashing 
+//    delete this->m_aodvTable;
+//    m_aodvTable = NULL;
 
     for (auto it = rreqPacketBuffer.begin(); it != rreqPacketBuffer.end(); ++it) {
         // remove all packets from this queue
@@ -61,62 +63,67 @@ AODV::~AODV() {
  * Public Functions
  ******************************/
 bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP) {
-    if (AODV_DEBUG)
-        cout << "[ORIG]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
+    // by default the next hop is the final destination in case this is a broadcast 
+    IP_ADDR nextHop = dest;
 
-    // by default this node is the originator
-    if (-1 == signed(origIP))
-        origIP = getIp();
-
-    if (length < 0)
-        cerr << "[AODV]:[ERROR]: Negative packet length." << endl;
-
-    // if entry exists in routing table, send it!
-    // check routing table
-     IP_ADDR nextHop;
-    if(this->m_aodvTable == nullptr){
-        printf("[AODV]:[ERROR]: The routing table is NULL\n");
-        exit(255);
-    }else{
-        nextHop = m_aodvTable->getNextHop(dest);
-    }
-
-    if (false == getTable()->getIsRouteActive(dest)) {
-        BufferedPacket bufferedPacket;
-        bufferedPacket.buffer = (char *)(malloc(length));
-        memcpy(bufferedPacket.buffer, packet, length);
-        bufferedPacket.length = length;
-        bufferedPacket.portId = portId;
-
-        // Put this packet in a buffer to be sent when a route opens up
-        if (this->rreqPacketBuffer.count(dest)) {
-            this->rreqPacketBuffer[dest].push(bufferedPacket);
-        } else {
-            this->rreqPacketBuffer[dest] = queue<BufferedPacket>({bufferedPacket});
-        }
-
-        if (nextHop != 0) {
-            // this route is temporarily unavailable... check if actively
-            // finding a route
-            // TODO: send a RERR
-
-//            return;
-        }
-
+    if (getStringFromIp(dest) != BROADCAST_STR)
+    {
         if (AODV_DEBUG)
-            cout << "[AODV]:[DEBUG]: No existing route, creating RREQ message." << endl;
+            cout << "[ORIG]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
 
-        rreqPacket rreq = this->rreqHelper.createRREQ(dest);
+        // by default this node is the originator
+        if (-1 == signed(origIP))
+            origIP = getIp();
 
-        // start a thread for THIS rreq and wait for a response
-        if (RREQ_RETRIES) {
-            thread waitForResponse(retryRouteRequestIfNoRREP, this, rreq,
-                                   RREQ_RETRIES);
-            waitForResponse.detach();
+        if (length < 0)
+            cerr << "[AODV]:[ERROR]: Negative packet length." << endl;
+
+        // if entry exists in routing table, send it!
+        // check routing table
+        if(this->m_aodvTable == nullptr){
+            printf("[AODV]:[ERROR]: The routing table is NULL\n");
+            exit(255);
+        }else{
+            nextHop = m_aodvTable->getNextHop(dest);
         }
-        _broadcastRREQBuffer(rreq);
 
-        return true;
+        if (false == getTable()->getIsRouteActive(dest)) {
+            BufferedPacket bufferedPacket;
+            bufferedPacket.buffer = (char *)(malloc(length));
+            memcpy(bufferedPacket.buffer, packet, length);
+            bufferedPacket.length = length;
+            bufferedPacket.portId = portId;
+
+            // Put this packet in a buffer to be sent when a route opens up
+            if (this->rreqPacketBuffer.count(dest)) {
+                this->rreqPacketBuffer[dest].push(bufferedPacket);
+            } else {
+                this->rreqPacketBuffer[dest] = queue<BufferedPacket>({bufferedPacket});
+            }
+
+            if (nextHop != 0) {
+                // this route is temporarily unavailable... check if actively
+                // finding a route
+                // TODO: send a RERR
+
+    //            return;
+            }
+
+            if (AODV_DEBUG)
+                cout << "[AODV]:[DEBUG]: No existing route, creating RREQ message." << endl;
+
+            rreqPacket rreq = this->rreqHelper.createRREQ(dest);
+
+            // start a thread for THIS rreq and wait for a response
+            if (RREQ_RETRIES) {
+                thread waitForResponse(retryRouteRequestIfNoRREP, this, rreq,
+                                    RREQ_RETRIES);
+                waitForResponse.detach();
+            }
+            _broadcastRREQBuffer(rreq);
+
+            return true;
+        }
     }
 
     if (AODV_DEBUG)
@@ -428,7 +435,7 @@ void AODV::_handlePacket(int port, char *packet, int length, IP_ADDR source) {
             // Have socket handle the packet
             packet += HEADER_SIZE; // Get only the data part of the packet
             if(ports.count(port)){
-                ports[port]->handlePacket(packet, length, source);
+                ports[port]->handlePacket(packet, length - HEADER_SIZE, source);
             }else{
                 fprintf(stderr, "[AODV]:[ERROR]: Received packet on port with no port handler\n");
             }
