@@ -53,6 +53,7 @@ def get_last_setting(current):
 def save_setting():
     with open(state_file, 'w') as fout:
         fout.write(states_i_w[adhoc_state])
+    
 
 if __name__=="__main__":
     adhoc_pin = 3

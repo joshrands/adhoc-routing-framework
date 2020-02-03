@@ -1,3 +1,6 @@
+#ifndef AODV_TEST_H
+#define AODV_TEST_H
+
 #include "aodv.h"
 
 struct QueuedPacket{
@@ -73,3 +76,5 @@ public:
     }
 
 };
+
+#endif
