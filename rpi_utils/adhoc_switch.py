@@ -64,12 +64,12 @@ if __name__=="__main__":
         current_state = GPIO.input(adhoc_pin)
         if current_state != adhoc_state:
             adhoc_state = current_state
-            if adhoc_state == 1:
+            if adhoc_state == states_w_i['wifi']:
                 print("Switching to WIFI mode...")
                 save_setting()
                 time.sleep(5)
                 set_wifi()
-            elif adhoc_state == 0:
+            elif adhoc_state == states_w_i['adhoc']:
                 print("Switching to AD HOC mode....")
                 save_setting()
                 time.sleep(5)

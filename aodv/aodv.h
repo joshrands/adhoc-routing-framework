@@ -95,19 +95,21 @@ protected:
 
 	// Functions
 	/**
-	 * @brief Routes packets to its target destination in the network. It is meant for non-routing packets. Packet should still have header.
+	 * @brief Takes in a packet and routes it in the network or to the desired port
 	 * 
 	 * @param portId the port id to send from/to
 	 * @param buffer the data to be sent, needs to contain the AODV header
 	 * @param length the length of that data
+	 * @param source the ip address the packet was received from
 	 */
 	virtual void _handlePacket(int portId, char *buffer, int length, IP_ADDR source);
 	/**
-	 * @brief Routes packets to its target destination in the network. It is meant for non-routing packets.
+	 * @brief Takes in a packet and routes it in the network or to the desired port
 	 * 
 	 * @param port the port class to send from/to
 	 * @param buffer the data to be sent, needs to contain the AODV header
 	 * @param length the length of that data
+	 * @param source the ip address the packet was received from
 	 */
 	void _handlePacket(Port* p, char *buffer, int length, IP_ADDR source);
 
@@ -119,7 +121,6 @@ protected:
 
 	// Virtual Functions
 	virtual bool _socketSendPacket(int portId, char *buffer, int length, IP_ADDR dest) = 0;
-
 };
 
 // retry the route request message if you don't receive one
