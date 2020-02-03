@@ -68,9 +68,8 @@ public:
 	void handleRERR(char* buffer, int length, IP_ADDR source);
 
 	// Network Monitoring
-	virtual void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port);
-	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
-	virtual void getOneHopNeighbors();
+	void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port);
+	bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
 
 	// output the current contents of the routing table 
 	void logRoutingTable();

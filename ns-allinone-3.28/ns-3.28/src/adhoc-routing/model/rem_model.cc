@@ -101,9 +101,13 @@ bool PredictionModel::withinExpectedValueRange(double time, double value)
     if (threshold < MIN_DEVIATION)
         threshold = MIN_DEVIATION;
 
-//  cout << "[DEBUG]: Expected: " << expected << " vs. Measured: " << value << endl;
-//  cout << "[DEBUG]: Error threshold: " << threshold << " vs. Deviation: " << deviation << endl;
-    if ( deviation > MAX_THRESH_DIFF || value < RSS_OUT_OF_RANGE || expected < RSS_OUT_OF_RANGE)
+    if (REM_DEBUG)
+    {
+        cout << "[DEBUG]: Expected: " << expected << " vs. Measured: " << value << endl;
+        cout << "[DEBUG]: Error threshold: " << threshold << " vs. Deviation: " << deviation << endl;
+    }
+
+    if ( deviation > MAX_THRESH_DIFF)// || value < RSS_OUT_OF_RANGE || expected < RSS_OUT_OF_RANGE)
     {
         if (REM_DEBUG)
             cout << "[DEBUG]: BAD: Threshold error" << endl;

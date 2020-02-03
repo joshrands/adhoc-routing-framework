@@ -26,7 +26,7 @@
 #define RX_GAIN           10
 
 #define minSpeed_mpers    3
-#define maxSpeed_mpers    10
+#define maxSpeed_mpers    5
 #define xSize_m           500
 #define ySize_m           500
 #define LOCAL_MONITOR_INTERVAL  2
@@ -38,6 +38,9 @@
 #include "ns3/wifi-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/packet.h"
+#include "ns3/basic-energy-source-helper.h"
+
+#include "battery-drain.h"
 
 #include <iostream>
 
@@ -46,14 +49,40 @@ using namespace ns3;
 NodeContainer nodes;
 map<Ptr<Node>, AdHocRoutingHelper*> adhocMap;
 map< IP_ADDR, Ptr<Node> > nodeMap;
+EnergySourceContainer energySources;
 
 void ReceiveCallback(Ptr<Socket> socket)
 {
     AdHocRoutingHelper::receivePacket(socket);
 }
 
+void initialHellos()
+{
+  std::cout << "[TEST]: Initial hellos!" << std::endl; 
+
+  auto it = nodeMap.begin();
+  while (it != nodeMap.end())
+  {
+
+    string msg = "Hello all!";
+    uint32_t length = msg.length();
+    char* buffer = (char*)(malloc(length));
+    for (uint32_t i = 0; i < length; i++)
+          buffer[i] = msg.at(i);
+    // send data from first node to last node 
+    AdHocRoutingHelper* adhoc = adhocMap[it->second];
+    IP_ADDR dest = getIpFromString(BROADCAST_STR); 
+    adhoc->routing->socketSendPacket(buffer, msg.length(), dest, DATA_PORT); 
+
+    delete buffer;
+
+    it++;
+  }
+}
+
 void testAdHoc()
 {
+  std::cout << "[TEST]: Sending message from node 1 to node 2" << std::endl;
   // Test sending from node 1 to node 3
   string msg = "Hello friend!";
   uint32_t length = msg.length();
@@ -69,14 +98,13 @@ void testAdHoc()
   IP_ADDR dest = it->first;
   adhoc->sendPacket(buffer, msg.length(), dest); 
 
-  Simulator::Schedule(Seconds(1.0), &testAdHoc);
+  Simulator::Schedule(Seconds(2.0), &testAdHoc);
 
   delete buffer;
 }
 
 void localMonitoring()
 {
-  map<Ptr<Node>, AdHocRoutingHelper*> adhocMap;
   auto it = adhocMap.begin();
   while (it != adhocMap.end())
   {
@@ -110,6 +138,9 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::WifiRemoteStationManager::NonUnicastMode",
                       StringValue (phyMode));
 
+  Packet::EnableChecking();
+  Packet::EnablePrinting();
+
   nodes.Create (numNodes);
 
   // The below set of helpers will help us to put together the wifi NICs we want
@@ -141,6 +172,20 @@ int main (int argc, char *argv[])
   // Set it to adhoc mode
   wifiMac.SetType ("ns3::AdhocWifiMac");
   NetDeviceContainer devices = wifi.Install (wifiPhy, wifiMac, nodes);
+
+  /* ADD ENERGY MODEL */
+  BasicEnergySourceHelper basicSourceHelper;
+  // configure energy source
+  basicSourceHelper.Set("BasicEnergySourceInitialEnergyJ", DoubleValue(500.0));
+  // install source
+  energySources = basicSourceHelper.Install(nodes);
+  // device energy model
+  WifiRadioEnergyModelHelper radioEnergyHelper;
+  // configure radio energy model
+  radioEnergyHelper.Set("TxCurrentA", DoubleValue(0.0174));
+  // install device model
+  DeviceEnergyModelContainer deviceModels = radioEnergyHelper.Install(devices, energySources);
+  /********************/
 
   // Note that with FixedRssLossModel, the positions below are not
   // used for received signal strength.
@@ -175,6 +220,7 @@ int main (int argc, char *argv[])
   ipv4.SetBase ("192.168.1.0", "255.255.255.0");
   ipv4.Assign (devices);
 
+  vector<Vector> currentPositions;
   for(int i = 0; i < numNodes; i++){
     Ptr<Socket> routeSink = Socket::CreateSocket (nodes.Get (i), UdpSocketFactory::GetTypeId ());
     InetSocketAddress localRouting = InetSocketAddress (Ipv4Address::GetAny (), ROUTING_PORT);
@@ -208,14 +254,25 @@ int main (int argc, char *argv[])
  
     adhocMap[nodes.Get(i)] = new AdHocRoutingHelper(nodes.Get(i), ip);
     nodes.Get(i)->m_AdHocRoutingHelper = adhocMap[nodes.Get(i)]; 
+
+    Vector pos = nodes.Get(i)->GetObject<RandomWaypointMobilityModel>()->GetPosition();
+    if (DEBUG)
+      cout << "[DEBUG]: Node " << i << " at " << pos.x << ", " << pos.y << endl;
+    currentPositions.push_back(pos);
   }
 
   // Tracing
 //  Simulator::Schedule (Seconds (1.0), &GenerateTraffic,
 //                       c, packetSize, numPackets, Seconds(1));
 
-  Simulator::Schedule(Seconds(1.0), &testAdHoc);// &(aodvArray[1]->socketSendPacket), buffer, msg.length() + 5, aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
+  Simulator::Schedule(Seconds(1.0), &initialHellos);
+  Simulator::Schedule(Seconds(2.0), &initialHellos);
+  Simulator::Schedule(Seconds(3.0), &initialHellos);
+
+  Simulator::Schedule(Seconds(5.0), &testAdHoc);// &(aodvArray[1]->socketSendPacket), buffer, msg.length() + 5, aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
   Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
+  // Drain battery
+  Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);
 
   Simulator::Stop (Seconds (duration + 10.0));
   Simulator::Run ();

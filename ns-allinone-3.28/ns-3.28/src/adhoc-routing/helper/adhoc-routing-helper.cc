@@ -9,6 +9,8 @@
 #include "ns3/simulator.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/tag.h"
+#include "ns3/udp-header.h"
+
 #include <iostream>
 
 namespace ns3 {
@@ -73,7 +75,7 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
     while (packet = socket->Recv ())
     {
         Ipv4Header header;
-        packet->RemoveHeader(header);
+        packet->RemoveHeader(header); 
 
         // get rss data from packet 
         WifiTag tag;
@@ -93,7 +95,9 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         std::cout << "Received one packet!  Socket: " << iaddr.GetIpv4 () << " port: " << iaddr.GetPort ();
         uint16_t port = iaddr.GetPort(); 
 */
-        std::cout << "Received data on port " << socket->m_port << std::endl;
+
+        if (DEBUG)
+            std::cout << "[DEBUG]: Received data on port " << socket->m_port << std::endl;
 
         // add aodv object
         Ipv4Address addr = header.GetSource(); 
@@ -103,15 +107,16 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         IP_ADDR source;
         memcpy(&(source),(ipBuf),4);
 
-        std::cout << "Node " << getStringFromIp(socket->GetNode()->m_nodeIp) << " from Node " << getStringFromIp(source) << std::endl;
+        if (DEBUG)
+            std::cout << "[DEBUG]: Node " << getStringFromIp(socket->GetNode()->m_nodeIp) << " from Node " << getStringFromIp(source) << std::endl;
 
         pair_data data;
         // TODO: Fill pair data 
         data.pairIp = source; 
         data.rss = tag.GetRssValue();
 
-        std::cout << "RSS: " << tag.GetRssValue() << std::endl;
-        std::cout << "RSS: " << data.rss << std::endl;
+        if (DEBUG)
+            std::cout << "[DEBUG]: Received RSS: " << data.rss << std::endl;
 
         socket->GetNode()->m_AdHocRoutingHelper->receivePacketWithPairData((char*)(packetBuffer), length, source, socket->m_port, data);
     }
@@ -124,7 +129,9 @@ uint32_t AdHocRoutingHelper::getNs3SimulatedTimeMS()
 
 double AdHocRoutingHelper::getNs3SimulatedBattery(IP_ADDR nodeIp)
 {
-    return 100;
+    // get the battery level of node ip
+    Ptr<Node> node = m_existingNodes[nodeIp];
+    return node->m_battery;
 }
 
 AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp)

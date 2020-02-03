@@ -1,6 +1,7 @@
 
 #include "rem.h"
 #include "aodv.h"
+#include "hello_monitor.h"
 
 #include <assert.h>
 #include "string.h"
@@ -28,6 +29,7 @@ void test_battery_model();
 void test_rss_model();
 void test_packet_encode_decode();
 void test_local_update_thread();
+void test_hello();
 
 int main (int argc, char *argv[]) 
 {	
@@ -37,7 +39,9 @@ int main (int argc, char *argv[])
 	test_battery_model();
 	test_rss_model();
 	test_packet_encode_decode();
-	test_local_update_thread();
+//	test_local_update_thread();
+	test_hello();
+
 
 	cout << "[TESTS]: TESTS COMPLETE." << endl;
 
@@ -150,4 +154,10 @@ void test_local_update_thread()
 	std::this_thread::sleep_for(std::chrono::milliseconds(5000));
 
 	cout << "[TESTS]: Local update thread tests complete." << endl;
+}
+
+void test_hello()
+{
+	AODVTest aodv("192.168.0.1");
+	HelloTest hello(&aodv);
 }

@@ -504,7 +504,7 @@ return;
 int main(int argc, char **argv)
 {
 
-    char *dev = NULL;           /* capture device name */
+    char *dev;           /* capture device name */
     char errbuf[PCAP_ERRBUF_SIZE];      /* error buffer */
     pcap_t *handle;             /* packet capture handle */
 
@@ -562,7 +562,7 @@ int main(int argc, char **argv)
 
     // TRY the following: 
     // DLT_PRISM_HEADER, DLT_IEEE802_11_RADIO, DLT_IEEE802_11_RADIO_AVS
-    if(pcap_set_datalink(handle, DLT_IEEE802_11_RADIO) == -1) {
+    if(pcap_set_datalink(handle, DLT_IEEE802_11_RADIO_AVS) == -1) {
         printf("Couldn't set datalink type %s: %s\n", dev, pcap_geterr(handle));
     }
 

@@ -27,6 +27,7 @@ void test_aodv_rreq();
 void test_aodv_loop_prevention();
 void test_aodv_do_nothing();
 void test_aodv_link_break();
+void test_aodv_rreq_to_rrep();
 
 int main (int argc, char *argv[]) 
 {	

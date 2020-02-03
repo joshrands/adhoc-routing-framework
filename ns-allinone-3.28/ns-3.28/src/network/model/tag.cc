@@ -41,8 +41,8 @@ TypeId WifiTag::GetTypeId (void)
    .AddAttribute ("Rss",
                   "Received signal strength",
                   EmptyAttributeValue (),
-                  MakeUintegerAccessor (&WifiTag::GetRssValue),
-                  MakeUintegerChecker<uint32_t> ());
+                  MakeDoubleAccessor (&WifiTag::GetRssValue),
+                  MakeDoubleChecker<double> ());
  return tid;
 }
 
@@ -53,30 +53,30 @@ TypeId WifiTag::GetInstanceTypeId (void) const
 
 uint32_t WifiTag::GetSerializedSize (void) const
 {
- return 4;
+ return 8;
 }
 
 void WifiTag::Serialize (TagBuffer i) const
 {
- i.WriteU32 (m_Rss);
+ i.WriteDouble (m_Rss);
 }
 
 void WifiTag::Deserialize (TagBuffer i)
 {
- m_Rss = i.ReadU32 ();
+ m_Rss = i.ReadDouble ();
 }
 
 void WifiTag::Print (std::ostream &os) const
 {
- os << "v=" << (uint32_t)m_Rss;
+ os << "m_Rss=" << (double)m_Rss;
 }
 
-void WifiTag::SetRssValue (uint32_t value)
+void WifiTag::SetRssValue (double value)
 {
  m_Rss = value;
 }
 
-uint32_t WifiTag::GetRssValue (void) const
+double WifiTag::GetRssValue (void) const
 {
  return m_Rss;
 }
