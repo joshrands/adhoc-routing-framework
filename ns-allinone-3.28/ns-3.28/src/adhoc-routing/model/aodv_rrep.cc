@@ -33,7 +33,7 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
     if (rrep.destIP == this->m_ip)
     {
         if (RREP_DEBUG)
-            cout << "[DEBUG]: Creating RREP from final destination" << endl;
+            cout << "[RREP]:[DEBUG]: Creating RREP from final destination" << endl;
         // yes, copy this sequence number in
         // increment this node sequence number if equal to orig sequence number 
         if (*(this->m_pSequenceNum) == rreq.destSeqNum)
@@ -47,7 +47,7 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
     else 
     {
         if (RREP_DEBUG)
-            cout << "[DEBUG]: Generating RREP from intermediary hop" << endl;
+            cout << "[RREP]:[DEBUG]: Generating RREP from intermediary hop" << endl;
         // we are an intermediary hop
         // copy known sequence number for destination into destSeq field
         rrep.destSeqNum = this->m_pTable->getDestSequenceNumber(rreq.destIP);

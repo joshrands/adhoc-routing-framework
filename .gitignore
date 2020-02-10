@@ -12,6 +12,8 @@ do-adhoc
 logs
 wicap/wicap
 
+#
+hardware_monitoring_testing
 
 # Prerequisites
 *.d

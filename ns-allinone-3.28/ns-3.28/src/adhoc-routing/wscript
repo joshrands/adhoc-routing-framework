@@ -9,19 +9,18 @@
 def build(bld):
     module = bld.create_ns3_module('adhoc-routing', ['core'])
     module.source = [
-        'model/adhoc_routing.cc',
 				'model/aodv.cc',
 				'model/aodv_rerr.cc',
 				'model/aodv_routing_table.cc',
 				'model/aodv_rrep.cc',
 				'model/aodv_rreq.cc',
 				'model/aodv_sim.cc',
-				'model/RoutingProtocol.cc',
-				'model/send_packet.cc',
 				'model/network_monitor.cc',
+				'model/port.cc',
 				'model/rem.cc',
 				'model/rem_model.cc',
 				'model/rem_sim.cc',
+				'model/routing_protocol.cc',
         'helper/adhoc-routing-helper.cc',
         ]
 
@@ -34,26 +33,27 @@ def build(bld):
     headers.module = 'adhoc-routing'
     headers.source = [
  				'model/defines.h',
-       	'model/adhoc_routing.h',
+				'model/adhoc_defines.h',
+				'model/aodv_defines.h',
 				'model/aodv.h',
+				'model/aodv_packets.h',
+				'model/aodv_params.h',
 				'model/aodv_rerr.h',
 				'model/aodv_routing_table.h',
 				'model/aodv_rrep.h',
 				'model/aodv_rreq.h',
 				'model/aodv_sim.h',
-				'model/RoutingProtocol.h',
-				'model/send_packet.h',
-				'model/aodv_defines.h',
-				'model/aodv_packets.h',
-				'model/aodv_params.h',
+				'model/defines.h',
+				'model/monitor_info.h',
 				'model/network_monitor.h',
+				'model/port.h',
+				'model/rem_defines.h',
 				'model/rem.h',
 				'model/rem_sim.h',
 				'model/rem_model.h',
-				'model/monitor_defines.h',
-				'model/monitor_info.h',
 				'model/rem_parameters.h',
 				'model/rem_packet.h',
+				'model/routing_protocol.h',
         'helper/adhoc-routing-helper.h',
         ]
 

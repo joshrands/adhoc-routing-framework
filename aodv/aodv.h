@@ -17,8 +17,7 @@
 #include "aodv_rerr.h"
 #include "aodv_params.h"
 
-#include "../adhoc/send_packet.h"
-#include "../adhoc/routing_protocol.h"
+#include "routing_protocol.h"
 
 #include <vector>
 #include <functional>

@@ -1,3 +1,6 @@
+#ifndef REMPACKET_H
+#define REMPACKET_H
+
 /*********************************
  * rem_packet.h
  *
@@ -24,3 +27,5 @@ struct REMModelPacket
 
     IP_ADDR pairIp; // optional pair ip if this is a pair-wise model 
 }; 
+
+#endif

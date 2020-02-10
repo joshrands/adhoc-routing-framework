@@ -1,3 +1,6 @@
+#ifndef REMSIM_H
+#define REMSIM_H
+
 /*********************************
  * rem_sim.h
  *
@@ -30,3 +33,4 @@ protected:
     uint32_t getCurrentTimeMS() override;
 
 };
+#endif

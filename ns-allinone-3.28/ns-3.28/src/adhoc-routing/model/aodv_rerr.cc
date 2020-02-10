@@ -15,20 +15,20 @@ RERRHelper::RERRHelper(IP_ADDR ip, AODVRoutingTable* table, uint32_t* seqNum)
 
 bool RERRHelper::shouldGenerateRERRFromBrokenLink(IP_ADDR brokenLink)
 {
-
+    fprintf(stderr, "[RERR]:[WARNING]: shouldGenerateRERRFromBrokenLink not implemented\n");
     return false;
 }
 
 bool RERRHelper::attemptLocalRepair(IP_ADDR brokenLink)
 {
-
+    fprintf(stderr, "[RERR]:[WARNING]: attemptLocalRepair not implemented\n");
     return false;
 }
 
 rerrPacket RERRHelper::createRERR(const IP_ADDR destIP, const IP_ADDR origIP)
 {
     if (RERR_DEBUG)
-        cout << "[DEBUG]: Generating Route Error packet for destination " << getStringFromIp(destIP) << endl;
+        cout << "[RRER]:[DEBUG]: Generating Route Error packet for destination " << getStringFromIp(destIP) << endl;
 
     rerrPacket rerr;
 
@@ -45,7 +45,7 @@ rerrPacket RERRHelper::createRERR(const IP_ADDR destIP, const IP_ADDR origIP)
 
 void RERRHelper::forwardRERR(const rerrPacket receivedRERR)
 {
-
+    fprintf(stderr, "[RERR]:[WARNING]: forwardRRER not implemented\n");
 }
 
 char* RERRHelper::createRERRBuffer(const rerrPacket rerr)

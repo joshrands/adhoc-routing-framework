@@ -1,3 +1,6 @@
+#ifndef REMPARAMETERS_H
+#define REMPARAMETERS_H
+
 /*********************************
  * rem_parameters.h
  *
@@ -40,3 +43,4 @@ public:
 
     int UPDATE_FREQUENCY = 1;
 };
+#endif

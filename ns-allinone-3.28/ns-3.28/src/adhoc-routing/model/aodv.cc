@@ -5,22 +5,25 @@
 #include <stdio.h>
 #include <thread>
 
-//int AODV::ROUTING_PORT = 5432;
+/******************************
+ * Constructors + Destructors
+ ******************************/
 
 AODV::AODV() {
-    if (AODV_DEBUG)
-        cout << "[DEBUG]: Warning: Must update aodv ip address.";
+    if (AODV_WARNING)
+        cout << "[AODV]:[WARNING]: Warning: Must update aodv ip address.";
+    
 }
 
 AODV::AODV(const char* ip) : AODV(getIpFromString(ip))
 {
 	if (AODV_DEBUG)
-		cout << "[DEBUG]: Created new aodv routing protocol." << endl;
+		cout << "[AODV]:[DEBUG]: Created new aodv routing protocol." << endl;
 }
 
 AODV::AODV(IP_ADDR ip) {
     if (AODV_DEBUG)
-        cout << "[DEBUG]: Created new aodv routing protocol." << endl;
+        cout << "[AODV]:[DEBUG]: Created new aodv routing protocol." << endl;
 
     this->ipAddress = ip;
     this->sequenceNum = 0;
@@ -40,137 +43,100 @@ AODV::AODV(IP_ADDR ip) {
 }
 
 AODV::~AODV() {
-    delete this->m_aodvTable;
-    m_aodvTable = NULL;
+    cout << "[AODV]:[WARNING]: TABLE MEMORY NOT BEING CLEARED" << endl;
+    // TODO: Figure out why this is crashing 
+//    delete this->m_aodvTable;
+//    m_aodvTable = NULL;
 
-
-    for (map<IP_ADDR, queue<pair<char *, int>>>::iterator it =
-             rreqPacketBuffer.begin();
-         it != rreqPacketBuffer.end(); ++it) {
+    for (auto it = rreqPacketBuffer.begin(); it != rreqPacketBuffer.end(); ++it) {
         // remove all packets from this queue
-        
-        queue<pair<char *, int>> packetQueue = it->second;
-        
+        queue<BufferedPacket> packetQueue = it->second;
         while (packetQueue.size() > 0) {
+            BufferedPacket package = packetQueue.front();
             packetQueue.pop();
-            pair<char *, int> package = packetQueue.front();
-            delete package.first;
+            free(package.buffer);
         }
     }
 }
 
-void AODV::receivePacket(char *packet, int length, IP_ADDR source) {
-    // get final destination
-    IP_ADDR finalDestination;
-    memcpy(&finalDestination, &(packet[1]), 4);
-    IP_ADDR origIP;
-    memcpy(&origIP, &(packet[5]), 4);
+/******************************
+ * Public Functions
+ ******************************/
+bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP) {
+    // by default the next hop is the final destination in case this is a broadcast 
+    IP_ADDR nextHop = dest;
 
-    if (this->getIp() == finalDestination) {
-        // packet has reached its final destination!
-        receivedPackets.emplace_back(pair<char *, int>(packet, length));
-        if (AODV_PRINT_PACKET) {
-            cout << "[PACKET]: Node " << getStringFromIp(this->getIp())
-                 << " received packet: " << endl;
-
-            for (int i = HEADER_SIZE; i < length; i++) {
-                cout << packet[i];
-            }
-            cout << endl;
-        }
-        // output the contents of this packet
-        if (AODV_LOG_OUTPUT) {
-            ofstream logFile;
-            logFile.open("./logs/" + getStringFromIp(this->getIp()) +
-                             "-packet-log.txt",
-                         ios::out);
-
-            for (int i = HEADER_SIZE; i < length; i++) {
-                logFile << packet[i];
-            }
-
-            logFile.close();
-
-            while (logFile.is_open())
-                ;
-        }
-
-        return;
-    } else {
-        // send the packet to final destination - will check routing table
-        // strip header and send packet
-        // TODO: Most important time to check link state.
-        packet += HEADER_SIZE;
-        sendPacket(packet, length - HEADER_SIZE, finalDestination, origIP);
-    }
-
-    if (AODV_LOG_OUTPUT)
-        logRoutingTable();
-}
-
-void AODV::sendPacket(char *packet, int length, IP_ADDR finalDestination,
-                      IP_ADDR origIP) {
-    cout << "[ORIG]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
-
-    // by default this node is the originator
-    if (-1 == signed(origIP))
-        origIP = getIp();
-
-    if (length < 0)
-        cout << "[ERROR]: Negative packet length." << endl;
-
-    // if entry exists in routing table, send it!
-    // check routing table
-    IP_ADDR nextHop = this->getTable()->getNextHop(finalDestination);
-
-    if (false == getTable()->getIsRouteActive(finalDestination)) {
-        char *bufferedPacket = (char *)(malloc(length));
-        memcpy(bufferedPacket, packet, length);
-        // Put this packet in a buffer to be sent when a route opens up
-        if (this->rreqPacketBuffer.count(finalDestination)) {
-            this->rreqPacketBuffer[finalDestination].push(
-                pair<char *, int>(bufferedPacket, length));
-        } else {
-            this->rreqPacketBuffer[finalDestination] = queue<pair<char *, int>>(
-                {pair<char *, int>(bufferedPacket, length)});
-        }
-
-        if (nextHop != 0) {
-            // this route is temporarily unavailable... check if actively
-            // finding a route
-            // TODO: send a RERR
-
-//            return;
-        }
-
+    if (getStringFromIp(dest) != BROADCAST_STR)
+    {
         if (AODV_DEBUG)
-            cout << "[DEBUG]: No existing route, creating RREQ message."
-                 << endl;
+            cout << "[ORIG]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
 
-        rreqPacket rreq = this->rreqHelper.createRREQ(finalDestination);
+        // by default this node is the originator
+        if (-1 == signed(origIP))
+            origIP = getIp();
 
-        // start a thread for THIS rreq and wait for a response
-        if (RREQ_RETRIES) {
-            thread waitForResponse(retryRouteRequestIfNoRREP, this, rreq,
-                                   RREQ_RETRIES);
-            waitForResponse.detach();
+        if (length < 0)
+            cerr << "[AODV]:[ERROR]: Negative packet length." << endl;
+
+        // if entry exists in routing table, send it!
+        // check routing table
+        if(this->m_aodvTable == nullptr){
+            printf("[AODV]:[ERROR]: The routing table is NULL\n");
+            exit(255);
+        }else{
+            nextHop = m_aodvTable->getNextHop(dest);
         }
-        broadcastRREQBuffer(rreq);
 
-        return;
+        if (false == getTable()->getIsRouteActive(dest)) {
+            BufferedPacket bufferedPacket;
+            bufferedPacket.buffer = (char *)(malloc(length));
+            memcpy(bufferedPacket.buffer, packet, length);
+            bufferedPacket.length = length;
+            bufferedPacket.portId = portId;
+
+            // Put this packet in a buffer to be sent when a route opens up
+            if (this->rreqPacketBuffer.count(dest)) {
+                this->rreqPacketBuffer[dest].push(bufferedPacket);
+            } else {
+                this->rreqPacketBuffer[dest] = queue<BufferedPacket>({bufferedPacket});
+            }
+
+            if (nextHop != 0) {
+                // this route is temporarily unavailable... check if actively
+                // finding a route
+                // TODO: send a RERR
+
+    //            return;
+            }
+
+            if (AODV_DEBUG)
+                cout << "[AODV]:[DEBUG]: No existing route, creating RREQ message." << endl;
+
+            rreqPacket rreq = this->rreqHelper.createRREQ(dest);
+
+            // start a thread for THIS rreq and wait for a response
+            if (RREQ_RETRIES) {
+                thread waitForResponse(retryRouteRequestIfNoRREP, this, rreq,
+                                    RREQ_RETRIES);
+                waitForResponse.detach();
+            }
+            _broadcastRREQBuffer(rreq);
+
+            return true;
+        }
     }
 
     if (AODV_DEBUG)
-        cout << "[DEBUG]: Route exists. Routing from "
+        cout << "[AODV]:[DEBUG]: Route exists. Routing from "
              << getStringFromIp(getIp()) << " to "
-             << getStringFromIp(finalDestination) << endl;
+             << getStringFromIp(dest) << endl;
 
     // add aodv header to buffer
     char *buffer = (char *)(malloc(HEADER_SIZE + length));
     uint8_t zero = 0x00;
     memcpy(buffer, &(zero), 1);
     buffer++;
-    memcpy(buffer, &finalDestination, 4);
+    memcpy(buffer, &dest, 4);
     buffer += 4;
     memcpy(buffer, &origIP, 4);
     buffer += 4;
@@ -181,234 +147,21 @@ void AODV::sendPacket(char *packet, int length, IP_ADDR finalDestination,
     buffer -= HEADER_SIZE;
 
     if (linkExists(nextHop)) {
-        socketSendPacket(buffer, length + HEADER_SIZE, nextHop, DATA_PORT);
+        _socketSendPacket(portId, buffer, length + HEADER_SIZE, nextHop);
     } else {
-        repairLink(nextHop, finalDestination, buffer, length, origIP,
-                   DATA_PORT);
+        repairLink(portId, nextHop, dest, buffer, length, origIP);
     }
 
     delete buffer;
+
+    return true;
 }
 
-void AODV::broadcastRREQBuffer(rreqPacket rreq) {
-    if (AODV_DEBUG)
-        cout << "[DEBUG]: Broadcasting Route Request from node "
-             << getStringFromIp(getIp()) << endl;
-
-    char *rreqBuffer = RREQHelper::createRREQBuffer(rreq);
-    socketSendPacket(rreqBuffer, sizeof(rreq), getIpFromString(BROADCAST_STR),
-                     ROUTING_PORT);
-
-    delete rreqBuffer;
-}
-
-void AODV::decodeReceivedPacketBuffer(char *buffer, int length,
-                                      IP_ADDR source, int port) {
-    //	cout << "Node " << getStringFromIp(getIp()) << " received a packet. " <<
-    // endl;
-
-    if (length <= 0) {
-        cout << "[ERROR]: ERROR DECODING PACKET. Length = 0." << endl;
-    }
-
-    // determine type of message
-    uint8_t type;
-    memcpy(&type, buffer, 1);
-
-    if (ROUTING_PORT == port)
-    {
-        switch (type) {
-        case 1:
-            handleRREQ(buffer, length, source);
-            break;
-        case 2:
-            handleRREP(buffer, length, source);
-            break;
-        case 3:
-            handleRERR(buffer, length, source);
-            break;
-        default:
-            // the packet is not AODV. ERROR because on AODV port 
-            cout << "[ERROR]: Non-AODV on AODV Port" << endl;
-            break;
-        }
-    }
-    else if (DATA_PORT == port) 
-    {
-        // on data port! receive packet like normal  
-        receivePacket(buffer, length, source);
-    }
-    else 
-    {
-        cout << "[ERROR]: Unknown port received by AODV" << endl;
-    }
-}
-
-void AODV::handleRREQ(char *buffer, int length, IP_ADDR source) {
-    // handle a received rreq message
-
-    // 1. make sure this is a valid rreq message
-    if (length != sizeof(rreqPacket)) {
-        if (AODV_DEBUG)
-            cout << "[ERROR]: Error handling rreq packet. Invalid length of " << length
-                 << " should be " << sizeof(rreqPacket) << endl;
-
-        return;
-    }
-
-    // valid rreq packet, make a decision
-    rreqPacket rreq = rreqHelper.readRREQBuffer(buffer);
-
-    // 2. is this a duplicate rreq?
-    if (rreqHelper.isDuplicateRREQ(rreq)) {
-        if (RREQ_DEBUG)
-            cout << "[DEBUG]: Duplicate RREQ message received." << endl;
-
-        return;
-    }
-
-    // 3. should we generate a rrep? are we the final destination?
-    if (rreqHelper.shouldGenerateRREP(rreq)) {
-        // generate a rreq message from this rreq
-        // TODO: Implement this
-        if (RREP_DEBUG)
-            cout << "[DEBUG]: Generating RREP message..." << endl;
-
-        rrepPacket rrep = rrepHelper.createRREPFromRREQ(rreq, source);
-
-        // convert packet to buffer and send
-        char *buffer;
-        buffer = RREPHelper::createRREPBuffer(rrep);
-
-        IP_ADDR nextHopIp = getTable()->getNextHop(rrep.origIP);
-
-        if (AODV_DEBUG)
-            cout << "[DEBUG]: Next hop for rrep: " << getStringFromIp(nextHopIp)
-                 << " from " << getStringFromIp(this->getIp()) << endl;
-
-        if (linkExists(nextHopIp))
-            socketSendPacket(buffer, sizeof(rrep), nextHopIp, ROUTING_PORT);
-//        else
-//        	repairLink(nextHopIp, rrep.origIP, buffer, sizeof(rrep), getIp(), ROUTING_PORT); 		
-
-        delete buffer;
-
-        return;
-    }
-
-    // 4. not final destination, forward the rreq
-    rreqPacket forwardRREQ = rreqHelper.createForwardRREQ(rreq, source);
-    broadcastRREQBuffer(forwardRREQ);
-}
-
-void AODV::handleRREP(char *buffer, int length, IP_ADDR source) {
-    // handle a received rrep message
-
-    // 1. make sure this is a valid rrep message
-    if (length != sizeof(rrepPacket)) {
-        if (AODV_DEBUG)
-            cout << "[DEBUG]: ERROR handling rrep packet. Invalid length."
-                 << endl;
-
-        return;
-    }
-
-    // valid rreq packet, make a decision
-    rrepPacket rrep = rrepHelper.readRREPBuffer(buffer);
-
-    this->getTable()->updateAODVRoutingTableFromRREP(&rrep, source);
-
-    // 2. are we the original ip? was this our route request reply?
-    if (this->getIp() == rrep.origIP) {
-        // packet made it back!
-        if (AODV_DEBUG)
-            cout << "[DEBUG]: Route discovery complete! Sending buffered "
-                    "packets, if they exist."
-                 << endl;
-
-        // Send any queued packages for that destination
-        if (this->rreqPacketBuffer.count(rrep.destIP)) {
-            if (AODV_DEBUG)
-                cout << "[DEBUG]: There are packets in the queue. Sending "
-                        "data..."
-                     << endl;
-
-            // Pull all the packets off the queue and send them
-            queue<pair<char *, int>> *packetQueue =
-                &rreqPacketBuffer[rrep.destIP];
-            while (packetQueue->size() > 0) {
-                pair<char *, int> package = packetQueue->front();
-                sendPacket(package.first, package.second, rrep.destIP,
-                           DATA_PORT);
-                delete package.first;
-
-                packetQueue->pop();
-            }
-        }
-        this->rreqPacketBuffer.erase(rrep.destIP);
-
-    } else {
-        // forward this packet
-        rrepPacket forwardRREP =
-            this->rrepHelper.createForwardRREP(rrep, source);
-
-        IP_ADDR nextHopIp = this->getTable()->getNextHop(forwardRREP.origIP);
-
-        if (RREP_DEBUG)
-            cout << "[DEBUG]: Forward rrep from " << getStringFromIp(getIp())
-                 << " to " << getStringFromIp(nextHopIp) << endl;
-
-        char *buffer = RREPHelper::createRREPBuffer(forwardRREP);
-
-        if (linkExists(nextHopIp))
-            socketSendPacket(buffer, sizeof(forwardRREP), nextHopIp, ROUTING_PORT);
-//        else if (RREP_DEBUG)
-//            cout << "[DEBUG]: We don't try to repair failed RREPs..." << endl;
-        //			repairLink(nextHopIp, forwardRREP.origIP, buffer,
-        // sizeof(forwardRREP), forwardRREP.destIP, ROUTING_PORT);
-
-        delete buffer;
-    }
-}
-
-void AODV::handleRERR(char *buffer, int length, IP_ADDR source) {
-    // handle a received rerr message. most likely forwarding it...
-    if (RERR_DEBUG)
-        cout << "[DEBUG]: Handling RERR message..." << endl;
-
-    rerrPacket rerr = RERRHelper::readRERRBuffer(buffer);
-
-    // when a link breaks, mark a routing table entry as invalid
-    if (RERR_DEBUG)
-        cout << "[DEBUG]: Setting unreachable IP "
-             << getStringFromIp(rerr.unreachableIP) << " to INACTIVE." << endl;
-
-    getTable()->setIsRouteActive(rerr.unreachableIP, false);
-
-    char *packet = (char *)(malloc(sizeof(rerr)));
-    memcpy(packet, &rerr, sizeof(rerr));
-
-    // when forwarding packets, make sure the routing table entry is valid
-    if (rerr.origIP == this->getIp()) {
-        if (RERR_DEBUG)
-            cout << "[DEBUG]: Route Error response received by sender. "
-                    "Generating a new RREQ..."
-                 << endl;
-
-        // generate a RREQ to the destination
-        rreqPacket rreq = rreqHelper.createRREQ(rerr.unreachableIP);
-        broadcastRREQBuffer(rreq);
-    } else if (getTable()->getIsRouteActive(rerr.origIP)) {
-        // send a packet to the next hop about the error
-        IP_ADDR nextHop = getTable()->getNextHop(rerr.origIP);
-        socketSendPacket(packet, sizeof(rerr), nextHop, ROUTING_PORT);
-    }
-}
-
-void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,
-                      int length, IP_ADDR origIP, int port) {
+void AODV::repairLink(int port, IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,
+                      int length, IP_ADDR origIP) {
+    // this function will try to repair the link, but if fail it will generate a RERR
+    // brokenLink is the link that is unreachable, finalDest is the final destination, and origIP is who sent this message
     // first try to fix the link locally
-    cout << "IP TEST: " << origIP << " : " << getIp() << endl;
     if (origIP == getIp())
     {
         // this is the first node.. do RREQ
@@ -420,15 +173,14 @@ void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,
                                    RREQ_RETRIES);
             waitForResponse.detach();
         }
-        broadcastRREQBuffer(rreq);
+        _broadcastRREQBuffer(rreq);
     }
     else if (true == attemptLocalRepair(brokenLink, finalDest)) {
         if (MONITOR_DEBUG)
-            cout << "[DEBUG]: Broken link repaired locally! Sending packet..."
+            cout << "[AODV]:[DEBUG]: Broken link repaired locally! Sending packet..."
                  << endl;
-
         IP_ADDR nextHop = getTable()->getNextHop(finalDest);
-        socketSendPacket(buffer, length, nextHop, port);
+        _socketSendPacket(port, buffer, length, nextHop);
     } else {
         // link is totally dead. Remove entry in routing table and send a RERR.
         rerrPacket rerr = rerrHelper.createRERR(finalDest, origIP);
@@ -440,10 +192,11 @@ void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,
 
         // send reverse rerr to originator
         IP_ADDR nextHop = getTable()->getNextHop(origIP);
-        cout << "[DEBUG]: Next hop for rerr to " << getStringFromIp(origIP) << " = " << getStringFromIp(nextHop) << endl;
+        if(AODV_DEBUG)
+            cout << "[AODV]:[DEBUG]: Next hop for rerr to " << getStringFromIp(origIP) << " = " << getStringFromIp(nextHop) << endl;
 
         // TODO: ADD PACKET TO PACKET BUFFER QUEUE
-        socketSendPacket(packet, sizeof(rerr), nextHop, ROUTING_PORT);
+        _socketSendPacket(ROUTING_PORT, packet, sizeof(rerr), nextHop);
 
         delete packet;
     }
@@ -451,16 +204,12 @@ void AODV::repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,
 
 bool AODV::attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest) {
     if (MONITOR_DEBUG)
-        cout << "[DEBUG]: Attempting local repair from broken link "
+        cout << "[AODV]:[DEBUG]: Attempting local repair from broken link "
              << getStringFromIp(brokenLink) << " to destination "
              << getStringFromIp(finalDest) << endl;
-
+    printf("[AODV]:[WARNING]: attemptLocalRepair is not implemented\n");
     // TODO: Use network monitoring to attempt local repair
     return false;
-}
-
-void AODV::getOneHopNeighbors() {
-
 }
 
 void AODV::logRoutingTable() {
@@ -497,72 +246,262 @@ void AODV::logRoutingTable() {
     while (logFile.is_open());
 }
 
-int AODVTest::globalPacketCount = 0;
-IP_ADDR AODVTest::lastNode = 0;
-IP_ADDR AODVTest::lastReceive = 0;
 
-int AODVTest::socketSendPacket(char *buffer, int length, IP_ADDR dest,
-                               int port) {
-    for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++) {
-        if ((dest == m_physicalNeighbors.at(i)->getIp() ||
-             dest == getIpFromString(BROADCAST_STR)))
-        {
-            // send packet to this node
-            AODVTest::lastReceive = m_physicalNeighbors.at(i)->getIp();
-            AODVTest::lastNode = getIp();
-            AODVTest::globalPacketCount++;
 
-            m_physicalNeighbors.at(i)->decodeReceivedPacketBuffer(
-                buffer, length, getIp(), port);
-        }
-        else 
-        {
-            cout << getStringFromIp(dest) << " from " << getStringFromIp(this->ipAddress) << endl;
-            if (AODV_DEBUG)
-                cout << "[DEBUG]: Testing sending monitoring packet..." << endl;
-        }
+/******************************
+ * Protected Functions
+ ******************************/
+void AODV::_broadcastRREQBuffer(rreqPacket rreq) {
+    if (AODV_DEBUG)
+        cout << "[AODV]:[DEBUG]: Broadcasting Route Request from node "
+             << getStringFromIp(getIp()) << endl;
+
+    char *rreqBuffer = RREQHelper::createRREQBuffer(rreq);
+    _socketSendPacket(ROUTING_PORT, rreqBuffer, sizeof(rreq), getIpFromString(BROADCAST_STR));
+
+    delete rreqBuffer;
+}
+
+
+void AODV::_handleRREQ(char *buffer, int length, IP_ADDR source) {
+    // handle a received rreq message
+
+    // 1. make sure this is a valid rreq message
+    if (length != sizeof(rreqPacket)) {
+        if (AODV_DEBUG)
+            cout << "[AODV]:[ERROR]: Error handling rreq packet. Invalid length of " << length
+                 << " should be " << sizeof(rreqPacket) << endl;
+
+        return;
     }
 
-    return 0;
+    // valid rreq packet, make a decision
+    rreqPacket rreq = rreqHelper.readRREQBuffer(buffer);
+
+    // 2. is this a duplicate rreq?
+    if (rreqHelper.isDuplicateRREQ(rreq)) {
+        if (RREQ_DEBUG)
+            cout << "[AODV]:[DEBUG]: Duplicate RREQ message received." << endl;
+        return;
+    }
+
+    // 3. should we generate a rrep? are we the final destination?
+    if (rreqHelper.shouldGenerateRREP(rreq)) {
+        // generate a rreq message from this rreq
+        // TODO: Implement this
+        if (RREP_DEBUG)
+            cout << "[AODV]:[DEBUG]: Generating RREP message..." << endl;
+
+        rrepPacket rrep = rrepHelper.createRREPFromRREQ(rreq, source);
+
+        // convert packet to buffer and send
+        char *buffer;
+        buffer = RREPHelper::createRREPBuffer(rrep);
+
+        IP_ADDR nextHopIp = getTable()->getNextHop(rrep.origIP);
+
+        if (AODV_DEBUG)
+            cout << "[AODV]:[DEBUG]: Next hop for rrep: " << getStringFromIp(nextHopIp)
+                 << " from " << getStringFromIp(this->getIp()) << endl;
+
+        if (linkExists(nextHopIp))
+            _socketSendPacket(ROUTING_PORT, buffer, sizeof(rrep), nextHopIp);
+//        else
+//        	repairLink(nextHopIp, rrep.origIP, buffer, sizeof(rrep), getIp(), ROUTING_PORT);
+        cout << "[AODV]:[WARNING]: We don't try to repair failed RREPs..." << endl;
+
+
+        delete buffer;
+
+        return;
+    }
+
+    // 4. not final destination, forward the rreq
+    rreqPacket forwardRREQ = rreqHelper.createForwardRREQ(rreq, source);
+    _broadcastRREQBuffer(forwardRREQ);
 }
 
-void AODVTest::addNeighbor(AODVTest *node) {
-    this->m_neighbors.push_back(node->getIp());
-    this->m_physicalNeighbors.push_back(node);
+void AODV::_handleRREP(char *buffer, int length, IP_ADDR source) {
+    // handle a received rrep message
+
+    // 1. make sure this is a valid rrep message
+    if (length != sizeof(rrepPacket)) {
+        if (AODV_DEBUG)
+            cout << "[AODV]:[DEBUG]: ERROR handling rrep packet. Invalid length."
+                 << endl;
+
+        return;
+    }
+
+    // valid rreq packet, make a decision
+    rrepPacket rrep = rrepHelper.readRREPBuffer(buffer);
+
+    this->getTable()->updateAODVRoutingTableFromRREP(&rrep, source);
+
+    // 2. are we the original ip? was this our route request reply?
+    if (this->getIp() == rrep.origIP) {
+        // packet made it back!
+        if (AODV_DEBUG)
+            cout << "[AODV]:[DEBUG]: Route discovery complete! Sending buffered "
+                    "packets, if they exist."
+                 << endl;
+
+        // Send any queued packages for that destination
+        if (this->rreqPacketBuffer.count(rrep.destIP)) {
+            if (AODV_DEBUG){
+                cout << "[AODV]:[DEBUG]: There are packets in the queue. Sending "
+                        "data..."
+                     << endl;
+            }
+
+            // Pull all the packets off the queue and send them
+            queue<BufferedPacket> *packetQueue = &rreqPacketBuffer[rrep.destIP];
+            while (packetQueue->size() > 0) {
+                BufferedPacket packet = packetQueue->front();
+                sendPacket(packet.portId, packet.buffer, packet.length, rrep.destIP);
+                delete packet.buffer;
+                packetQueue->pop();
+            }
+        }
+        this->rreqPacketBuffer.erase(rrep.destIP);
+
+    } else {
+        // forward this packet
+        rrepPacket forwardRREP =
+            this->rrepHelper.createForwardRREP(rrep, source);
+
+        IP_ADDR nextHopIp = this->getTable()->getNextHop(forwardRREP.origIP);
+
+        if (RREP_DEBUG)
+            cout << "[AODV]:[DEBUG]: Forward rrep from " << getStringFromIp(getIp())
+                 << " to " << getStringFromIp(nextHopIp) << endl;
+
+        char *buffer = RREPHelper::createRREPBuffer(forwardRREP);
+
+        if (linkExists(nextHopIp))
+            _socketSendPacket(ROUTING_PORT, buffer, sizeof(forwardRREP), nextHopIp);
+        else if (RREP_DEBUG)
+            cout << "[AODV]:[WARNING]: We don't try to repair failed RREPs..." << endl;
+        //			repairLink(nextHopIp, forwardRREP.origIP, buffer,
+        // sizeof(forwardRREP), forwardRREP.destIP, ROUTING_PORT);
+
+        delete buffer;
+    }
 }
 
-void AODVTest::removeNeighbor(AODVTest *node) {
-    for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++) {
-        if (node->getIp() == m_physicalNeighbors.at(i)->getIp()) {
-            m_neighbors.erase(m_neighbors.begin() + i);
-            m_physicalNeighbors.erase(m_physicalNeighbors.begin() + i);
+void AODV::_handleRERR(char *buffer, int length, IP_ADDR source) {
+    // handle a received rerr message. most likely forwarding it...
+    if (RERR_DEBUG)
+        cout << "[AODV]:[DEBUG]: Handling RERR message..." << endl;
+
+    rerrPacket rerr = RERRHelper::readRERRBuffer(buffer);
+
+    // when a link breaks, mark a routing table entry as invalid
+    if (RERR_DEBUG)
+        cout << "[AODV]:[DEBUG]: Setting unreachable IP "
+             << getStringFromIp(rerr.unreachableIP) << " to INACTIVE." << endl;
+
+    getTable()->setIsRouteActive(rerr.unreachableIP, false);
+
+    char *packet = (char *)(malloc(sizeof(rerr)));
+    memcpy(packet, &rerr, sizeof(rerr));
+
+    // when forwarding packets, make sure the routing table entry is valid
+    if (rerr.origIP == this->getIp()) {
+        if (RERR_DEBUG)
+            cout << "[AODV]:[DEBUG]: Route Error response received by sender. "
+                    "Generating a new RREQ..."
+                 << endl;
+
+        // generate a RREQ to the destination
+        rreqPacket rreq = rreqHelper.createRREQ(rerr.unreachableIP);
+        _broadcastRREQBuffer(rreq);
+    } else if (getTable()->getIsRouteActive(rerr.origIP)) {
+        // send a packet to the next hop about the error
+        IP_ADDR nextHop = getTable()->getNextHop(rerr.origIP);
+        _socketSendPacket(ROUTING_PORT, packet, sizeof(rerr), nextHop);
+    }
+}
+
+void AODV::_handlePacket(int port, char *packet, int length, IP_ADDR source) {
+    if(port == ROUTING_PORT){
+        _handleAODVPacket(packet, length, source);
+    }else{
+        // get final destination
+        IP_ADDR finalDestination;
+        memcpy(&finalDestination, &(packet[1]), 4);
+        IP_ADDR origIP;
+        memcpy(&origIP, &(packet[5]), 4);
+        if (this->getIp() == finalDestination) {
+            // We are the final destinatin
+            // Have socket handle the packet
+            packet += HEADER_SIZE; // Get only the data part of the packet
+            if(ports.count(port)){
+                ports[port]->handlePacket(packet, length - HEADER_SIZE, source);
+            }else{
+                fprintf(stderr, "[AODV]:[ERROR]: Received packet on port with no port handler\n");
+            }
+            packet -= HEADER_SIZE;
+        }else{
+            // send the packet to final destination - will check routing table
+            // strip header and send packet
+            // TODO: Most important time to check link state.
+            packet += HEADER_SIZE;
+            sendPacket(port, packet, length - HEADER_SIZE, finalDestination, origIP);
+            packet -= HEADER_SIZE;
         }
     }
 }
 
-bool AODVTest::isNeighbor(AODVTest node) {
-    for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++) {
-        if (node.getIp() == m_physicalNeighbors.at(i)->getIp())
-            return true;
+void AODV::_handlePacket(Port* p, char *buffer, int length, IP_ADDR source){
+    _handlePacket(p->getPortId(), buffer, length, source);
+}
+
+void AODV::_handleAODVPacket(char *buffer, int length, IP_ADDR source){
+    if (length <= 0) {
+        cerr << "[AODV]:[ERROR]: ERROR DECODING PACKET. Length = 0." << endl;
     }
 
-    return false;
+    // determine type of message
+    uint8_t type;
+    memcpy(&type, buffer, 1);
+    //int type_p = 0;
+    //type_p |= type;
+    //cout<<"Type: "<<type_p<<endl;
+    switch (type) {
+    case 1:
+        _handleRREQ(buffer, length, source);
+        break;
+    case 2:
+        _handleRREP(buffer, length, source);
+        break;
+    case 3:
+        _handleRERR(buffer, length, source);
+        break;
+    default:
+        // the packet is not AODV. ERROR because on AODV port 
+        cerr << "[AODV]:[ERROR]: Non-AODV on AODV Port" << endl;
+        break;
+    }
 }
 
-bool AODVTest::packetInRreqBuffer(IP_ADDR dest) {
-    return (rreqPacketBuffer.count(dest));
+bool AODV::_socketSendPacket(Port* p, char *buffer, int length, IP_ADDR dest){
+    return _socketSendPacket(p->getPortId(), buffer, length, dest);
 }
 
+/******************************
+ * Helper Functions
+ ******************************/
 void retryRouteRequestIfNoRREP(AODV *aodv, rreqPacket sendRREQ,
                                int numberOfRetriesRemaining) {
     if (RREQ_DEBUG)
-        cout << "[DEBUG]: Waiting for RREP..." << endl;
+        cout << "[AODV]:[DEBUG]: Waiting for RREP..." << endl;
 
     // wait net traversal time
     this_thread::sleep_for(chrono::milliseconds(NET_TRAVERSAL_TIME_MS * 2));
 
     if (RREQ_DEBUG)
-        cout << "[DEBUG]: Checking if RREP has been received for RREQ" << endl;
+        cout << "[AODV]:[DEBUG]: Checking if RREP has been received for RREQ" << endl;
 
     // check if rreq with same sequence id is contained in the packet buffer
     if (numberOfRetriesRemaining - 1 > 0 &&
@@ -572,7 +511,7 @@ void retryRouteRequestIfNoRREP(AODV *aodv, rreqPacket sendRREQ,
     } else {
         // RREQ received! exit thread
         if (RREQ_DEBUG)
-            cout << "[DEBUG]: No longer retrying RREQ." << endl;
+            cout << "[AODV]:[DEBUG]: No longer retrying RREQ." << endl;
 
         exit(0);
     }

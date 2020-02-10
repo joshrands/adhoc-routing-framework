@@ -10,7 +10,7 @@
 CXX = g++
 LD = g++
 LIB = ar
-INC_DIRS = -I../ -I../monitoring
+INC_DIRS = -I../ -I../monitoring -I../adhoc
 
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
 LDFLAGS = -g -pthread ${INC_DIRS}

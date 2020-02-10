@@ -11,7 +11,7 @@
  * Date: 11/27/2019
  ********************************/
 
-#include "../rem/rem.h"
+#include "rem.h"
 
 
 class REMSim : public REM 
