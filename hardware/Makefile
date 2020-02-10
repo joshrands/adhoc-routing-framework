@@ -11,7 +11,7 @@
 CXX = g++
 LD = g++
 LIB = ar
-INC_DIRS = -I../aodv -I../socket -I../
+INC_DIRS = -I../aodv -I../socket -I../ -I../adhoc
 
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK -Wall ${INC_DIRS}
 LDFLAGS = -g -pthread -I../socket/ -I../aodv/ -Wall ${INC_DIRS}
