@@ -10,7 +10,7 @@
  * Date: 9/4/2019
  ********************************/
 
-#include "RoutingProtocol.h"
+#include "routing_protocol.h"
 
 #include <iostream>
 

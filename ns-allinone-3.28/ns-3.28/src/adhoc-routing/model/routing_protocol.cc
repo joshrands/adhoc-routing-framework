@@ -1,12 +1,10 @@
-#include "RoutingProtocol.h"
+#include "routing_protocol.h"
 
 #define ROUTE_DEBUG		0
 
 #include <fstream>
 
 using namespace std;
-
-//int RoutingProtocol::DATA_PORT = 5555;
 
 IP_ADDR getIpFromString(string ipStr)
 {
@@ -38,29 +36,21 @@ RoutingTable::RoutingTable()
 
 RoutingTable::~RoutingTable()
 {
-/*	map<IP_ADDR, TableInfo*>::iterator it;
-
-	for ( it = this->table.begin(); it != this->table.end(); it++ )
-	{
-		cout << "Found allocated memory" << endl;
-		delete (it->second);
-	}
-*/
 	this->table.empty();
 }
+
 
 IP_ADDR RoutingTable::getNextHop(const IP_ADDR dest)
 {
 	IP_ADDR nextHop;
 
-	if (this->table.count(dest))
+	if (this->table.count(dest)) // Entry exists
 	{
-//		cout << "Entry exists." << endl;
+		
 		nextHop = table[dest].nextHop;
 	}
-	else
+	else // Table entry does not exist
 	{
-//		cout << "Table entry does not exist." << endl;
 		nextHop = 0;
 	}
 
@@ -79,7 +69,9 @@ void RoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop)
 	else
 	{
 		// no entry, create new 
-		cout << "Creating new entry" << endl;
+		if(TABLE_DEBUG){
+			cout << "[TABLE]: [DEBUG]: Creating new entry" << endl;
+		}
 		TableInfo info;
 		info.dest = dest;
 		info.nextHop = nextHop;
@@ -89,32 +81,57 @@ void RoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop)
 	}
 }
 
-RoutingProtocol::RoutingProtocol()
-{
+RoutingProtocol::RoutingProtocol(){
+}
+RoutingProtocol::~RoutingProtocol(){
+}
 
+void RoutingProtocol::addPort(Port* p){
+	if(ports.count(p->getPortId()) == 0){
+		if(ROUTING_DEBUG){
+			printf("[ROUTING]:[DEBUG]: Adding port %d\n",p->getPortId());
+		}
+		ports[p->getPortId()] = p;
+		this->_buildPort(p);
+	}
+}
+
+void RoutingProtocol::removePort(Port* p){
+	if(ports.count(p->getPortId())){
+		if(ROUTING_DEBUG){
+			printf("[ROUTING]:[DEBUG]: Removing port %d\n",p->getPortId());
+		}
+		this->_destroyPort(p);
+		ports.erase(p->getPortId());
+	}
+}
+
+bool RoutingProtocol::sendPacket(Port* p, char* data, int length, IP_ADDR dest, IP_ADDR origIP){
+	return sendPacket(p->getPortId(), data, length, dest, origIP);
 }
 
 bool RoutingProtocol::linkExists(IP_ADDR dest) {
     if (MONITOR_DEBUG)
-        cout << "[DEBUG]: Checking if link exists from "
+        cout << "[ROUTING]:[DEBUG]: Checking if link exists from "
              << getStringFromIp(getIp()) << " to " << getStringFromIp(dest)
              << endl;
 
-//	globalMux.lock();
+	// if this is a broadcast, the link always exists.
+	if (getStringFromIp(dest) == BROADCAST_STR)
+	{
+		cout << "[ROUTING]:[DEBUG]: Broadcast link always exists" << endl;
+		return true;
+	}	
     for (IP_ADDR ip : m_neighbors) {
         if (dest == ip) {
             if (MONITOR_DEBUG)
-                cout << "[DEBUG]: Link exists!" << endl;
-
-//			globalMux.unlock();
+                cout << "[ROUTING]:[DEBUG]: Link exists!" << endl;
             return true;
         }
     }
 
-//	globalMux.unlock();
-
     if (MONITOR_DEBUG)
-        cout << "[DEBUG]: Link does not exist." << endl;
+        cout << "[ROUTING]:[DEBUG]: Link does not exist." << endl;
 
     return false;
 }
@@ -126,8 +143,10 @@ void RoutingProtocol::resetLinks()
 	globalMux.unlock();
 }
 
-void RoutingProtocol::addExistingLink(IP_ADDR node)
+void RoutingProtocol::addLink(IP_ADDR node)
 {
+	if (ROUTING_DEBUG)
+		cout << "[DEBUG]:[ROUTING]: Adding link to node " << getStringFromIp(node) << endl;
 	globalMux.lock();
 	m_neighbors.push_back(node);
 	globalMux.unlock();

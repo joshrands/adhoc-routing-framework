@@ -11,7 +11,7 @@
  * Date: 10/28/2019
  ********************************/
 
-#include "../adhoc/network_monitor.h"
+#include "network_monitor.h"
 #include "rem_model.h"
 
 #include <vector>

@@ -1,6 +1,6 @@
 
 #include "rem.h"
-#include "hello_monitor.h"
+#include "../hello_monitor/hello_monitor.h"
 #include "aodv_test.h"
 
 #include <assert.h>
@@ -163,5 +163,6 @@ void test_local_update_thread()
 void test_hello()
 {
 	AODVTest aodv("192.168.0.1");
-	HelloTest hello(&aodv);
+	test(false, "Hello messages not implemented.");
+//	HelloTest hello(&aodv);
 }

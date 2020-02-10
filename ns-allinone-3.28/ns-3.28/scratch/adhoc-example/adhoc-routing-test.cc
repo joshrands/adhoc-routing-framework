@@ -70,9 +70,9 @@ void initialHellos()
     for (uint32_t i = 0; i < length; i++)
           buffer[i] = msg.at(i);
     // send data from first node to last node 
-    AdHocRoutingHelper* adhoc = adhocMap[it->second];
-    IP_ADDR dest = getIpFromString(BROADCAST_STR); 
-    adhoc->routing->socketSendPacket(buffer, msg.length(), dest, DATA_PORT); 
+// TODO: Fix this    AdHocRoutingHelper* adhoc = adhocMap[it->second];
+// TOOD: Fix this    IP_ADDR dest = getIpFromString(BROADCAST_STR); 
+// TODO: Fix this    adhoc->routing->socketSendPacket(buffer, msg.length(), dest, DATA_PORT); 
 
     delete buffer;
 
@@ -92,11 +92,11 @@ void testAdHoc()
 
   auto it = nodeMap.begin();
   // send data from first node to last node 
-  AdHocRoutingHelper* adhoc = adhocMap[it->second];
+// TODO: Fix this  AdHocRoutingHelper* adhoc = adhocMap[it->second];
 //  i;ut += NUM_NODES - 1;
   it++;
-  IP_ADDR dest = it->first;
-  adhoc->sendPacket(buffer, msg.length(), dest); 
+// TODO: Fix this  IP_ADDR dest = it->first;
+// TODO: Fix this  adhoc->sendPacket(buffer, msg.length(), dest); 
 
   Simulator::Schedule(Seconds(2.0), &testAdHoc);
 
@@ -108,7 +108,7 @@ void localMonitoring()
   auto it = adhocMap.begin();
   while (it != adhocMap.end())
   {
-    it->second->monitor->updateLocalModels();
+// TODO: Fix this    it->second->monitor->updateLocalModels();
     it++;
   }
 

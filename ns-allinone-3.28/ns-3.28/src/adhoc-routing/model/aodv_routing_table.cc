@@ -3,7 +3,7 @@
 AODVRoutingTable::AODVRoutingTable()
 {
 	if (TABLE_DEBUG)
-		cout << "[DEBUG]: Created new aodv routing table." << endl;
+		cout << "[TABLE]:[DEBUG]: Created new aodv routing table." << endl;
 }
 
 AODVRoutingTable::~AODVRoutingTable()
@@ -14,8 +14,7 @@ AODVRoutingTable::~AODVRoutingTable()
 IP_ADDR AODVRoutingTable::getNextHop(const IP_ADDR dest)
 {
 	IP_ADDR nextHop;
-
-	if (&m_aodvTable != NULL && m_aodvTable.count(dest))
+	if (m_aodvTable.count(dest))
 	{
 		nextHop = m_aodvTable[dest].nextHop;
 	}
@@ -79,7 +78,7 @@ void AODVRoutingTable::setDestSequenceNumber(const IP_ADDR dest, uint32_t destSe
 	}
 	else
 	{
-		cout << "[ERROR]: Error update sequence number: Unknown table entry." << endl;
+		cout << "[TABLE]:[ERROR]: Error update sequence number: Unknown table entry." << endl;
 		return;
 	}
 }
@@ -94,7 +93,7 @@ void AODVRoutingTable::setHopCount(const IP_ADDR dest, uint8_t hopCount)
 	}
 	else
 	{
-		cout << "[ERROR]: Error update hop count: Unknown table entry." << endl;
+		cout << "[TABLE]:[ERROR]: Error update hop count: Unknown table entry." << endl;
 		return;
 	}
 }
@@ -109,7 +108,7 @@ void AODVRoutingTable::setLastRREQId(const IP_ADDR dest, uint32_t lastRREQId)
 	}
 	else
 	{
-		cout << "[ERROR]: Error update last rreq id: Unknown table entry." << endl;
+		cout << "[TABLE]:[ERROR]: Error update last rreq id: Unknown table entry." << endl;
 		return;
 	}
 }
@@ -120,12 +119,14 @@ void AODVRoutingTable::setIsRouteActive(const IP_ADDR dest, bool active)
 	if (this->m_aodvTable.count(dest))
 	{
 		// entry exists, update dest sequence number  
-		cout << "Setting " << getStringFromIp(dest) << " to INACTIVE " << active << endl;
+		if(TABLE_DEBUG){
+			cout << "[TABLE]:[DEBUG]: Setting " << getStringFromIp(dest) << " to INACTIVE " << active << endl;
+		}
 		this->m_aodvTable[dest].active = active;
 	}
 	else
 	{
-		cout << "[ERROR]: Error update active: Unknown table entry." << endl;
+		cout << "[TABLE]:[ERROR]: Error update active: Unknown table entry." << endl;
 		return;
 	}
 }
@@ -133,10 +134,10 @@ void AODVRoutingTable::setIsRouteActive(const IP_ADDR dest, bool active)
 void AODVRoutingTable::updateAODVRoutingTableFromRREQ(rreqPacket* receivedRREQ, IP_ADDR sourceIP)
 {
 	if (TABLE_DEBUG)
-		cout << "[DEBUG]: Updating routing table from RREQ packet" << endl;
+		cout << "[TABLE]:[DEBUG]: Updating routing table from RREQ packet" << endl;
 
 	if (receivedRREQ->hopCount == 0)
-		cout << "HOP COUNT IS ZERO. FROM " << getStringFromIp(sourceIP) << endl;
+		cerr << "[TABLE]:[ERROR]: HOP COUNT IS ZERO. FROM " << getStringFromIp(sourceIP) << endl;
 
 	if (  receivedRREQ->origSeqNum > getDestSequenceNumber(receivedRREQ->origIP)
 	   || getCostOfDest(receivedRREQ->origIP) > getCostOfRREQ(*receivedRREQ))
@@ -152,7 +153,7 @@ void AODVRoutingTable::updateAODVRoutingTableFromRREQ(rreqPacket* receivedRREQ, 
 void AODVRoutingTable::updateAODVRoutingTableFromRREP(rrepPacket* receivedRREP, IP_ADDR sourceIP)
 {
 	if (TABLE_DEBUG)
-		cout << "[DEBUG]: Updating routing table from RREP packet" << endl;
+		cout << "[TABLE]:[DEBUG]: Updating routing table from RREP packet" << endl;
 
 	if (  receivedRREP->destSeqNum > getDestSequenceNumber(receivedRREP->destIP)
 	   || getCostOfDest(receivedRREP->destIP) > getCostOfRREP(*receivedRREP)
@@ -171,7 +172,7 @@ void AODVRoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHo
 	{	
 		// entry exists, update existing 
 		if (TABLE_DEBUG)
-			cout << "[DEBUG]: Updating existing AODV entry" << endl;
+			cout << "[TABLE]:[DEBUG]: Updating existing AODV entry" << endl;
 		this->m_aodvTable[dest].nextHop = nextHop;
 		this->m_aodvTable[dest].ttl = DEFAULT_TTL;
 	}
@@ -179,7 +180,7 @@ void AODVRoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHo
 	{
 		// no entry, create new 
 		if (TABLE_DEBUG)
-			cout << "[DEBUG]: Creating new AODV entry" << endl;
+			cout << "[TABLE]:[DEBUG]: Creating new AODV entry" << endl;
 		AODVInfo info;
 		info.dest = dest;
 		info.nextHop = nextHop;
@@ -198,7 +199,7 @@ void AODVRoutingTable::removeTableEntry(const IP_ADDR dest)
 	{	
 		// entry exists, delete entry 
 		if (TABLE_DEBUG)
-			cout << "[DEBUG]: Setting table entry as inactive" << endl;
+			cout << "[TABLE]:[DEBUG]: Setting table entry as inactive" << endl;
 
 		this->m_aodvTable[dest].active = false;
 	}
@@ -206,24 +207,27 @@ void AODVRoutingTable::removeTableEntry(const IP_ADDR dest)
 	{
 		// no entry, create new 
 		if (TABLE_DEBUG)
-			cout << "[DEBUG]: Error. Tried to erase non-existent table entry." << endl;
+			cout << "[TABLE]:[DEBUG]: Error. Tried to erase non-existent table entry." << endl;
 	}
 }
 
 int AODVRoutingTable::getCostOfDest(const IP_ADDR dest)
-{
+{	
+	printf("[TABLE]:[WARNING]: getCostOfDest is currently using hopcount\n");
 	// currently using hopcount...
 	return getDestHopCount(dest);
 }
 
 int AODVRoutingTable::getCostOfRREQ(const rreqPacket rreq)
-{
+{	
+	printf("[TABLE]:[WARNING]: getCostOfRREQ is currently using hopcount\n");
 	// currently using hopcount...
 	return rreq.hopCount;
 }
 
 int AODVRoutingTable::getCostOfRREP(const rrepPacket rrep)
 {
+	printf("[TABLE]:[WARNING]: getCostOfRREP is currently using hopcount\n");
 	// currently using hopcount...
 	return rrep.hopCount;
 }

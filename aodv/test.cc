@@ -405,7 +405,7 @@ void test_aodv_link_break()
 //	node0.sendPacket(buffer, length, node4.getIp());
 
 	// FAILING this test is okay because if links break we will consider those packets lost...
-	test(AODVTest::lastReceive == node4.getIp(), "Last received packet was node " + getStringFromIp(AODVTest::lastReceive) + " not node 4");
+	test(AODVTest::lastReceive == node4.getIp(), "OKAY TO FAIL: Last received packet was node " + getStringFromIp(AODVTest::lastReceive) + " not node 4");
 
 	node0.sendPacket(printPort->getPortId(), buffer, length, node4.getIp());
 	test(AODVTest::lastReceive == node4.getIp(), "Last received packet was node " + getStringFromIp(AODVTest::lastReceive));

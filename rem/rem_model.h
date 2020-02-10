@@ -15,7 +15,7 @@
 #include "rem_parameters.h"
 #include "rem_defines.h"
 #include "rem_packet.h"
-#include "../adhoc/routing_protocol.h"
+#include "routing_protocol.h"
 
 #include <vector>
 #include <iostream>

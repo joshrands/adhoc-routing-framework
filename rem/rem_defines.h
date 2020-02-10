@@ -4,8 +4,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "../defines.h"
-#include "../aodv/aodv_defines.h"
+#include "defines.h"
+#include "aodv_defines.h"
 
 #define REM_DEBUG   		DEBUG && 0
 #define BATTERY_DEBUG       DEBUG && 1

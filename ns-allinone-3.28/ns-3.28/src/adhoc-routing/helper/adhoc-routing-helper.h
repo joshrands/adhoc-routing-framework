@@ -2,7 +2,7 @@
 #ifndef ADHOC_ROUTING_HELPER_H
 #define ADHOC_ROUTING_HELPER_H
 
-#include "ns3/adhoc_routing.h"
+#include "ns3/aodv_sim.h"
 #include "ns3/defines.h"
 #include "ns3/node.h"
 #include "ns3/socket.h"
@@ -12,7 +12,7 @@ namespace ns3 {
 
 /* ... */
 // TODO: Create a helper with ns3 aodv and sim rem 
-class AdHocRoutingHelper : public AdHocRouting
+class AdHocRoutingHelper : public SimAODV
 {
 public:
     // default constructor initializes everything 

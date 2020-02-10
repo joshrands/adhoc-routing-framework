@@ -11,6 +11,8 @@ do-adhoc
 /monitoring/pcap-fun/read-packet
 logs
 
+#
+hardware_monitoring_testing
 
 # Prerequisites
 *.d

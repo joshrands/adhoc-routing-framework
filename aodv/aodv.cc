@@ -153,6 +153,8 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
     }
 
     delete buffer;
+
+    return true;
 }
 
 void AODV::repairLink(int port, IP_ADDR brokenLink, IP_ADDR finalDest, char *buffer,

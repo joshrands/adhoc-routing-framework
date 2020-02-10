@@ -7,8 +7,8 @@
  * Date: 1/19/2019
  ********************************/
 
-#include "../adhoc/routing_protocol.h"
-#include "../defines.h"
+#include "routing_protocol.h"
+#include "defines.h"
 #include <set>
 
 #define HELLO_DEBUG     DEBUG && 1

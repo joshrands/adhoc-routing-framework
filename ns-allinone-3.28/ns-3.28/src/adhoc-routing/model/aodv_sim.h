@@ -11,19 +11,48 @@
  ********************************/
 
 #include "aodv.h"
+#include "network_monitor.h"
 
-class AODVSim : public AODV
+struct SimPacket{
+    char* data;
+    int length;
+    int portId;
+    IP_ADDR source;
+    pair_data packetPairData;
+};
+
+class SimAODV : public AODV
 {
 public:
-    // constructors 
-    AODVSim();
-    AODVSim(IP_ADDR ip);
+    // Default constructor 
+    SimAODV() : AODV() {}
 
-    // TODO: implement later with network monitoring
-	void getOneHopNeighbors();
+		/*!
+     * @brief Construct a new SimAODV object
+     * @param ip the ip address of the current device
+     */
+    SimAODV(uint32_t ip) : AODV(ip) {}
+    SimAODV(const char* ip) : AODV(ip) {}
 
-    int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
+    // Destructors
+    ~SimAODV() {}
+
+    // when handlePackets is called, network monitor gets pair data from the QueuedPacket
+    int handlePackets() override;
+
+    // queue for storing packets
+    queue<SimPacket> packetQueue;
+    // network monitoring
+    NetworkMonitor* networkMonitor = nullptr;
+
+    // Override this function with a function to send data between two nodes in the desired simulation
     function<int(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)> simSocketSendPacket;
+
+protected:
+    bool _socketSendPacket(int portId, char *buffer, int length, IP_ADDR dest) override;
+    void _buildPort(Port*) override;
+    void _destroyPort(Port*) override;
+
 };
 
 #endif

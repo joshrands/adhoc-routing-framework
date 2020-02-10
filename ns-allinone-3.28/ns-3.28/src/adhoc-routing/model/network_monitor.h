@@ -1,3 +1,6 @@
+#ifndef NETWORKMONITOR_H
+#define NETWORKMONITOR_H
+
 /*********************************
  * network_monitor.h
  *
@@ -6,23 +9,30 @@
  * Author: Josh Rands
  * Date: 10/28/2019
  ********************************/
-
-#include "monitor_info.h"
-#include "defines.h"
-
 #include <vector>
 #include <map>
 #include <thread>
 #include <chrono>
 #include <mutex>
 
+#include "monitor_info.h"
+#include "adhoc_defines.h"
+#include "port.h"
+
 using namespace std;
-class NetworkMonitor
-{
+class NetworkMonitor : public Port {
 public:
     NetworkMonitor();
     NetworkMonitor(IP_ADDR nodeIp);
     ~NetworkMonitor();
+
+    /**
+     * @brief This function is called by adhocRouting to give the port its data
+     * 
+     * @param data char array of data
+     * @param length the length of the data
+     */
+    void handlePacket(char* data, int length, IP_ADDR source) { handleMonitoringPacketBuffer(data, length, source, MONITOR_PORT); }
 
     virtual void updatePairData(pair_data pairData) = 0;
 
@@ -35,12 +45,12 @@ public:
     virtual void updateLocalModels() = 0;
 
     // get monitoring information 
-    virtual double getBatteryLevel(IP_ADDR ownerIp) = 0;
-    virtual double getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp) = 0;
+//    virtual double getBatteryLevel(IP_ADDR ownerIp) = 0;
+//    virtual double getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp) = 0;
 
     // update local models with new data points 
-    virtual void updateLocalBatteryModel(double batteryLevel) = 0;
-    virtual void updateLocalRSSModel(IP_ADDR pairIp, double rss) = 0;
+//    virtual void updateLocalBatteryModel(double batteryLevel) = 0;
+//    virtual void updateLocalRSSModel(IP_ADDR pairIp, double rss) = 0;
 
     bool localDataExistsForNode(IP_ADDR nodeIp);
     bool pairDataExistsForNode(IP_ADDR nodeIp);
@@ -74,3 +84,5 @@ protected:
 };
 
 void runLocalModelUpdateThread(NetworkMonitor* monitor, mutex* mux);
+
+#endif

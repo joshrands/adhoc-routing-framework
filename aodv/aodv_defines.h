@@ -4,8 +4,9 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "../defines.h"
-#include "../adhoc/adhoc_defines.h"
+
+#include "defines.h"
+#include "adhoc_defines.h"
 
 #define BROADCAST_STR       "255.255.255.255"
 #define HEADER_SIZE         9

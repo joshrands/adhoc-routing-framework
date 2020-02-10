@@ -11,6 +11,9 @@
 #include "ns3/tag.h"
 #include "ns3/udp-header.h"
 
+#include "ns3/network_monitor.h"
+#include "ns3/aodv_sim.h"
+
 #include <iostream>
 
 namespace ns3 {
@@ -42,11 +45,10 @@ int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, 
         header.SetSource(sourceNode->GetObject<Ipv4>()->GetAddress(1,0).GetLocal());
         packet->AddHeader(header);
 
-        socket->Send(packet);
+        return socket->Send(packet);
     }
     else 
     {
-        // set destination to this node and broadcast
         Ptr<Ipv4> destIpv4 = destNode->GetObject<Ipv4>(); // Get Ipv4 instance of the node
         Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
 
@@ -63,10 +65,8 @@ int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, 
         header.SetSource(sourceNode->GetObject<Ipv4>()->GetAddress(1,0).GetLocal());
         packet->AddHeader(header);
 
-        socket->Send(packet);
+        return socket->Send(packet);
     }
-
-    return 0;
 }
 
 void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
@@ -87,14 +87,6 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         packet->CopyData(packetBuffer, length);
         
         Ptr<Ipv4> ipv4 =  socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
-
-/*        Address address;
-        socket->GetPeerName (address);
-        InetSocketAddress iaddr = InetSocketAddress::ConvertFrom (address);
-
-        std::cout << "Received one packet!  Socket: " << iaddr.GetIpv4 () << " port: " << iaddr.GetPort ();
-        uint16_t port = iaddr.GetPort(); 
-*/
 
         if (DEBUG)
             std::cout << "[DEBUG]: Received data on port " << socket->m_port << std::endl;
@@ -118,7 +110,11 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         if (DEBUG)
             std::cout << "[DEBUG]: Received RSS: " << data.rss << std::endl;
 
-        socket->GetNode()->m_AdHocRoutingHelper->receivePacketWithPairData((char*)(packetBuffer), length, source, socket->m_port, data);
+        // add packet to buffer 
+        SimPacket packet;
+        packet.source = source;
+        std::cout << "TODO: DON'T DO THIS " << packet.source << std::endl;
+//        socket->GetNode()->m_AdHocRoutingHelper->receivePacketWithPairData((char*)(packetBuffer), length, source, socket->m_port, data);
     }
 }
 
@@ -140,9 +136,9 @@ AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp)
     m_node->m_AdHocRoutingHelper = this;
 
     AdHocRoutingHelper::m_existingNodes[nodeIp] = node;
-
+/*
     // create a routing protocol 
-    AODVSim* aodv = new AODVSim(nodeIp);
+    SimAODV* aodv = new AODVSim(nodeIp);
     this->routing = aodv;
     std::cout << "[WARNING]: Must override AODV simSocketSend" << std::endl;
     aodv->simSocketSendPacket = &AdHocSendPacket;
@@ -162,7 +158,8 @@ AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp)
     std::cout << "[WARNING]: Must start a recurring event to call monitor->updateLocalModels" << std::endl;
 
     std::cout << "[WARNING]: Use AdHocRoutingHelper sendPacket and receivePacket functions." << std::endl;
+*/
 }
 
+// close ns3 namespace
 }
-
