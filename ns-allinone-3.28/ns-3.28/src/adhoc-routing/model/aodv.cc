@@ -432,7 +432,7 @@ void AODV::_handlePacket(int port, char *packet, int length, IP_ADDR source) {
         memcpy(&finalDestination, &(packet[1]), 4);
         IP_ADDR origIP;
         memcpy(&origIP, &(packet[5]), 4);
-        if (this->getIp() == finalDestination) {
+        if (this->getIp() == finalDestination || finalDestination == getIpFromString(BROADCAST_STR)) {
             // We are the final destinatin
             // Have socket handle the packet
             packet += HEADER_SIZE; // Get only the data part of the packet
