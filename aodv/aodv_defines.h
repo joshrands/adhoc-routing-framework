@@ -8,7 +8,6 @@
 #include "defines.h"
 #include "adhoc_defines.h"
 
-#define BROADCAST_STR       "255.255.255.255"
 #define HEADER_SIZE         9
 
 #define GLOBAL_AODV_DEBUG   1
