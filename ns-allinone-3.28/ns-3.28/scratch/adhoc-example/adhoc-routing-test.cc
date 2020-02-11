@@ -40,6 +40,10 @@
 #include "ns3/packet.h"
 #include "ns3/basic-energy-source-helper.h"
 
+/**** CSM SmallSat ns3 includes ****/
+#include "ns3/routing_protocol.h"
+/***********************************/
+
 #include "battery-drain.h"
 
 #include <iostream>
@@ -51,6 +55,7 @@ map<Ptr<Node>, AdHocRoutingHelper*> adhocMap;
 map< IP_ADDR, Ptr<Node> > nodeMap;
 EnergySourceContainer energySources;
 
+// Set the socket receive packet callback to the adhoc routing helper 
 void ReceiveCallback(Ptr<Socket> socket)
 {
     AdHocRoutingHelper::receivePacket(socket);
@@ -70,9 +75,9 @@ void initialHellos()
     for (uint32_t i = 0; i < length; i++)
           buffer[i] = msg.at(i);
     // send data from first node to last node 
-// TODO: Fix this    AdHocRoutingHelper* adhoc = adhocMap[it->second];
-// TOOD: Fix this    IP_ADDR dest = getIpFromString(BROADCAST_STR); 
-// TODO: Fix this    adhoc->routing->socketSendPacket(buffer, msg.length(), dest, DATA_PORT); 
+    AdHocRoutingHelper* adhoc = adhocMap[it->second];
+    IP_ADDR dest = getIpFromString(BROADCAST_STR); 
+    adhoc->sendPacket(DATA_PORT, buffer, msg.length(), dest); 
 
     delete buffer;
 
@@ -92,11 +97,10 @@ void testAdHoc()
 
   auto it = nodeMap.begin();
   // send data from first node to last node 
-// TODO: Fix this  AdHocRoutingHelper* adhoc = adhocMap[it->second];
-//  i;ut += NUM_NODES - 1;
+  AdHocRoutingHelper* adhoc = adhocMap[it->second];
   it++;
-// TODO: Fix this  IP_ADDR dest = it->first;
-// TODO: Fix this  adhoc->sendPacket(buffer, msg.length(), dest); 
+  IP_ADDR dest = it->first;
+  adhoc->sendPacket(DATA_PORT, buffer, msg.length(), dest); 
 
   Simulator::Schedule(Seconds(2.0), &testAdHoc);
 
@@ -108,7 +112,7 @@ void localMonitoring()
   auto it = adhocMap.begin();
   while (it != adhocMap.end())
   {
-// TODO: Fix this    it->second->monitor->updateLocalModels();
+    it->second->networkMonitor->updateLocalModels();
     it++;
   }
 
@@ -262,14 +266,11 @@ int main (int argc, char *argv[])
   }
 
   // Tracing
-//  Simulator::Schedule (Seconds (1.0), &GenerateTraffic,
-//                       c, packetSize, numPackets, Seconds(1));
-
   Simulator::Schedule(Seconds(1.0), &initialHellos);
   Simulator::Schedule(Seconds(2.0), &initialHellos);
   Simulator::Schedule(Seconds(3.0), &initialHellos);
 
-  Simulator::Schedule(Seconds(5.0), &testAdHoc);// &(aodvArray[1]->socketSendPacket), buffer, msg.length() + 5, aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
+  Simulator::Schedule(Seconds(5.0), &testAdHoc);
   Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
   // Drain battery
   Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);

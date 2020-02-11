@@ -2,13 +2,30 @@
 #ifndef ADHOC_ROUTING_HELPER_H
 #define ADHOC_ROUTING_HELPER_H
 
-#include "ns3/aodv_sim.h"
-#include "ns3/defines.h"
 #include "ns3/node.h"
 #include "ns3/socket.h"
+
+#include "ns3/port.h"
+#include "ns3/aodv_sim.h"
+#include "ns3/defines.h"
+
 #include <map>
 
 namespace ns3 {
+
+class PrintPort : public Port{
+public:
+    PrintPort(int portId):Port(portId){}
+    ~PrintPort(){}
+    void handlePacket(char* data, int length, IP_ADDR source){
+        std::cout << "[PRINT PORT]: Received ";
+        for(int i = 0; i < length; i++){
+            std::cout << data[i];
+        }
+        std::cout << " from\n" << getStringFromIp(source) << std::endl;
+    }
+
+};
 
 /* ... */
 // TODO: Create a helper with ns3 aodv and sim rem 
@@ -26,8 +43,8 @@ public:
 protected:
     Ptr<Node> m_node;
 
+    // So nodes can send packets to each other 
     static std::map<IP_ADDR, Ptr<Node>> m_existingNodes;
-//    static std::map<Ptr<Node>, Ptr<EnergySource>> m_batteryLevels;
 };
 
 }
