@@ -82,4 +82,20 @@ void test_hello()
 	test(aodv2.isNeighbor(&aodv1) == true, "Nodes are neighbors because monitoring!");
 	test(aodv1.isNeighbor(&aodv2) == true, "Nodes are neighbors because monitoring!");
 	globalMux.unlock();
+
+	aodv1.removePhysicalNeighborOnly(&aodv2);
+	aodv2.removePhysicalNeighborOnly(&aodv1);
+
+	thread helloThread3(dispatchHello, &hello1, HelloNeighbors::HELLO_INTERVAL_MS*2);
+	thread helloThread4(dispatchHello, &hello2, HelloNeighbors::HELLO_INTERVAL_MS*2);
+
+	helloThread3.join();
+	helloThread4.join();
+
+	this_thread::sleep_for(chrono::milliseconds(HelloNeighbors::HELLO_INTERVAL_MS*2));
+
+	globalMux.lock();
+	test(aodv2.isNeighbor(&aodv1) == false, "Nodes are NOT neighbors because monitoring!");
+	test(aodv1.isNeighbor(&aodv2) == false, "Nodes are NOT neighbors because monitoring!");
+	globalMux.unlock();
 }

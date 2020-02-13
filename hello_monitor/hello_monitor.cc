@@ -4,7 +4,7 @@
 #include <thread>
 #include <chrono>
 
-int HelloNeighbors::HELLO_INTERVAL_MS = 1000;
+int HelloNeighbors::HELLO_INTERVAL_MS = 100;
 
 HelloNeighbors::~HelloNeighbors()
 {
@@ -13,8 +13,6 @@ HelloNeighbors::~HelloNeighbors()
 
 void HelloNeighbors::handlePacket(char* data, int length, IP_ADDR source)
 {
-    std::cout << "[HELLO][WARNING]: Handle packets not implemented" << std::endl;
-
     if (HELLO_DEBUG)
         cout << "[HELLO]:[DEBUG]: Hello packet received! ADDING NEIGHBOR" << endl;
 
@@ -51,36 +49,6 @@ void HelloNeighbors::_updateNeighbors(int remaining_time_ms)
     // this hello neighbors object is still running, yay! 
     m_active = true;
 
-    // update the active neighbors 
-    // check the at risk neighbors. if an at risk neighbor is not in the detected neighbors then remove it 
-    for (IP_ADDR atRiskLink : m_atRiskNeighbors)
-    {
-        if (m_detectedNeighbors.count(atRiskLink) > 0)
-        {
-            // the link was detected! no longer at risk. 
-            m_atRiskNeighbors.erase(atRiskLink);
-        }
-        else 
-        {
-            // the link was not detected. remove the link from active links and at risk links 
-            m_activeNeighbors.erase(atRiskLink);
-            m_atRiskNeighbors.erase(atRiskLink);
-            if (HELLO_DEBUG)
-                cout << "[HELLO]:[INFO]: Link " << getStringFromIp(atRiskLink) << " removed from "
-                     << getStringFromIp(routingProtocol->getIp()) << endl;
-        }
-    }
-
-    // check the active links and add at risk links if not detected 
-    for (IP_ADDR activeLink : m_activeNeighbors)
-    {
-        if (m_detectedNeighbors.count(activeLink) == 0)
-        {
-            // the link was not detected... move to at risk link 
-            m_atRiskNeighbors.insert(activeLink);
-        }
-    }
-
     // 1. Update neighbors of routing protocol
     routingProtocol->neighborMux.lock();
     routingProtocol->resetLinks();
@@ -102,7 +70,7 @@ void HelloNeighbors::_updateNeighbors(int remaining_time_ms)
     if (HELLO_DEBUG)
         cout << "[HELLO]:[DEBUG]: CLEARING ALL LOCAL HELLO NEIGHBORS." << endl;
 
-    m_detectedNeighbors.clear();
+    m_activeNeighbors.clear();
 
     // neighbors have been updated so we can unlock mutex 
     helloMux.unlock();
@@ -114,14 +82,12 @@ void HelloNeighbors::_updateNeighbors(int remaining_time_ms)
     _broadcastHelloMessage();
 
     // 5. Update neighbors from received hellos 
-    // this is happening on a different thread :)
-    // TODO: In handlePacket for this Port??? @Zach 
+    // this is happening on a different thread in handlePackets :)
 
     // 6. Wait 1/2 hello interval
     _sleep(HELLO_INTERVAL_MS / 2);
 
     // 7. Repeat
-    cout << remaining_time_ms << endl;
     _updateNeighbors(remaining_time_ms - HELLO_INTERVAL_MS);
 }
 
@@ -145,9 +111,6 @@ void HelloNeighbors::_receiveHelloMessage(IP_ADDR nodeIp)
     if (HELLO_DEBUG)
         cout << "[HELLO]:[DEBUG]: Adding neighbor " << getStringFromIp(nodeIp) 
              << " to node " << getStringFromIp(routingProtocol->getIp()) << endl;
-
-    if (m_detectedNeighbors.count(nodeIp) == 0)
-        m_detectedNeighbors.insert(nodeIp);
 
     if (m_activeNeighbors.count(nodeIp) == 0)
         m_activeNeighbors.insert(nodeIp);
