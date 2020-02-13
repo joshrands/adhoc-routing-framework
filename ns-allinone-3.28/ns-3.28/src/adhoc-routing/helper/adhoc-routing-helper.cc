@@ -150,7 +150,8 @@ AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp) : SimAODV
     this->simSocketSendPacket = &AdHocSendPacket;
     std::cout << "[ADHOC_HELPER]:[INFO]: Using ns3 simSocketSendPacket" << std::endl;
 
-    // create network monitoring 
+    // create network monitoring
+    // NOTE: This is for battery level ONLY right now 
     REMSim* rem = new REMSim(nodeIp);
     rem->getSimulatedBatteryLevel = &(AdHocRoutingHelper::getNs3SimulatedBattery);
     rem->getSimulatedTime = &(AdHocRoutingHelper::getNs3SimulatedTimeMS);
@@ -161,7 +162,7 @@ AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp) : SimAODV
     this->networkMonitor = rem;
     this->networkMonitor->setPortId(MONITOR_PORT);
 
-    // add ports to AdHocRoutingHelper
+    // add port to AdHocRoutingHelper
     std::cout << "[ADHOC_HELPER]:[INFO]: Added REM port" << std::endl;
     this->addPort(rem);
 

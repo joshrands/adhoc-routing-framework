@@ -32,6 +32,7 @@ public:
 	void addNeighbor(AODVTest* node);
 	void removeNeighbor(AODVTest* node);
     void addPhysicalNeighborOnly(AODVTest* node);
+    void removePhysicalNeighborOnly(AODVTest* node);
 
 	// return true if node is neighbor
 	bool isNeighbor(AODVTest* node);

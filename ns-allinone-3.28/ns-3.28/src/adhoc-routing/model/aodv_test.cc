@@ -54,6 +54,15 @@ void AODVTest::addPhysicalNeighborOnly(AODVTest* node)
     this->m_physicalNeighbors.push_back(node);
 }
 
+void AODVTest::removePhysicalNeighborOnly(AODVTest* node)
+{
+    for (uint32_t i = 0; i < m_physicalNeighbors.size(); i++) {
+        if (node->getIp() == m_physicalNeighbors.at(i)->getIp()) {
+            m_physicalNeighbors.erase(m_physicalNeighbors.begin() + i);
+        }
+    }
+}
+
 bool AODVTest::isNeighbor(AODVTest* node) {
     for (uint32_t i = 0; i < m_neighbors.size(); i++) {
         if (node->getIp() == m_neighbors.at(i))

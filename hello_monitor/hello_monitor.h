@@ -13,11 +13,11 @@
 
 #define HELLO_DEBUG     DEBUG && 1
 
-class HelloNeighbors : public Port
+class HelloMonitor : public Port
 {
 public:
-    HelloNeighbors(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); m_active = true; }
-    ~HelloNeighbors();
+    HelloMonitor(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); m_active = true; }
+    ~HelloMonitor();
 
     /**
      * @brief This function is called by adhocRouting to give the port its data
@@ -63,10 +63,10 @@ protected:
 
 };
 
-class HelloTest : public HelloNeighbors
+class HelloTest : public HelloMonitor
 {
 public: 
-    HelloTest(int portId, RoutingProtocol* routing) : HelloNeighbors(portId, routing) { }
+    HelloTest(int portId, RoutingProtocol* routing) : HelloMonitor(portId, routing) { }
 
 protected:
     bool _sleep(int DURATION_MS);

@@ -9,6 +9,7 @@ int SimAODV::handlePackets()
 		// Pop the packet off the queue
 		packetQueue.pop();
         // update pair data from packet
+
         // IMPORTANT: We are not updating pair data because it is not accurate
         // enough for link breakage determination. We are using hello messages
         // to determine neighbors and storing last known rss with those hello

@@ -167,6 +167,10 @@ public:
      */
 	void setIp(const uint32_t ip) { ipAddress = ip; }
 
+    // Mutex for if the neighbor states are properly updated 
+    // Network monitoring objects use this mutex when updating a routing protocol's neighbors
+    mutex neighborMux;
+
 protected:
 	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
 	vector<IP_ADDR> m_neighbors;

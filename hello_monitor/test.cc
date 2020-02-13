@@ -70,13 +70,13 @@ void test_hello()
 	aodv1.addPort(&hello1);
 	aodv2.addPort(&hello2);
 
-	thread helloThread1(dispatchHello, &hello1, HelloNeighbors::HELLO_INTERVAL_MS*2);
-	thread helloThread2(dispatchHello, &hello2, HelloNeighbors::HELLO_INTERVAL_MS*2);
+	thread helloThread1(dispatchHello, &hello1, HelloMonitor::HELLO_INTERVAL_MS*2);
+	thread helloThread2(dispatchHello, &hello2, HelloMonitor::HELLO_INTERVAL_MS*2);
 
 	helloThread1.join();
 	helloThread2.join();
 
-	this_thread::sleep_for(chrono::milliseconds(HelloNeighbors::HELLO_INTERVAL_MS*2));
+	this_thread::sleep_for(chrono::milliseconds(HelloMonitor::HELLO_INTERVAL_MS*2));
 
 	globalMux.lock();
 	test(aodv2.isNeighbor(&aodv1) == true, "Nodes are neighbors because monitoring!");
@@ -86,13 +86,13 @@ void test_hello()
 	aodv1.removePhysicalNeighborOnly(&aodv2);
 	aodv2.removePhysicalNeighborOnly(&aodv1);
 
-	thread helloThread3(dispatchHello, &hello1, HelloNeighbors::HELLO_INTERVAL_MS*2);
-	thread helloThread4(dispatchHello, &hello2, HelloNeighbors::HELLO_INTERVAL_MS*2);
+	thread helloThread3(dispatchHello, &hello1, HelloMonitor::HELLO_INTERVAL_MS*2);
+	thread helloThread4(dispatchHello, &hello2, HelloMonitor::HELLO_INTERVAL_MS*2);
 
 	helloThread3.join();
 	helloThread4.join();
 
-	this_thread::sleep_for(chrono::milliseconds(HelloNeighbors::HELLO_INTERVAL_MS*2));
+	this_thread::sleep_for(chrono::milliseconds(HelloMonitor::HELLO_INTERVAL_MS*2));
 
 	globalMux.lock();
 	test(aodv2.isNeighbor(&aodv1) == false, "Nodes are NOT neighbors because monitoring!");

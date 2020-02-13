@@ -4,14 +4,14 @@
 #include <thread>
 #include <chrono>
 
-int HelloNeighbors::HELLO_INTERVAL_MS = 100;
+int HelloMonitor::HELLO_INTERVAL_MS = 100;
 
-HelloNeighbors::~HelloNeighbors()
+HelloMonitor::~HelloMonitor()
 {
 
 }
 
-void HelloNeighbors::handlePacket(char* data, int length, IP_ADDR source)
+void HelloMonitor::handlePacket(char* data, int length, IP_ADDR source)
 {
     if (HELLO_DEBUG)
         cout << "[HELLO]:[DEBUG]: Hello packet received! ADDING NEIGHBOR" << endl;
@@ -20,7 +20,7 @@ void HelloNeighbors::handlePacket(char* data, int length, IP_ADDR source)
     _receiveHelloMessage(source);
 } 
 
-void HelloNeighbors::sendHellos(int duration_ms)
+void HelloMonitor::sendHellos(int duration_ms)
 {
     if (nullptr == routingProtocol)
     {
@@ -34,7 +34,7 @@ void HelloNeighbors::sendHellos(int duration_ms)
     _updateNeighbors(duration_ms);
 }
 
-void HelloNeighbors::_updateNeighbors(int remaining_time_ms)
+void HelloMonitor::_updateNeighbors(int remaining_time_ms)
 {
     // 0. Should we continue? 
     helloMux.lock();
@@ -91,7 +91,7 @@ void HelloNeighbors::_updateNeighbors(int remaining_time_ms)
     _updateNeighbors(remaining_time_ms - HELLO_INTERVAL_MS);
 }
 
-void HelloNeighbors::_broadcastHelloMessage()
+void HelloMonitor::_broadcastHelloMessage()
 {
     char* buffer = (char*)(malloc(4));
     memcpy(buffer, &m_parentIp, 4);
@@ -103,7 +103,7 @@ void HelloNeighbors::_broadcastHelloMessage()
     routingProtocol->sendPacket(getPortId(), buffer, 4, getIpFromString(BROADCAST_STR), m_parentIp);
 }
 
-void HelloNeighbors::_receiveHelloMessage(IP_ADDR nodeIp)
+void HelloMonitor::_receiveHelloMessage(IP_ADDR nodeIp)
 {
     // if this neighbor doesn't already exist, add it to the vector 
     helloMux.lock();
@@ -125,6 +125,8 @@ bool HelloTest::_sleep(int DURATION_MS)
 
     // wait sleep time 
     this_thread::sleep_for(chrono::milliseconds(DURATION_MS));
+
+    return true;
 }
 
 void dispatchHello(HelloTest* hello, int duration)
