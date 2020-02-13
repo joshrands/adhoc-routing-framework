@@ -9,7 +9,12 @@ int SimAODV::handlePackets()
 		// Pop the packet off the queue
 		packetQueue.pop();
         // update pair data from packet
-        networkMonitor->updatePairData(p.packetPairData);
+        // IMPORTANT: We are not updating pair data because it is not accurate
+        // enough for link breakage determination. We are using hello messages
+        // to determine neighbors and storing last known rss with those hello
+        // messages. No RSS prediction or REM models are done/calculated. 
+//        networkMonitor->updatePairData(p.packetPairData);
+
         // handle this packet
 		_handlePacket(p.portId, p.data, p.length, p.source);
 	}

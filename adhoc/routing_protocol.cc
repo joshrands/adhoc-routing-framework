@@ -122,13 +122,20 @@ bool RoutingProtocol::linkExists(IP_ADDR dest) {
 		cout << "[ROUTING]:[DEBUG]: Broadcast link always exists" << endl;
 		return true;
 	}	
+
+	// Lock neighbor mux because we are checking neighbors
+	neighborMux.lock();
+
     for (IP_ADDR ip : m_neighbors) {
         if (dest == ip) {
             if (MONITOR_DEBUG)
                 cout << "[ROUTING]:[DEBUG]: Link exists!" << endl;
+
+			neighborMux.unlock();
             return true;
         }
     }
+	neighborMux.unlock();
 
     if (MONITOR_DEBUG)
         cout << "[ROUTING]:[DEBUG]: Link does not exist." << endl;

@@ -15,8 +15,11 @@ void HelloNeighbors::handlePacket(char* data, int length, IP_ADDR source)
 {
     std::cout << "[HELLO][WARNING]: Handle packets not implemented" << std::endl;
 
+    if (HELLO_DEBUG)
+        cout << "[HELLO]:[DEBUG]: Hello packet received! ADDING NEIGHBOR" << endl;
+
     // if a hello message was received from SOURCE, then that is a neighbor! 
-    m_neighbors.insert(source);
+    _receiveHelloMessage(source);
 } 
 
 void HelloNeighbors::sendHellos(int duration_ms)
@@ -27,39 +30,82 @@ void HelloNeighbors::sendHellos(int duration_ms)
         return;
     }
 
+    if (HELLO_DEBUG)
+        cout << "[HELLO]:[DEBUG]: Dispatching hello neighbors updating for node "
+             << getStringFromIp(routingProtocol->getIp()) << endl;
     _updateNeighbors(duration_ms);
 }
 
 void HelloNeighbors::_updateNeighbors(int remaining_time_ms)
 {
-    // TODO: Add mutex to force proper order
-
     // 0. Should we continue? 
-    globalMux.lock();
+    helloMux.lock();
 
     if (remaining_time_ms <= 0)
     {
         m_active = false;
-        globalMux.unlock();
-        // exit thread
+        helloMux.unlock();
         return;
-//        exit(0);
     }
+
+    // this hello neighbors object is still running, yay! 
     m_active = true;
-    globalMux.unlock();
+
+    // update the active neighbors 
+    // check the at risk neighbors. if an at risk neighbor is not in the detected neighbors then remove it 
+    for (IP_ADDR atRiskLink : m_atRiskNeighbors)
+    {
+        if (m_detectedNeighbors.count(atRiskLink) > 0)
+        {
+            // the link was detected! no longer at risk. 
+            m_atRiskNeighbors.erase(atRiskLink);
+        }
+        else 
+        {
+            // the link was not detected. remove the link from active links and at risk links 
+            m_activeNeighbors.erase(atRiskLink);
+            m_atRiskNeighbors.erase(atRiskLink);
+            if (HELLO_DEBUG)
+                cout << "[HELLO]:[INFO]: Link " << getStringFromIp(atRiskLink) << " removed from "
+                     << getStringFromIp(routingProtocol->getIp()) << endl;
+        }
+    }
+
+    // check the active links and add at risk links if not detected 
+    for (IP_ADDR activeLink : m_activeNeighbors)
+    {
+        if (m_detectedNeighbors.count(activeLink) == 0)
+        {
+            // the link was not detected... move to at risk link 
+            m_atRiskNeighbors.insert(activeLink);
+        }
+    }
 
     // 1. Update neighbors of routing protocol
-    // TODO: Should we add a mux/semaphore here? 
+    routingProtocol->neighborMux.lock();
     routingProtocol->resetLinks();
-    for (IP_ADDR link : m_neighbors)
+
+    if (HELLO_DEBUG)
+        cout << "[HELLO]:[DEBUG]: Adding " << m_activeNeighbors.size() << " neighbors." << endl;
+
+    for (IP_ADDR link : m_activeNeighbors)
     {
         if (HELLO_DEBUG)
-            cout << "[DEBUG]:[HELLO]: Add link to node " << getStringFromIp(link) << endl;
+            cout << "[HELLO]:[INFO]: Add link to node " << getStringFromIp(link) << endl;
+
         routingProtocol->addLink(link);
     }
 
+    routingProtocol->neighborMux.unlock();
+
     // 2. Clear neighbors for next time period 
-    m_neighbors.clear();
+    if (HELLO_DEBUG)
+        cout << "[HELLO]:[DEBUG]: CLEARING ALL LOCAL HELLO NEIGHBORS." << endl;
+
+    m_detectedNeighbors.clear();
+
+    // neighbors have been updated so we can unlock mutex 
+    helloMux.unlock();
 
     // 3. Wait 1/2 hello interval
     _sleep(HELLO_INTERVAL_MS / 2);
@@ -94,10 +140,19 @@ void HelloNeighbors::_broadcastHelloMessage()
 void HelloNeighbors::_receiveHelloMessage(IP_ADDR nodeIp)
 {
     // if this neighbor doesn't already exist, add it to the vector 
-    if (m_neighbors.count(nodeIp) == 0)
-    {
-        m_neighbors.insert(nodeIp);
-    }
+    helloMux.lock();
+
+    if (HELLO_DEBUG)
+        cout << "[HELLO]:[DEBUG]: Adding neighbor " << getStringFromIp(nodeIp) 
+             << " to node " << getStringFromIp(routingProtocol->getIp()) << endl;
+
+    if (m_detectedNeighbors.count(nodeIp) == 0)
+        m_detectedNeighbors.insert(nodeIp);
+
+    if (m_activeNeighbors.count(nodeIp) == 0)
+        m_activeNeighbors.insert(nodeIp);
+
+    helloMux.unlock();
 }
 
 bool HelloTest::_sleep(int DURATION_MS)

@@ -445,7 +445,6 @@ void AODV::_handlePacket(int port, char *packet, int length, IP_ADDR source) {
         }else{
             // send the packet to final destination - will check routing table
             // strip header and send packet
-            // TODO: Most important time to check link state.
             packet += HEADER_SIZE;
             sendPacket(port, packet, length - HEADER_SIZE, finalDestination, origIP);
             packet -= HEADER_SIZE;

@@ -27,11 +27,11 @@
 
 #define minSpeed_mpers    3
 #define maxSpeed_mpers    5
-#define xSize_m           500
-#define ySize_m           500
+#define xSize_m           50
+#define ySize_m           50
 #define LOCAL_MONITOR_INTERVAL  2
 
-#define NUM_NODES         10
+#define NUM_NODES         4
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"

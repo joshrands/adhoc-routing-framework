@@ -32,12 +32,16 @@ public:
     // Initiate sending hello messages
     void sendHellos(int duration_ms);
 
-    bool isActive() { globalMux.lock(); return m_active; globalMux.unlock(); }
+    bool isActive() { helloMux.lock(); return m_active; helloMux.unlock(); }
 
 protected:
-    set<IP_ADDR> m_neighbors;
+    set<IP_ADDR> m_activeNeighbors;
+    set<IP_ADDR> m_detectedNeighbors;
+    set<IP_ADDR> m_atRiskNeighbors;
+
     IP_ADDR m_parentIp;
     bool m_active;
+    mutex helloMux;
 
     // 1. Update neighbors of routing protocol
     // 2. Clear neighbors for next time period 

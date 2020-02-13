@@ -71,8 +71,9 @@ void test_hello()
 	aodv2.addPort(&hello2);
 
 	thread helloThread1(dispatchHello, &hello1, HelloNeighbors::HELLO_INTERVAL_MS*2);
-	helloThread1.join();
 	thread helloThread2(dispatchHello, &hello2, HelloNeighbors::HELLO_INTERVAL_MS*2);
+
+	helloThread1.join();
 	helloThread2.join();
 
 	this_thread::sleep_for(chrono::milliseconds(HelloNeighbors::HELLO_INTERVAL_MS*2));
