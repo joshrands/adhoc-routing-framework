@@ -4,7 +4,7 @@
 #include <thread>
 #include <chrono>
 
-int HelloMonitor::HELLO_INTERVAL_MS = 100;
+int HelloMonitor::HELLO_INTERVAL_MS = 1000;
 
 HelloMonitor::~HelloMonitor()
 {
@@ -112,9 +112,12 @@ void HelloMonitor::receiveHelloMessage(IP_ADDR nodeIp)
         cout << "[HELLO]:[DEBUG]: Adding neighbor " << getStringFromIp(nodeIp) 
              << " to node " << getStringFromIp(routingProtocol->getIp()) << endl;
 
+    routingProtocol->neighborMux.lock();
+    routingProtocol->addLink(nodeIp);
+    routingProtocol->neighborMux.unlock();
+
     if (m_activeNeighbors.count(nodeIp) == 0)
     {
-        routingProtocol->addLink(nodeIp);
         m_activeNeighbors.insert(nodeIp);
     }
 

@@ -306,9 +306,8 @@ void AODV::_handleRREQ(char *buffer, int length, IP_ADDR source) {
 
         if (linkExists(nextHopIp))
             _socketSendPacket(ROUTING_PORT, buffer, sizeof(rrep), nextHopIp);
-//        else
-//        	repairLink(nextHopIp, rrep.origIP, buffer, sizeof(rrep), getIp(), ROUTING_PORT);
-        cout << "[AODV]:[WARNING]: We don't try to repair failed RREPs..." << endl;
+        else
+            cout << "[AODV]:[WARNING]: We don't try to repair failed RREPs..." << endl;
 
 
         delete buffer;
@@ -380,10 +379,8 @@ void AODV::_handleRREP(char *buffer, int length, IP_ADDR source) {
 
         if (linkExists(nextHopIp))
             _socketSendPacket(ROUTING_PORT, buffer, sizeof(forwardRREP), nextHopIp);
-        else if (RREP_DEBUG)
+        else 
             cout << "[AODV]:[WARNING]: We don't try to repair failed RREPs..." << endl;
-        //			repairLink(nextHopIp, forwardRREP.origIP, buffer,
-        // sizeof(forwardRREP), forwardRREP.destIP, ROUTING_PORT);
 
         delete buffer;
     }

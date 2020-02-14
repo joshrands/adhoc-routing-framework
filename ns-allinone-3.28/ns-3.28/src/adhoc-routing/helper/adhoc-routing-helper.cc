@@ -25,7 +25,8 @@ std::map<IP_ADDR, Ptr<Node>> AdHocRoutingHelper::m_existingNodes;
 int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
 {
     if (DEBUG) 
-        std::cout << "[ADHOC_HELPER]:[DEBUG]: Source node = " << getStringFromIp(source) << std::endl;
+        std::cout << "[ADHOC_HELPER]:[DEBUG]: Source node = " << getStringFromIp(source) 
+                  << " to destinatio node = " << getStringFromIp(dest) << std::endl;
 
     Ptr<Node> sourceNode = AdHocRoutingHelper::m_existingNodes[source];
     Ptr<Node> destNode = AdHocRoutingHelper::m_existingNodes[dest];
@@ -192,8 +193,6 @@ AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp) : SimAODV
     // add port to AdHocRoutingHelper
     std::cout << "[ADHOC_HELPER]:[INFO]: Added hello monitor port" << std::endl;
     this->addPort(hello);
-
-//    Simulator::Schedule(MilliSeconds(HELLO_INTERVAL_MS), &waitSimulatedTimeForHelloMonitor, HELLO_INTERVAL_MS, hello);
 
     // create print packet port 
     PrintPort* printPort = new PrintPort(DATA_PORT);

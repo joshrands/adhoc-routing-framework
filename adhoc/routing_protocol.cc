@@ -127,6 +127,7 @@ bool RoutingProtocol::linkExists(IP_ADDR dest) {
 	neighborMux.lock();
 
     for (IP_ADDR ip : m_neighbors) {
+		cout << "NEIGHBOR LINK: " << getStringFromIp(ip) << endl;
         if (dest == ip) {
             if (MONITOR_DEBUG)
                 cout << "[ROUTING]:[DEBUG]: Link exists!" << endl;
@@ -153,8 +154,8 @@ void RoutingProtocol::resetLinks()
 void RoutingProtocol::addLink(IP_ADDR node)
 {
 	if (ROUTING_DEBUG)
-		cout << "[DEBUG]:[ROUTING]: Adding link to node " << getStringFromIp(node) << endl;
-	globalMux.lock();
+		cout << "[DEBUG]:[ROUTING]: Adding link on " << getStringFromIp(getIp()) << " to node " << getStringFromIp(node) << endl;
+
 	bool exists = false;
 	for (IP_ADDR link : m_neighbors)
 	{
@@ -164,5 +165,4 @@ void RoutingProtocol::addLink(IP_ADDR node)
 
 	if (!exists)
 		m_neighbors.push_back(node);
-	globalMux.unlock();
 }
