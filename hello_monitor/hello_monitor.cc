@@ -17,7 +17,7 @@ void HelloMonitor::handlePacket(char* data, int length, IP_ADDR source)
         cout << "[HELLO]:[DEBUG]: Hello packet received! ADDING NEIGHBOR" << endl;
 
     // if a hello message was received from SOURCE, then that is a neighbor! 
-    _receiveHelloMessage(source);
+    receiveHelloMessage(source);
 } 
 
 void HelloMonitor::sendHellos(int duration_ms)
@@ -103,7 +103,7 @@ void HelloMonitor::_broadcastHelloMessage()
     routingProtocol->sendPacket(getPortId(), buffer, 4, getIpFromString(BROADCAST_STR), m_parentIp);
 }
 
-void HelloMonitor::_receiveHelloMessage(IP_ADDR nodeIp)
+void HelloMonitor::receiveHelloMessage(IP_ADDR nodeIp)
 {
     // if this neighbor doesn't already exist, add it to the vector 
     helloMux.lock();
@@ -113,7 +113,11 @@ void HelloMonitor::_receiveHelloMessage(IP_ADDR nodeIp)
              << " to node " << getStringFromIp(routingProtocol->getIp()) << endl;
 
     if (m_activeNeighbors.count(nodeIp) == 0)
+    {
+        routingProtocol->addLink(nodeIp);
         m_activeNeighbors.insert(nodeIp);
+    }
+
 
     helloMux.unlock();
 }

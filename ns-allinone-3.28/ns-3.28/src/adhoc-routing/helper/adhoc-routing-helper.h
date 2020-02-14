@@ -8,6 +8,7 @@
 #include "ns3/port.h"
 #include "ns3/aodv_sim.h"
 #include "ns3/defines.h"
+#include "ns3/hello_sim.h"
 
 #include <map>
 
@@ -39,9 +40,13 @@ public:
     static void receivePacket (Ptr<Socket> socket);
     static uint32_t getNs3SimulatedTimeMS();
     static double getNs3SimulatedBattery(IP_ADDR nodeIp);
+    static void waitSimulatedTimeForHelloMonitor(int DURATION_MS, SimHelloMonitor* waitingHello);
+
+    SimHelloMonitor* helloMonitor;
 
 protected:
     Ptr<Node> m_node;
+    int HELLO_INTERVAL_MS = 1000;
 
     // So nodes can send packets to each other 
     static std::map<IP_ADDR, Ptr<Node>> m_existingNodes;

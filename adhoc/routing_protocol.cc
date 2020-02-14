@@ -155,6 +155,14 @@ void RoutingProtocol::addLink(IP_ADDR node)
 	if (ROUTING_DEBUG)
 		cout << "[DEBUG]:[ROUTING]: Adding link to node " << getStringFromIp(node) << endl;
 	globalMux.lock();
-	m_neighbors.push_back(node);
+	bool exists = false;
+	for (IP_ADDR link : m_neighbors)
+	{
+		if (node == link)
+			exists = true;
+	}
+
+	if (!exists)
+		m_neighbors.push_back(node);
 	globalMux.unlock();
 }

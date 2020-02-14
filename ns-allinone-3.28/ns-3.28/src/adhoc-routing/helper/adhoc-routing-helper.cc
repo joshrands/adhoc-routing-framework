@@ -122,6 +122,8 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         packet.portId = socket->m_port;
         packet.source = source;
 
+        socket->GetNode()->m_AdHocRoutingHelper->helloMonitor->receiveHelloMessage(source);
+
         // Push the packet onto the packet queue and then handle it
         socket->GetNode()->m_AdHocRoutingHelper->packetQueue.push(packet);
         socket->GetNode()->m_AdHocRoutingHelper->handlePackets();
@@ -138,6 +140,20 @@ double AdHocRoutingHelper::getNs3SimulatedBattery(IP_ADDR nodeIp)
     // get the battery level of node ip
     Ptr<Node> node = m_existingNodes[nodeIp];
     return node->m_battery;
+}
+
+void AdHocRoutingHelper::waitSimulatedTimeForHelloMonitor(int DURATION_MS, SimHelloMonitor* waitingHello)
+{
+    // duration of 1 so we do 1 iteration and then stop
+    // we do this because in a discrete event simulator we can't keep track of time easily
+    // instead we schedule sends every DURATION_MS
+    waitingHello->sendHellos(1);
+
+    Simulator::Schedule(MilliSeconds(DURATION_MS), &waitSimulatedTimeForHelloMonitor, DURATION_MS, waitingHello);
+}
+
+void dumbySleep(int DURATION_MS)
+{
 }
 
 AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp) : SimAODV(nodeIp)
@@ -160,11 +176,24 @@ AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp) : SimAODV
     rem->initialize(nodeIp);
     // assign SimAODV networkMonitor to this rem
     this->networkMonitor = rem;
-    this->networkMonitor->setPortId(MONITOR_PORT);
+    rem->setPortId(MONITOR_PORT);
 
     // add port to AdHocRoutingHelper
     std::cout << "[ADHOC_HELPER]:[INFO]: Added REM port" << std::endl;
     this->addPort(rem);
+
+    // create hello monitoring 
+    SimHelloMonitor* hello = new SimHelloMonitor(HELLO_PORT, this);
+    this->helloMonitor = hello;
+    // because this is a discrete event simulator, actually waiting doesn't make sense
+    // we need to schedule
+    hello->waitSimulatedTime = &(dumbySleep);
+
+    // add port to AdHocRoutingHelper
+    std::cout << "[ADHOC_HELPER]:[INFO]: Added hello monitor port" << std::endl;
+    this->addPort(hello);
+
+//    Simulator::Schedule(MilliSeconds(HELLO_INTERVAL_MS), &waitSimulatedTimeForHelloMonitor, HELLO_INTERVAL_MS, hello);
 
     // create print packet port 
     PrintPort* printPort = new PrintPort(DATA_PORT);

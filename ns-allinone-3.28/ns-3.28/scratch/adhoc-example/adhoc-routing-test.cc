@@ -31,7 +31,7 @@
 #define ySize_m           50
 #define LOCAL_MONITOR_INTERVAL  2
 
-#define NUM_NODES         4
+#define NUM_NODES         2
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"
@@ -244,6 +244,12 @@ int main (int argc, char *argv[])
     monitorSink->SetRecvCallback(MakeCallback(&ReceiveCallback));
     monitorSink->m_port = MONITOR_PORT;
 
+    Ptr<Socket> helloSink = Socket::CreateSocket(nodes.Get(i), UdpSocketFactory::GetTypeId());
+    InetSocketAddress localHello = InetSocketAddress (Ipv4Address::GetAny (), HELLO_PORT);
+    helloSink->Bind(localHello);
+    helloSink->SetRecvCallback(MakeCallback(&ReceiveCallback));
+    helloSink->m_port = HELLO_PORT;
+
     Ptr<Ipv4> ipv4 = nodes.Get(i)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
     Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal ();  
     // add aodv object 
@@ -263,14 +269,16 @@ int main (int argc, char *argv[])
     if (DEBUG)
       cout << "[DEBUG]: Node " << i << " at " << pos.x << ", " << pos.y << endl;
     currentPositions.push_back(pos);
+
+    Simulator::Schedule(MilliSeconds(1001 + i), &AdHocRoutingHelper::waitSimulatedTimeForHelloMonitor, 2000, adhocMap[nodes.Get(i)]->helloMonitor);
   }
 
   // Tracing
-  Simulator::Schedule(Seconds(1.0), &initialHellos);
-  Simulator::Schedule(Seconds(2.0), &initialHellos);
-  Simulator::Schedule(Seconds(3.0), &initialHellos);
+//  Simulator::Schedule(Seconds(1.0), &initialHellos);
+//  Simulator::Schedule(Seconds(2.0), &initialHellos);
+//  Simulator::Schedule(Seconds(3.0), &initialHellos);
 
-  Simulator::Schedule(Seconds(5.0), &testAdHoc);
+  Simulator::Schedule(Seconds(2.0), &testAdHoc);
   Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
   // Drain battery
   Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);

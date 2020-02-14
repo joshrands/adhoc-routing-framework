@@ -34,6 +34,9 @@ public:
 
     bool isActive() { helloMux.lock(); return m_active; helloMux.unlock(); }
 
+    // receive a hello message from a specific node 
+    void receiveHelloMessage(IP_ADDR nodeIp);
+
 protected:
     set<IP_ADDR> m_activeNeighbors;
     set<IP_ADDR> m_detectedNeighbors;
@@ -54,8 +57,6 @@ protected:
 
     // broadcast a hello message so neighbors can add 
     void _broadcastHelloMessage();
-    // receive a hello message from a specific node 
-    void _receiveHelloMessage(IP_ADDR nodeIp);
 
     // virtual function for waiting a predetermined interval. This will be implemented different for hardware vs. simulation
     // returns TRUE once complete, FALSE otherwise
