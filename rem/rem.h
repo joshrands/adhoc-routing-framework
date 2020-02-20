@@ -75,10 +75,6 @@ protected:
     // int key is the ownerId to a vector of pairIds with associated RssModels
     map<IP_ADDR,map<IP_ADDR,RssModel>> netRssModels;
 
-/* NS3-TODO:  
-    Ptr<Node> parentNode; // parent node
-    Ptr<EnergySource> battery;
-*/
 };
 
 class REMTest : public REM

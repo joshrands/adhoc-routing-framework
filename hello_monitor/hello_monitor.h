@@ -16,6 +16,8 @@
 class HelloMonitor : public Port
 {
 public:
+    static int NEIGHBOR_TTL_MS;
+
     HelloMonitor(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); m_active = true; }
     ~HelloMonitor();
 
@@ -38,9 +40,7 @@ public:
     void receiveHelloMessage(IP_ADDR nodeIp);
 
 protected:
-    set<IP_ADDR> m_activeNeighbors;
-    set<IP_ADDR> m_detectedNeighbors;
-    set<IP_ADDR> m_atRiskNeighbors;
+    map<IP_ADDR, uint32_t> m_neighborDetectionTimes;
 
     IP_ADDR m_parentIp;
     bool m_active;
@@ -62,6 +62,10 @@ protected:
     // returns TRUE once complete, FALSE otherwise
     virtual bool _sleep(int DURATION_MS) = 0;
 
+    // abstract function for getting the current time 
+    virtual uint32_t getCurrentTimeMS() = 0;
+    // current time in milliseconds
+    uint32_t m_clockMS;
 };
 
 class HelloTest : public HelloMonitor
@@ -71,6 +75,8 @@ public:
 
 protected:
     bool _sleep(int DURATION_MS);
+
+    uint32_t getCurrentTimeMS() override;
 
 };
 

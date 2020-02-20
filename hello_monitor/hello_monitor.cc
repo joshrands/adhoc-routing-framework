@@ -4,7 +4,8 @@
 #include <thread>
 #include <chrono>
 
-int HelloMonitor::HELLO_INTERVAL_MS = 1000;
+int HelloMonitor::HELLO_INTERVAL_MS = 500;
+int HelloMonitor::NEIGHBOR_TTL_MS = 1000; 
 
 HelloMonitor::~HelloMonitor()
 {
@@ -31,6 +32,7 @@ void HelloMonitor::sendHellos(int duration_ms)
     if (HELLO_DEBUG)
         cout << "[HELLO]:[DEBUG]: Dispatching hello neighbors updating for node "
              << getStringFromIp(routingProtocol->getIp()) << endl;
+
     _updateNeighbors(duration_ms);
 }
 
@@ -49,49 +51,31 @@ void HelloMonitor::_updateNeighbors(int remaining_time_ms)
     // this hello neighbors object is still running, yay! 
     m_active = true;
 
-    // update the active neighbors 
-    // check the at risk neighbors. if an at risk neighbor is not in the detected neighbors then remove it 
-    for (IP_ADDR atRiskLink : m_atRiskNeighbors)
-    {
-        if (m_detectedNeighbors.count(atRiskLink) > 0)
-        {
-            // the link was detected! no longer at risk. 
-            m_atRiskNeighbors.erase(atRiskLink);
-        }
-        else 
-        {
-            // the link was not detected. remove the link from active links and at risk links 
-            m_activeNeighbors.erase(atRiskLink);
-            m_atRiskNeighbors.erase(atRiskLink);
-            if (HELLO_DEBUG)
-                cout << "[HELLO]:[INFO]: Link " << getStringFromIp(atRiskLink) << " removed from "
-                     << getStringFromIp(routingProtocol->getIp()) << endl;
-        }
-    }
-
-    // check the active links and add at risk links if not detected 
-    for (IP_ADDR activeLink : m_activeNeighbors)
-    {
-        if (m_detectedNeighbors.count(activeLink) == 0)
-        {
-            // the link was not detected... move to at risk link 
-            m_atRiskNeighbors.insert(activeLink);
-        }
-    }
-
     // 1. Update neighbors of routing protocol
     routingProtocol->neighborMux.lock();
     routingProtocol->resetLinks();
 
     if (HELLO_DEBUG)
-        cout << "[HELLO]:[DEBUG]: Adding " << m_activeNeighbors.size() << " neighbors." << endl;
+        cout << "[HELLO]:[DEBUG]: Checking " << m_neighborDetectionTimes.size() << " neighbors." << endl;
 
-    for (IP_ADDR link : m_activeNeighbors)
+    uint32_t currentTimeMS = getCurrentTimeMS();
+
+    std::map<IP_ADDR, uint32_t>::iterator it = m_neighborDetectionTimes.begin();
+
+    // add valid neighbor links 
+    while (it != m_neighborDetectionTimes.end())
     {
-        if (HELLO_DEBUG)
-            cout << "[HELLO]:[INFO]: Add link to node " << getStringFromIp(link) << endl;
+        if ((it->second - currentTimeMS) < NEIGHBOR_TTL_MS)
+        {
+            if (HELLO_DEBUG)
+                cout << "[HELLO]:[INFO]: Add link to node " << getStringFromIp(it->first) << endl;
 
-        routingProtocol->addLink(link);
+            routingProtocol->addLink(it->first);
+        }
+        else if (HELLO_DEBUG)
+            cout << "[HELLO]:[INFO]: Link from " << getStringFromIp(m_parentIp) << " to " << getStringFromIp(it->first) << endl; 
+
+        it++;
     }
 
     routingProtocol->neighborMux.unlock();
@@ -99,11 +83,6 @@ void HelloMonitor::_updateNeighbors(int remaining_time_ms)
     // 2. Clear neighbors for next time period 
     if (HELLO_DEBUG)
         cout << "[HELLO]:[DEBUG]: CLEARING ALL LOCAL HELLO NEIGHBORS." << endl;
-
-    // clear detected neighbors for this round 
-    m_detectedNeighbors.clear();
-
-    m_activeNeighbors.clear();
 
     // neighbors have been updated so we can unlock mutex 
     helloMux.unlock();
@@ -138,22 +117,20 @@ void HelloMonitor::_broadcastHelloMessage()
 
 void HelloMonitor::receiveHelloMessage(IP_ADDR nodeIp)
 {
-    // if this neighbor doesn't already exist, add it to the vector 
+    // if this neighbor doesn't already exist, add it to the map 
     helloMux.lock();
 
     if (HELLO_DEBUG)
         cout << "[HELLO]:[DEBUG]: Adding neighbor " << getStringFromIp(nodeIp) 
              << " to node " << getStringFromIp(routingProtocol->getIp()) << endl;
 
+    // add this link in real time so we don't have to wait an entire hello monitor cycle.
     routingProtocol->neighborMux.lock();
     routingProtocol->addLink(nodeIp);
     routingProtocol->neighborMux.unlock();
 
-    if (m_activeNeighbors.count(nodeIp) == 0)
-        m_activeNeighbors.insert(nodeIp);
-
-    if (m_detectedNeighbors.count(nodeIp) == 0)
-        m_detectedNeighbors.insert(nodeIp);
+    // update local map detection time
+    m_neighborDetectionTimes[nodeIp] = getCurrentTimeMS();
 
     helloMux.unlock();
 }
@@ -164,9 +141,18 @@ bool HelloTest::_sleep(int DURATION_MS)
         std::cout << "[HELLO][DEBUG]: Sleeping for " << DURATION_MS << " ms" << std::endl;
 
     // wait sleep time 
-    this_thread::sleep_for(chrono::milliseconds(DURATION_MS));
+    for (int i = 0; i < DURATION_MS; i+=DURATION_MS/10)
+    {
+        m_clockMS += i;
+        this_thread::sleep_for(chrono::milliseconds(i));
+    }
 
     return true;
+}
+
+uint32_t HelloTest::getCurrentTimeMS()
+{
+    return m_clockMS;
 }
 
 void dispatchHello(HelloTest* hello, int duration)
@@ -175,4 +161,4 @@ void dispatchHello(HelloTest* hello, int duration)
         cout << "[DEBUG]:[HELLO]: Dispatching hello sendHellos" << endl;
 
     hello->sendHellos(duration);
-}
+} 
