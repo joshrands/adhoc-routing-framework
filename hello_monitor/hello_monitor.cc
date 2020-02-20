@@ -49,6 +49,36 @@ void HelloMonitor::_updateNeighbors(int remaining_time_ms)
     // this hello neighbors object is still running, yay! 
     m_active = true;
 
+    // update the active neighbors 
+    // check the at risk neighbors. if an at risk neighbor is not in the detected neighbors then remove it 
+    for (IP_ADDR atRiskLink : m_atRiskNeighbors)
+    {
+        if (m_detectedNeighbors.count(atRiskLink) > 0)
+        {
+            // the link was detected! no longer at risk. 
+            m_atRiskNeighbors.erase(atRiskLink);
+        }
+        else 
+        {
+            // the link was not detected. remove the link from active links and at risk links 
+            m_activeNeighbors.erase(atRiskLink);
+            m_atRiskNeighbors.erase(atRiskLink);
+            if (HELLO_DEBUG)
+                cout << "[HELLO]:[INFO]: Link " << getStringFromIp(atRiskLink) << " removed from "
+                     << getStringFromIp(routingProtocol->getIp()) << endl;
+        }
+    }
+
+    // check the active links and add at risk links if not detected 
+    for (IP_ADDR activeLink : m_activeNeighbors)
+    {
+        if (m_detectedNeighbors.count(activeLink) == 0)
+        {
+            // the link was not detected... move to at risk link 
+            m_atRiskNeighbors.insert(activeLink);
+        }
+    }
+
     // 1. Update neighbors of routing protocol
     routingProtocol->neighborMux.lock();
     routingProtocol->resetLinks();
@@ -69,6 +99,9 @@ void HelloMonitor::_updateNeighbors(int remaining_time_ms)
     // 2. Clear neighbors for next time period 
     if (HELLO_DEBUG)
         cout << "[HELLO]:[DEBUG]: CLEARING ALL LOCAL HELLO NEIGHBORS." << endl;
+
+    // clear detected neighbors for this round 
+    m_detectedNeighbors.clear();
 
     m_activeNeighbors.clear();
 
@@ -117,10 +150,10 @@ void HelloMonitor::receiveHelloMessage(IP_ADDR nodeIp)
     routingProtocol->neighborMux.unlock();
 
     if (m_activeNeighbors.count(nodeIp) == 0)
-    {
         m_activeNeighbors.insert(nodeIp);
-    }
 
+    if (m_detectedNeighbors.count(nodeIp) == 0)
+        m_detectedNeighbors.insert(nodeIp);
 
     helloMux.unlock();
 }
