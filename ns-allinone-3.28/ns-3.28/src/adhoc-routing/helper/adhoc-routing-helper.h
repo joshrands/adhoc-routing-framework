@@ -44,9 +44,21 @@ public:
 
     SimHelloMonitor* helloMonitor;
 
+    // Network monitoring helpers for Rss and Bandwidth 
+    map<uint32_t, double> getLinkRssMap() { return m_linkRssDb; } 
+    map<uint32_t, uint32_t> getLinkBandwidthMap() { return m_linkBandwidth; } 
+
+    void updateLinkRss(uint32_t ip, double rss) { m_linkRssDb[ip] = rss; }
+    void updateLinkBandwidth(uint32_t ip, uint32_t bandwidth) { m_linkBandwidth[ip] = bandwidth; }
+
 protected:
     Ptr<Node> m_node;
     int HELLO_INTERVAL_MS = 1000;
+
+    // Link RSS in decibels
+    map<uint32_t, double> m_linkRssDb;
+    // Link bandwidth in bytes
+    map<uint32_t, uint32_t> m_linkBandwidth;
 
     // So nodes can send packets to each other 
     static std::map<IP_ADDR, Ptr<Node>> m_existingNodes;

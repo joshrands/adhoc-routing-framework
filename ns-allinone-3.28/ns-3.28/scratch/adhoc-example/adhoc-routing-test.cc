@@ -31,7 +31,7 @@
 #define ySize_m           400
 #define LOCAL_MONITOR_INTERVAL  2
 
-#define NUM_NODES         5
+#define NUM_NODES         10
 
 #include "ns3/core-module.h"
 #include "ns3/mobility-module.h"

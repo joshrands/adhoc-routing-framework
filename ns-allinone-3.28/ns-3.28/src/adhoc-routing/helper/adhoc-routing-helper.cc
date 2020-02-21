@@ -123,11 +123,19 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         packet.portId = socket->m_port;
         packet.source = source;
 
-        socket->GetNode()->m_AdHocRoutingHelper->helloMonitor->receiveHelloMessage(source);
+        AdHocRoutingHelper* adhocRoutingHelper = socket->GetNode()->m_AdHocRoutingHelper;
+
+        // Log this interaction as a 'hello' message
+        adhocRoutingHelper->helloMonitor->receiveHelloMessage(source);
+
+        // Update network statistics
+        adhocRoutingHelper->updateLinkRss(source, packetPairData.rss);
+        // TODO: Confirm that this statistic is what we want 
+        adhocRoutingHelper->updateLinkBandwidth(source, socket->GetRxAvailable());
 
         // Push the packet onto the packet queue and then handle it
-        socket->GetNode()->m_AdHocRoutingHelper->packetQueue.push(packet);
-        socket->GetNode()->m_AdHocRoutingHelper->handlePackets();
+        adhocRoutingHelper->packetQueue.push(packet);
+        adhocRoutingHelper->handlePackets();
     }
 }
 
