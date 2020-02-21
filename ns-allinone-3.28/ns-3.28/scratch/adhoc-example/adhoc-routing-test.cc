@@ -273,15 +273,11 @@ int main (int argc, char *argv[])
     Simulator::Schedule(MilliSeconds(1001 + i), &AdHocRoutingHelper::waitSimulatedTimeForHelloMonitor, 2000, adhocMap[nodes.Get(i)]->helloMonitor);
   }
 
-  // Tracing
-//  Simulator::Schedule(Seconds(1.0), &initialHellos);
-//  Simulator::Schedule(Seconds(2.0), &initialHellos);
-//  Simulator::Schedule(Seconds(3.0), &initialHellos);
-
   Simulator::Schedule(Seconds(2.0), &testAdHoc);
-  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
+  // TODO: Add network monitroing back.
+//  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
   // Drain battery
-  Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);
+//  Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);
 
   Simulator::Stop (Seconds (duration + 10.0));
   Simulator::Run ();

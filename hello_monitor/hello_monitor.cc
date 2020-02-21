@@ -5,7 +5,7 @@
 #include <chrono>
 
 int HelloMonitor::HELLO_INTERVAL_MS = 500;
-int HelloMonitor::NEIGHBOR_TTL_MS = 1000; 
+uint32_t HelloMonitor::NEIGHBOR_TTL_MS = 1000; 
 
 HelloMonitor::~HelloMonitor()
 {
@@ -65,7 +65,7 @@ void HelloMonitor::_updateNeighbors(int remaining_time_ms)
     // add valid neighbor links 
     while (it != m_neighborDetectionTimes.end())
     {
-        if ((it->second - currentTimeMS) < NEIGHBOR_TTL_MS)
+        if ((currentTimeMS - it->second) < NEIGHBOR_TTL_MS)
         {
             if (HELLO_DEBUG)
                 cout << "[HELLO]:[INFO]: Add link to node " << getStringFromIp(it->first) << endl;
@@ -73,7 +73,10 @@ void HelloMonitor::_updateNeighbors(int remaining_time_ms)
             routingProtocol->addLink(it->first);
         }
         else if (HELLO_DEBUG)
-            cout << "[HELLO]:[INFO]: Link from " << getStringFromIp(m_parentIp) << " to " << getStringFromIp(it->first) << endl; 
+        {
+            cout << "[HELLO]:[INFO]: Invalid link from " << getStringFromIp(m_parentIp) << " to " << getStringFromIp(it->first) << endl; 
+            cout << "[HELLO]:[DEBUG]: " << currentTimeMS - it->second << " ms old" << endl;
+        }
 
         it++;
     }

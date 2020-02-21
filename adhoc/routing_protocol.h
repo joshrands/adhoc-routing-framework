@@ -58,7 +58,7 @@ public:
 
 	// returns the ip address of the next hop 
 	// returns 0 if not in table 
-	IP_ADDR getNextHop(const IP_ADDR dest);
+	virtual IP_ADDR getNextHop(const IP_ADDR dest);
 
 	// adds an element to the table 
 	virtual void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
@@ -178,6 +178,8 @@ protected:
 	uint32_t ipAddress;
     // The list of ports that can send and receive messages using this routing protocol
 	unordered_map<int, Port*> ports;
+
+    RoutingTable* m_pRoutingTable;
 
 	// Functions
 	virtual void _buildPort(Port*) = 0;

@@ -16,7 +16,7 @@
 class HelloMonitor : public Port
 {
 public:
-    static int NEIGHBOR_TTL_MS;
+    static uint32_t NEIGHBOR_TTL_MS;
 
     HelloMonitor(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); m_active = true; }
     ~HelloMonitor();

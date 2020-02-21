@@ -26,7 +26,7 @@ public:
 	uint8_t active;
 };
 
-class AODVRoutingTable
+class AODVRoutingTable : public RoutingTable
 {
 public:
 	AODVRoutingTable();
@@ -37,7 +37,7 @@ public:
 	void updateAODVRoutingTableFromRREQ(rreqPacket* receivedRREQ, IP_ADDR sourceIP);
 	void updateAODVRoutingTableFromRREP(rrepPacket* receivedRREP, IP_ADDR sourceIP);
 
-	IP_ADDR getNextHop(const IP_ADDR dest);
+	IP_ADDR getNextHop(const IP_ADDR dest) override;
 	uint32_t getDestSequenceNumber(const IP_ADDR dest);
 	uint8_t getDestHopCount(const IP_ADDR dest);
 	uint32_t getLastRREQId(const IP_ADDR dest);
@@ -47,7 +47,7 @@ public:
 	void setLastRREQId(const IP_ADDR dest, uint32_t lastRREQId);
 	void setIsRouteActive(const IP_ADDR dest, const bool active);
 
-	void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
+	void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop) override;
 	void removeTableEntry(const IP_ADDR dest);
 
 	// get the cost to send packets to this node 

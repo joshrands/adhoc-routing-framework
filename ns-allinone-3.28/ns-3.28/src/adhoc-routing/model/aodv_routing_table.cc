@@ -174,7 +174,9 @@ void AODVRoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHo
 	{	
 		// entry exists, update existing 
 		if (TABLE_DEBUG)
-			cout << "[TABLE]:[DEBUG]: Updating existing AODV entry" << endl;
+			cout << "[TABLE]:[DEBUG]: Updating existing AODV entry" 
+				 << " dest: " << getStringFromIp(dest) << " next hop: " 
+				 << getStringFromIp(nextHop) << endl;
 		this->m_aodvTable[dest].nextHop = nextHop;
 		this->m_aodvTable[dest].ttl = DEFAULT_TTL;
 	}

@@ -189,6 +189,7 @@ AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp) : SimAODV
     // because this is a discrete event simulator, actually waiting doesn't make sense
     // we need to schedule
     hello->waitSimulatedTime = &(dumbySleep);
+    hello->getSimulatedTime = &(AdHocRoutingHelper::getNs3SimulatedTimeMS);
 
     // add port to AdHocRoutingHelper
     std::cout << "[ADHOC_HELPER]:[INFO]: Added hello monitor port" << std::endl;

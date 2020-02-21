@@ -6,3 +6,8 @@ bool SimHelloMonitor::_sleep(int DURATION_MS)
 
     return true;
 }
+
+uint32_t SimHelloMonitor::getCurrentTimeMS()
+{
+    return getSimulatedTime();
+}
