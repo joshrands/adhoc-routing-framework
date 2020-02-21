@@ -13,6 +13,9 @@ AODVRoutingTable::~AODVRoutingTable()
 
 IP_ADDR AODVRoutingTable::getNextHop(const IP_ADDR dest)
 {
+	if (TABLE_DEBUG)
+		cout << "[AODVTABLE]:[DEBUG]: Getting next hop for " << getStringFromIp(dest) << endl;
+
 	IP_ADDR nextHop;
 	if (m_aodvTable.count(dest))
 	{

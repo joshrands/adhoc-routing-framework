@@ -42,6 +42,9 @@ RoutingTable::~RoutingTable()
 
 IP_ADDR RoutingTable::getNextHop(const IP_ADDR dest)
 {
+	if (TABLE_DEBUG)
+		cout << "[TABLE]:[DEBUG]: Getting next hop for " << getStringFromIp(dest) << endl;
+
 	IP_ADDR nextHop;
 
 	if (this->table.count(dest)) // Entry exists
@@ -164,5 +167,11 @@ void RoutingProtocol::addLink(IP_ADDR node)
 	}
 
 	if (!exists)
+	{
 		m_neighbors.push_back(node);
+		// TODO: ADD AS ONE HOP NEIGHBOR TO ROUTING TABLE
+		m_pRoutingTable->updateTableEntry(node, node);
+		if (ROUTING_DEBUG)
+			cout << "[ROUTING]:[INFO]: One hop neighbor: " << getStringFromIp(node) << " added to routing table." << endl; 
+	}
 }

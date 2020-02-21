@@ -27,7 +27,7 @@ AODV::AODV(IP_ADDR ip) {
 
     this->ipAddress = ip;
     this->sequenceNum = 0;
-    this->m_aodvTable = new AODVRoutingTable();
+    this->m_pRoutingTable = (RoutingTable*) new AODVRoutingTable();
 
     this->rreqHelper.setRoutingTable(this->getTable());
     this->rreqHelper.setIp(ip);
@@ -69,7 +69,7 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
     if (getStringFromIp(dest) != BROADCAST_STR)
     {
         if (AODV_DEBUG)
-            cout << "[ORIG]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
+            cout << "[AODV]:[INFO]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
 
         // by default this node is the originator
         if (-1 == signed(origIP))
@@ -80,12 +80,16 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
 
         // if entry exists in routing table, send it!
         // check routing table
-        if(this->m_aodvTable == nullptr){
+        if(this->m_pRoutingTable == nullptr){
             printf("[AODV]:[ERROR]: The routing table is NULL\n");
             exit(255);
         }else{
-            nextHop = m_aodvTable->getNextHop(dest);
+            if (AODV_DEBUG)
+                cout << "[AODV]:[DEBUG]: Getting next hop for " << getStringFromIp(dest) << endl;
+            nextHop = m_pRoutingTable->getNextHop(dest);
         }
+
+        cout << "CHECK";
 
         if (false == getTable()->getIsRouteActive(dest)) {
             BufferedPacket bufferedPacket;
@@ -123,6 +127,10 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
             _broadcastRREQBuffer(rreq);
 
             return true;
+        }
+        else if (AODV_DEBUG)
+        {
+            cout << "[AODV]:[DEBUG]: Route is active, no RREQ necessary." << endl;
         }
     }
 
