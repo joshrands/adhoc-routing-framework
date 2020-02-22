@@ -49,7 +49,7 @@ int main() {
 bool testHardwareAodv(){
     bool pass = true;
 
-    RoutingProtocol* haodv = new HardwareAODV(getIpFromString("127.0.0.1"));
+    RoutingProtocol* haodv = new HardwareHelloAODV(getIpFromString("127.0.0.1"), 3000);
     PrintPort* printPort = new PrintPort(DATA_PORT);
     haodv->addPort(printPort);
 
@@ -62,26 +62,26 @@ bool testHardwareAodv(){
     send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.2"));
     pass &= test(send, "Can attempt to send message to node on network");
     sleep(1);
-    pass &= test(2 == haodv->handlePackets(), "RREQ are broadcasted and handled");
+    pass &= test(4 == haodv->handlePackets(), "RREQ are broadcasted and handled");
     send = true;
     send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.3"));
     send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.3"));
     pass &= test(send, "Can attempt to send message to node on network");
     sleep(1);
-    pass &= test(2 == haodv->handlePackets(), "RREQ are broadcasted and handled");
+    pass &= test(4 == haodv->handlePackets(), "RREQ are broadcasted and handled");
     send = true;
     send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.9"));
     send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.9"));
     pass &= test(send, "Can attempt to send message to node on network");
     sleep(1);
-    pass &= test(2 == haodv->handlePackets(), "RREQ are broadcasted and handled");
+    pass &= test(4 == haodv->handlePackets(), "RREQ are broadcasted and handled");
     haodv->removePort(printPort);
     pass &= test(0 == haodv->handlePackets(), "Messages aren't sent mutiple times");
     
     delete printPort;
     delete haodv;
 
-    return pass;
+    return !pass;
 }
 
 
@@ -108,5 +108,4 @@ bool testWait(){
     uint64_t elapsed = end-start;
     delete basicRoutingProt;
     return test((elapsed > 98 && elapsed < 102), std::string("Hardware hello waits properly"));
-
 }

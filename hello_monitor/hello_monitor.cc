@@ -138,7 +138,7 @@ bool HelloTest::_sleep(uint64_t duration_ms)
         std::cout << "[HELLO][DEBUG]: Sleeping for " << duration_ms << " ms" << std::endl;
 
     // wait sleep time 
-    for (int i = 0; i < duration_ms; i+=duration_ms/10)
+    for (uint64_t i = 0; i < duration_ms; i+=duration_ms/10)
     {
         m_clockMS += i;
         this_thread::sleep_for(chrono::milliseconds(i));

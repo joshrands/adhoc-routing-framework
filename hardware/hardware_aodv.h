@@ -17,7 +17,7 @@ private:
     void _hardwareAODV();
     
 protected:
-    vector<thread> portThreads;
+    unordered_map<int, thread> portThreads;
     unordered_map<int, UDPSocket*> portSockets;
     UDPSocket* aodvSocket;
     thread aodving;

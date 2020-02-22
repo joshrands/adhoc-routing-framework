@@ -159,6 +159,28 @@ void UDPSocket::receiveFromPortThread() {
   }
 }
 
+void UDPSocket::receiveFromPortThreadStoppable(std::atomic<bool>& run) {
+  // Continually calls receiveFrom placing the returned messages on the message
+  // queue
+  while (run) {
+    char *buffer = (char *)malloc(MAXLINE * sizeof(char));
+    Endpoint sender;
+    int n = receiveFrom(sender, buffer, MAXLINE);
+    if (n <= 0) {
+      fprintf(stderr, "[UDP SOCKET]:[ERROR]: Receiving data on port failed\n");
+      if(UDP_DEBUG){
+        fprintf(stderr, "[UDP SOCKET]:[ERROR]: %s\n", strerror(errno));
+      }
+      exit(-1);
+    }
+    buffer[n] = '\0';
+
+    // Collect signal strength put in map
+    messages.push(Message(sender, buffer, n));
+  }
+}
+
+
 bool UDPSocket::getMessage(Message &message) { return messages.pop(message); }
 
 bool UDPSocket::areThereMessages(){ 
