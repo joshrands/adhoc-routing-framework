@@ -11,10 +11,10 @@
 CXX = g++
 LD = g++
 LIB = ar
-INC_DIRS = -I../aodv -I../socket -I../ -I../adhoc
+INC_DIRS = -I../aodv -I../socket -I../adhoc -I../hello_monitor -I../
 
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK -Wall ${INC_DIRS}
-LDFLAGS = -g -pthread -I../socket/ -I../aodv/ -Wall ${INC_DIRS}
+LDFLAGS = -g -pthread -Wall ${INC_DIRS}
 LIBFLAGS = -cvq 
 
 #
@@ -23,12 +23,12 @@ LIBFLAGS = -cvq
 TARGET = test
 LIB_NAME = libhardware.a
 HARDWARE_OBJ_FILES = hardware_aodv.o hardware_hello.o hardware_aodv_hello.o
-OBJ_LIB_FILES = ${HARDWARE_OBJ_FILES} ../aodv/*.o ../socket/*.o ../adhoc/*.o
+OBJ_LIB_FILES = ${HARDWARE_OBJ_FILES} ../aodv/*.o ../socket/*.o ../adhoc/*.o ../hello_monitor/*.o
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
 INC_FILES = hardware_aodv.h hardware_defines.h hardware_hello.h hardware_aodv_hello.h
 
-SUBDIRS = ../aodv ../socket ../adhoc
+SUBDIRS = ../aodv ../socket ../adhoc ../hello_monitor
 
 #
 # Any libraries we might need.

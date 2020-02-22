@@ -4,10 +4,6 @@
 #include <thread>
 #include <chrono>
 
-HelloMonitor::~HelloMonitor()
-{
-
-}
 
 void HelloMonitor::handlePacket(char* data, int length, IP_ADDR source)
 {
@@ -18,7 +14,7 @@ void HelloMonitor::handlePacket(char* data, int length, IP_ADDR source)
     receiveHelloMessage(source);
 } 
 
-void HelloMonitor::sendHellos(int duration_ms)
+void HelloMonitor::sendHellos(uint64_t duration_ms)
 {
     if (nullptr == routingProtocol)
     {
@@ -33,7 +29,7 @@ void HelloMonitor::sendHellos(int duration_ms)
     _updateNeighbors(duration_ms);
 }
 
-void HelloMonitor::_updateNeighbors(int remaining_time_ms)
+void HelloMonitor::_updateNeighbors(uint64_t remaining_time_ms)
 {
     // 0. Should we continue? 
     helloMux.lock();
@@ -55,9 +51,9 @@ void HelloMonitor::_updateNeighbors(int remaining_time_ms)
     if (HELLO_DEBUG)
         cout << "[HELLO]:[DEBUG]: Checking " << m_neighborDetectionTimes.size() << " neighbors." << endl;
 
-    uint32_t currentTimeMS = getCurrentTimeMS();
+    uint64_t currentTimeMS = _getCurrentTimeMS();
 
-    std::map<IP_ADDR, uint32_t>::iterator it = m_neighborDetectionTimes.begin();
+    std::map<IP_ADDR, uint64_t>::iterator it = m_neighborDetectionTimes.begin();
 
     // add valid neighbor links 
     while (it != m_neighborDetectionTimes.end())
@@ -130,13 +126,13 @@ void HelloMonitor::receiveHelloMessage(IP_ADDR nodeIp)
     routingProtocol->neighborMux.unlock();
 
     // update local map detection time
-    m_neighborDetectionTimes[nodeIp] = getCurrentTimeMS();
+    m_neighborDetectionTimes[nodeIp] = _getCurrentTimeMS();
 
     helloMux.unlock();
 }
 
 
-bool HelloTest::_sleep(int duration_ms)
+bool HelloTest::_sleep(uint64_t duration_ms)
 {
     if (HELLO_DEBUG)
         std::cout << "[HELLO][DEBUG]: Sleeping for " << duration_ms << " ms" << std::endl;
@@ -151,12 +147,12 @@ bool HelloTest::_sleep(int duration_ms)
     return true;
 }
 
-uint32_t HelloTest::getCurrentTimeMS()
+uint64_t HelloTest::_getCurrentTimeMS()
 {
     return m_clockMS;
 }
 
-void dispatchHello(HelloTest* hello, int duration)
+void dispatchHello(HelloTest* hello, uint64_t duration)
 {
     if (HELLO_DEBUG)
         cout << "[DEBUG]:[HELLO]: Dispatching hello sendHellos" << endl;

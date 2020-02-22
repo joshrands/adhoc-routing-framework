@@ -10,7 +10,7 @@
 CXX = g++
 LD = g++
 LIB = ar
-INC_DIRS = -I../ -I../adhoc
+INC_DIRS = -I../ -I../adhoc -I../aodv
 
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
 LDFLAGS = -g -std=c++11 -pthread ${INC_DIRS}
@@ -24,7 +24,7 @@ LIB_NAME = libhello.a
 OBJ_LIB_FILES = hello_monitor.o ../adhoc/*.o ../aodv/*.o
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = ${TARGET}.h hello_monitor.h ../adhoc/*.h ../aodv/*.h 
+INC_FILES = ${TARGET}.h hello_monitor.h
 
 SUBDIRS = ../adhoc ../aodv
 

@@ -1,15 +1,11 @@
-#include "hello_monitor.h"
-
-#include "../aodv/aodv.h"
-#include "../aodv/aodv_test.h"
-#include "../defines.h"
-
 #include <assert.h>
 #include <cmath>
 #include <iostream>
 #include <thread>
-
 #include "string.h"
+#include "../aodv/aodv.h"
+#include "../aodv/aodv_test.h"
+#include "hello_monitor.h"
 
 using namespace std;
 

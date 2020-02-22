@@ -18,14 +18,14 @@ public:
     SimHelloMonitor(int portId, RoutingProtocol* routing) : HelloMonitor(portId, routing) { }
 
     void(*waitSimulatedTime)(int duration_ms);
-    uint32_t(*getSimulatedTime)();
+    uint64_t(*getSimulatedTime)();
 
 protected:
     // override because we have different time systems depending on hardware, sim, etc
-    bool _sleep(int duration_ms) override;
+    bool _sleep(uint64_t duration_ms) override;
 
     // override because we have different time systems depending on hardware, sim, etc
-    uint32_t getCurrentTimeMS() override;
+    uint64_t _getCurrentTimeMS() override;
 
 };
 #endif

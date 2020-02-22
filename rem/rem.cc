@@ -7,7 +7,7 @@
 void REM::initialize(IP_ADDR parentIp)
 {
     m_parentIp = parentIp;
-    simStartTime = this->getCurrentTimeMS();
+    simStartTime = this->_getCurrentTimeMS();
 
     if (REM_DEBUG)
         cout << "[DEBUG]: Initializing REM monitoring service for node " << getStringFromIp(m_parentIp) << endl;
@@ -79,7 +79,7 @@ void REM::updateLocalModels()
         {
             pair_data data;
             data.pairIp = it->first;
-            data.rss = it->second.getDataPoint(getCurrentTimeMS());
+            data.rss = it->second.getDataPoint(_getCurrentTimeMS());
 
             if (data.rss > RSS_OUT_OF_RANGE)
             {
@@ -171,11 +171,11 @@ double REM::getBatteryLevel(IP_ADDR ownerIp)
 {
     if (signed(ownerIp) == -1)
     {
-        return localBatteryModel.getDataPoint(getCurrentTimeMS());
+        return localBatteryModel.getDataPoint(_getCurrentTimeMS());
     }
     else 
     {
-        return netBatteryModels[ownerIp].getDataPoint(getCurrentTimeMS());
+        return netBatteryModels[ownerIp].getDataPoint(_getCurrentTimeMS());
     }
 }
 
@@ -184,18 +184,18 @@ double REM::getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp = -1)
     if (signed(ownerIp) == -1)
     {
         // this is a local model
-        return localRssModels[pairIp].getDataPoint(getCurrentTimeMS());
+        return localRssModels[pairIp].getDataPoint(_getCurrentTimeMS());
     }
     else 
     {
-        return netRssModels[ownerIp][pairIp].getDataPoint(getCurrentTimeMS());        
+        return netRssModels[ownerIp][pairIp].getDataPoint(_getCurrentTimeMS());        
     }
 }
 
 void REM::updateLocalBatteryModel(double batteryLevel)
 {
     // adding a new point might result in a new model...
-    localBatteryModel.addDataPoint(batteryLevel, getCurrentTimeMS());
+    localBatteryModel.addDataPoint(batteryLevel, _getCurrentTimeMS());
 
     // if the model needs to be broadcasted, do it! 
     if (localBatteryModel.needsToBeBroadcasted)
@@ -221,7 +221,7 @@ void REM::updateLocalRSSModel(IP_ADDR pairIp, double rss)
         cout << "[DEBUG]: Updating local RSS model between " << getStringFromIp(m_parentIp) << " and " << getStringFromIp(pairIp) << endl;
 
     // adding a data point might result in a new model...
-    localRssModels[pairIp].addDataPoint(rss, getCurrentTimeMS());
+    localRssModels[pairIp].addDataPoint(rss, _getCurrentTimeMS());
 
     // if the model needs to be broadcasted, do it! 
     if (localRssModels[pairIp].needsToBeBroadcasted)
@@ -286,7 +286,7 @@ double REMTest::getCurrentBatteryLevel()
     return m_battery;
 } 
 
-uint32_t REMTest::getCurrentTimeMS()
+uint64_t REMTest::_getCurrentTimeMS()
 {
     return m_clock_MS;
 }

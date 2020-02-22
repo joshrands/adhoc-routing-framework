@@ -38,7 +38,7 @@ public:
     // Destructors
     ~HardwareAODV();
 
-    int handlePackets() override;
+    virtual int handlePackets() override;
 	
 	// Network Monitoring
 	// attempt to repair the link and then send the packet to its destination

@@ -73,7 +73,7 @@ public:
         for(int i = 0; i < length; i++){
             printf("%c", data[i]);
         }
-        printf(" from %s\n", getStringFromIp(source));
+        printf(" from %s\n", getStringFromIp(source).c_str());
     }
 
 };

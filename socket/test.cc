@@ -24,11 +24,11 @@ void test(bool condition, string desc)
 		cout << RED << "[FAIL]: " << desc << END;
 }
 
-void test(bool condition, char *desc) {
+void test(bool condition, const char *desc) {
     if (condition) {
-        cout << GREEN << "[PASS]: " << desc << endl;
+        cout << GREEN << "[PASS]: " << desc << END;
     } else
-        cout << RED << "[FAIL]: " << desc <<endl;
+        cout << RED << "[FAIL]: " << desc << END;
 }
 
 bool getYesNo(string message) {

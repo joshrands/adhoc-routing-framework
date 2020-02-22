@@ -87,10 +87,10 @@ bool UDPSocket::joinMulticastGroup(const char *address) {
 
 bool UDPSocket::setBroadcasting(bool broadcast) {
   int option = (broadcast) ? (1) : (0);
-  return setOption(SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
   if(UDP_DEBUG){
     printf("[UDP SOCKET]:[DEBUG]: Setting udp socket to broadcast mode\n");
   }
+  return setOption(SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
 }
 
 // -1 if unsuccessful, else number of bytes written
