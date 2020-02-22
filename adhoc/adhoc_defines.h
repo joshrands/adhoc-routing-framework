@@ -1,7 +1,7 @@
 #ifndef ADHOC_DEFINES
 #define ADHOC_DEFINES
 
-#include "../defines.h"
+#include "defines.h"
 
 
 #define MONITOR_DEBUG       DEBUG && 1

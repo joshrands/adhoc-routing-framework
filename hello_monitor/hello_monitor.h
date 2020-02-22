@@ -6,18 +6,14 @@
  * Author: Josh Rands
  * Date: 1/19/2019
  ********************************/
-
-#include "routing_protocol.h"
-#include "defines.h"
 #include <set>
 
-#define HELLO_DEBUG     DEBUG && 1
+#include "routing_protocol.h"
+#include "hello_defines.h"
 
 class HelloMonitor : public Port
 {
 public:
-    static uint32_t NEIGHBOR_TTL_MS;
-
     HelloMonitor(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); m_active = true; }
     ~HelloMonitor();
 
@@ -28,8 +24,6 @@ public:
      * @param length the length of the data
      */
     void handlePacket(char* data, int length, IP_ADDR source) override;
-
-    static int HELLO_INTERVAL_MS;
 
     // Initiate sending hello messages
     void sendHellos(int duration_ms);

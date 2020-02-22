@@ -4,9 +4,6 @@
 #include <thread>
 #include <chrono>
 
-int HelloMonitor::HELLO_INTERVAL_MS = 500;
-uint32_t HelloMonitor::NEIGHBOR_TTL_MS = 1000; 
-
 HelloMonitor::~HelloMonitor()
 {
 
@@ -65,7 +62,7 @@ void HelloMonitor::_updateNeighbors(int remaining_time_ms)
     // add valid neighbor links 
     while (it != m_neighborDetectionTimes.end())
     {
-        if ((currentTimeMS - it->second) < NEIGHBOR_TTL_MS)
+        if ((currentTimeMS - it->second) < HELLO_NEIGHBOR_TTL_MS)
         {
             if (HELLO_DEBUG)
                 cout << "[HELLO]:[INFO]: Add link to node " << getStringFromIp(it->first) << endl;

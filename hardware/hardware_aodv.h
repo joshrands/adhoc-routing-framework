@@ -14,12 +14,14 @@
 
 class HardwareAODV : public AODV{
 private:
+    void _hardwareAODV();
+    
+protected:
     vector<thread> portThreads;
     unordered_map<int, UDPSocket*> portSockets;
     UDPSocket* aodvSocket;
     thread aodving;
 
-    void _hardwareAODV();
 public:
     // Constructors
 
