@@ -52,4 +52,4 @@ ${TARGET} : ${OBJ_FILES}
 #
 clean:
 	rm -f core ${TARGET} ${HARDWARE_OBJ_FILES} ${LIB_NAME}
-	rm -f "*.o"
+	rm -f *.o
