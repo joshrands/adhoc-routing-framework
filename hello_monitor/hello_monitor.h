@@ -13,11 +13,13 @@
 
 #define HELLO_DEBUG     DEBUG && 1
 
-class HelloNeighbors : public Port
+class HelloMonitor : public Port
 {
 public:
-    HelloNeighbors(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); m_active = true; }
-    ~HelloNeighbors();
+    static uint32_t NEIGHBOR_TTL_MS;
+
+    HelloMonitor(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); m_active = true; }
+    ~HelloMonitor();
 
     /**
      * @brief This function is called by adhocRouting to give the port its data
@@ -32,12 +34,17 @@ public:
     // Initiate sending hello messages
     void sendHellos(int duration_ms);
 
-    bool isActive() { globalMux.lock(); return m_active; globalMux.unlock(); }
+    bool isActive() { helloMux.lock(); return m_active; helloMux.unlock(); }
+
+    // receive a hello message from a specific node 
+    void receiveHelloMessage(IP_ADDR nodeIp);
 
 protected:
-    set<IP_ADDR> m_neighbors;
+    map<IP_ADDR, uint32_t> m_neighborDetectionTimes;
+
     IP_ADDR m_parentIp;
     bool m_active;
+    mutex helloMux;
 
     // 1. Update neighbors of routing protocol
     // 2. Clear neighbors for next time period 
@@ -50,22 +57,26 @@ protected:
 
     // broadcast a hello message so neighbors can add 
     void _broadcastHelloMessage();
-    // receive a hello message from a specific node 
-    void _receiveHelloMessage(IP_ADDR nodeIp);
 
     // virtual function for waiting a predetermined interval. This will be implemented different for hardware vs. simulation
     // returns TRUE once complete, FALSE otherwise
     virtual bool _sleep(int DURATION_MS) = 0;
 
+    // abstract function for getting the current time 
+    virtual uint32_t getCurrentTimeMS() = 0;
+    // current time in milliseconds
+    uint32_t m_clockMS;
 };
 
-class HelloTest : public HelloNeighbors
+class HelloTest : public HelloMonitor
 {
 public: 
-    HelloTest(int portId, RoutingProtocol* routing) : HelloNeighbors(portId, routing) { }
+    HelloTest(int portId, RoutingProtocol* routing) : HelloMonitor(portId, routing) { }
 
 protected:
     bool _sleep(int DURATION_MS);
+
+    uint32_t getCurrentTimeMS() override;
 
 };
 

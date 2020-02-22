@@ -10,7 +10,7 @@
  * Date: 10/28/2019
  ********************************/
 
-#define RSS_OUT_OF_RANGE        -95
+#define RSS_OUT_OF_RANGE        -90
 
 #include "rem_parameters.h"
 #include "rem_defines.h"
@@ -37,7 +37,7 @@ public:
     double MIN_DEVIATION = MAX_THRESH_DIFF / 5;
 
     int UPDATE_FREQUENCY  = 1; // update model every x seconds
-    uint16_t DEFAULT_TTL  = 3600; // default ttl is x seconds
+    uint16_t DEFAULT_TTL  = 5; // default ttl is x seconds
     int PACKET_SIZE       = 19; // 13 bytes as of now
     int HOP_COUNT         = 2;
 

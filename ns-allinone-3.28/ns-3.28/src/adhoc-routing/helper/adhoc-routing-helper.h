@@ -2,13 +2,31 @@
 #ifndef ADHOC_ROUTING_HELPER_H
 #define ADHOC_ROUTING_HELPER_H
 
-#include "ns3/aodv_sim.h"
-#include "ns3/defines.h"
 #include "ns3/node.h"
 #include "ns3/socket.h"
+
+#include "ns3/port.h"
+#include "ns3/aodv_sim.h"
+#include "ns3/defines.h"
+#include "ns3/hello_sim.h"
+
 #include <map>
 
 namespace ns3 {
+
+class PrintPort : public Port{
+public:
+    PrintPort(int portId):Port(portId){}
+    ~PrintPort(){}
+    void handlePacket(char* data, int length, IP_ADDR source){
+        std::cout << "[PRINT PORT]: Received ";
+        for(int i = 0; i < length; i++){
+            std::cout << data[i];
+        }
+        std::cout << " from\n" << getStringFromIp(source) << std::endl;
+    }
+
+};
 
 /* ... */
 // TODO: Create a helper with ns3 aodv and sim rem 
@@ -22,12 +40,28 @@ public:
     static void receivePacket (Ptr<Socket> socket);
     static uint32_t getNs3SimulatedTimeMS();
     static double getNs3SimulatedBattery(IP_ADDR nodeIp);
+    static void waitSimulatedTimeForHelloMonitor(int DURATION_MS, SimHelloMonitor* waitingHello);
+
+    SimHelloMonitor* helloMonitor;
+
+    // Network monitoring helpers for Rss and Bandwidth 
+    map<uint32_t, double> getLinkRssMap() { return m_linkRssDb; } 
+    map<uint32_t, uint32_t> getLinkBandwidthMap() { return m_linkBandwidth; } 
+
+    void updateLinkRss(uint32_t ip, double rss) { m_linkRssDb[ip] = rss; }
+    void updateLinkBandwidth(uint32_t ip, uint32_t bandwidth) { m_linkBandwidth[ip] = bandwidth; }
 
 protected:
     Ptr<Node> m_node;
+    int HELLO_INTERVAL_MS = 1000;
 
+    // Link RSS in decibels
+    map<uint32_t, double> m_linkRssDb;
+    // Link bandwidth in bytes
+    map<uint32_t, uint32_t> m_linkBandwidth;
+
+    // So nodes can send packets to each other 
     static std::map<IP_ADDR, Ptr<Node>> m_existingNodes;
-//    static std::map<Ptr<Node>, Ptr<EnergySource>> m_batteryLevels;
 };
 
 }

@@ -42,6 +42,9 @@ RoutingTable::~RoutingTable()
 
 IP_ADDR RoutingTable::getNextHop(const IP_ADDR dest)
 {
+	if (TABLE_DEBUG)
+		cout << "[TABLE]:[DEBUG]: Getting next hop for " << getStringFromIp(dest) << endl;
+
 	IP_ADDR nextHop;
 
 	if (this->table.count(dest)) // Entry exists
@@ -122,13 +125,21 @@ bool RoutingProtocol::linkExists(IP_ADDR dest) {
 		cout << "[ROUTING]:[DEBUG]: Broadcast link always exists" << endl;
 		return true;
 	}	
+
+	// Lock neighbor mux because we are checking neighbors
+	neighborMux.lock();
+
     for (IP_ADDR ip : m_neighbors) {
+		cout << "NEIGHBOR LINK: " << getStringFromIp(ip) << endl;
         if (dest == ip) {
             if (MONITOR_DEBUG)
                 cout << "[ROUTING]:[DEBUG]: Link exists!" << endl;
+
+			neighborMux.unlock();
             return true;
         }
     }
+	neighborMux.unlock();
 
     if (MONITOR_DEBUG)
         cout << "[ROUTING]:[DEBUG]: Link does not exist." << endl;
@@ -146,8 +157,21 @@ void RoutingProtocol::resetLinks()
 void RoutingProtocol::addLink(IP_ADDR node)
 {
 	if (ROUTING_DEBUG)
-		cout << "[DEBUG]:[ROUTING]: Adding link to node " << getStringFromIp(node) << endl;
-	globalMux.lock();
-	m_neighbors.push_back(node);
-	globalMux.unlock();
+		cout << "[DEBUG]:[ROUTING]: Adding link on " << getStringFromIp(getIp()) << " to node " << getStringFromIp(node) << endl;
+
+	bool exists = false;
+	for (IP_ADDR link : m_neighbors)
+	{
+		if (node == link)
+			exists = true;
+	}
+
+	if (!exists)
+	{
+		m_neighbors.push_back(node);
+		// TODO: ADD AS ONE HOP NEIGHBOR TO ROUTING TABLE
+		m_pRoutingTable->updateTableEntry(node, node);
+		if (ROUTING_DEBUG)
+			cout << "[ROUTING]:[INFO]: One hop neighbor: " << getStringFromIp(node) << " added to routing table." << endl; 
+	}
 }

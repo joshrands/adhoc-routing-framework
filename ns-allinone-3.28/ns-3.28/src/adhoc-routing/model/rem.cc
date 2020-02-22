@@ -46,7 +46,6 @@ void REM::initializeRssModel(IP_ADDR pairIp)
     model.ownerIp = m_parentIp; 
     model.pairIp = pairIp;
     model.dataCount = 0;
-// NS3-TODO        model.parentNode = receiveNode;
     model.HOP_COUNT = this->HOP_COUNT;
 
     model.initialize();

@@ -1,5 +1,5 @@
 #include "test.h"
-#include "../adhoc/send_packet.h"
+#include "send_packet.h"
 
 // AODV TESTING
 
@@ -149,11 +149,11 @@ void test_aodv_rreq_forwarding()
 
 	// 0 - 1 - 2 - 3 - 4
 
-	AODVTest node0 = AODVTest(getIpFromString("192.168.0.0"));
-	AODVTest node1 = AODVTest(getIpFromString("192.168.0.1"));
-	AODVTest node2 = AODVTest(getIpFromString("192.168.0.2"));
-	AODVTest node3 = AODVTest(getIpFromString("192.168.0.3"));
-	AODVTest node4 = AODVTest(getIpFromString("192.168.0.4"));
+	AODVTest node0(getIpFromString("192.168.0.0"));
+	AODVTest node1(getIpFromString("192.168.0.1"));
+	AODVTest node2(getIpFromString("192.168.0.2"));
+	AODVTest node3(getIpFromString("192.168.0.3"));
+	AODVTest node4(getIpFromString("192.168.0.4"));
 
 	// create a rreq from node 0 to node 4
 	rreqPacket rreq = node0.getRREQHelper()->createRREQ(node4.getIp());

@@ -13,6 +13,9 @@ AODVRoutingTable::~AODVRoutingTable()
 
 IP_ADDR AODVRoutingTable::getNextHop(const IP_ADDR dest)
 {
+	if (TABLE_DEBUG)
+		cout << "[AODVTABLE]:[DEBUG]: Getting next hop for " << getStringFromIp(dest) << endl;
+
 	IP_ADDR nextHop;
 	if (m_aodvTable.count(dest))
 	{
@@ -163,6 +166,8 @@ void AODVRoutingTable::updateAODVRoutingTableFromRREP(rrepPacket* receivedRREP, 
 		this->setDestSequenceNumber(receivedRREP->destIP, receivedRREP->destSeqNum);
 		this->setHopCount(receivedRREP->destIP, receivedRREP->hopCount);
 	}
+	else 
+		cout << "[TABLE]:[WARNING]: Routing table NOT updated from RREP packet." << endl;
 }
 
 void AODVRoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop)
@@ -172,7 +177,9 @@ void AODVRoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHo
 	{	
 		// entry exists, update existing 
 		if (TABLE_DEBUG)
-			cout << "[TABLE]:[DEBUG]: Updating existing AODV entry" << endl;
+			cout << "[TABLE]:[DEBUG]: Updating existing AODV entry" 
+				 << " dest: " << getStringFromIp(dest) << " next hop: " 
+				 << getStringFromIp(nextHop) << endl;
 		this->m_aodvTable[dest].nextHop = nextHop;
 		this->m_aodvTable[dest].ttl = DEFAULT_TTL;
 	}

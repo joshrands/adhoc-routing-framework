@@ -58,7 +58,7 @@ public:
 
 	// returns the ip address of the next hop 
 	// returns 0 if not in table 
-	IP_ADDR getNextHop(const IP_ADDR dest);
+	virtual IP_ADDR getNextHop(const IP_ADDR dest);
 
 	// adds an element to the table 
 	virtual void updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop);
@@ -167,6 +167,10 @@ public:
      */
 	void setIp(const uint32_t ip) { ipAddress = ip; }
 
+    // Mutex for if the neighbor states are properly updated 
+    // Network monitoring objects use this mutex when updating a routing protocol's neighbors
+    mutex neighborMux;
+
 protected:
 	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
 	vector<IP_ADDR> m_neighbors;
@@ -174,6 +178,8 @@ protected:
 	uint32_t ipAddress;
     // The list of ports that can send and receive messages using this routing protocol
 	unordered_map<int, Port*> ports;
+
+    RoutingTable* m_pRoutingTable;
 
 	// Functions
 	virtual void _buildPort(Port*) = 0;

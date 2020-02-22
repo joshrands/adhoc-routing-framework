@@ -13,6 +13,8 @@ cp -r ./rem/*.h ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
 cp -r ./rem/*.cc ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
 cp -r ./simulation/*.h ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
 cp -r ./simulation/*.cc ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
+cp -r ./hello_monitor/*.h ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
+cp -r ./hello_monitor/*.cc ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model
 
 rm ./ns-allinone-3.28/ns-3.28/src/adhoc-routing/model/test*
 

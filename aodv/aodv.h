@@ -60,7 +60,7 @@ public:
 	void logRoutingTable();
 
 	// get the routing table 
-	AODVRoutingTable* getTable() { return m_aodvTable; } 
+	AODVRoutingTable* getTable() { return (AODVRoutingTable*) m_pRoutingTable; } 
 
 protected:
 	// node sequence number. MUST increment on a route discovery
@@ -68,7 +68,7 @@ protected:
 	// node rreq id. Incremented by one during route discovery
 	uint32_t rreqID;
 	// aodv routing table
-	AODVRoutingTable* m_aodvTable;
+//	AODVRoutingTable* m_aodvTable;
 	// current packet id index
 	uint32_t packetIdCount;	
 	// map of rreq ids and their corresponding packet to be sent once the route is established

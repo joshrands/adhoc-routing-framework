@@ -27,7 +27,7 @@ AODV::AODV(IP_ADDR ip) {
 
     this->ipAddress = ip;
     this->sequenceNum = 0;
-    this->m_aodvTable = new AODVRoutingTable();
+    this->m_pRoutingTable = (RoutingTable*) new AODVRoutingTable();
 
     this->rreqHelper.setRoutingTable(this->getTable());
     this->rreqHelper.setIp(ip);
@@ -69,7 +69,7 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
     if (getStringFromIp(dest) != BROADCAST_STR)
     {
         if (AODV_DEBUG)
-            cout << "[ORIG]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
+            cout << "[AODV]:[INFO]: Next hop: " << getStringFromIp(this->getTable()->getNextHop(origIP)) << endl;
 
         // by default this node is the originator
         if (-1 == signed(origIP))
@@ -80,12 +80,16 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
 
         // if entry exists in routing table, send it!
         // check routing table
-        if(this->m_aodvTable == nullptr){
+        if(this->m_pRoutingTable == nullptr){
             printf("[AODV]:[ERROR]: The routing table is NULL\n");
             exit(255);
         }else{
-            nextHop = m_aodvTable->getNextHop(dest);
+            if (AODV_DEBUG)
+                cout << "[AODV]:[DEBUG]: Getting next hop for " << getStringFromIp(dest) << endl;
+            nextHop = m_pRoutingTable->getNextHop(dest);
         }
+
+        cout << "CHECK";
 
         if (false == getTable()->getIsRouteActive(dest)) {
             BufferedPacket bufferedPacket;
@@ -123,6 +127,10 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
             _broadcastRREQBuffer(rreq);
 
             return true;
+        }
+        else if (AODV_DEBUG)
+        {
+            cout << "[AODV]:[DEBUG]: Route is active, no RREQ necessary." << endl;
         }
     }
 
@@ -306,9 +314,8 @@ void AODV::_handleRREQ(char *buffer, int length, IP_ADDR source) {
 
         if (linkExists(nextHopIp))
             _socketSendPacket(ROUTING_PORT, buffer, sizeof(rrep), nextHopIp);
-//        else
-//        	repairLink(nextHopIp, rrep.origIP, buffer, sizeof(rrep), getIp(), ROUTING_PORT);
-        cout << "[AODV]:[WARNING]: We don't try to repair failed RREPs..." << endl;
+        else
+            cout << "[AODV]:[WARNING]: We don't try to repair failed RREPs..." << endl;
 
 
         delete buffer;
@@ -380,10 +387,8 @@ void AODV::_handleRREP(char *buffer, int length, IP_ADDR source) {
 
         if (linkExists(nextHopIp))
             _socketSendPacket(ROUTING_PORT, buffer, sizeof(forwardRREP), nextHopIp);
-        else if (RREP_DEBUG)
+        else 
             cout << "[AODV]:[WARNING]: We don't try to repair failed RREPs..." << endl;
-        //			repairLink(nextHopIp, forwardRREP.origIP, buffer,
-        // sizeof(forwardRREP), forwardRREP.destIP, ROUTING_PORT);
 
         delete buffer;
     }
@@ -432,11 +437,12 @@ void AODV::_handlePacket(int port, char *packet, int length, IP_ADDR source) {
         memcpy(&finalDestination, &(packet[1]), 4);
         IP_ADDR origIP;
         memcpy(&origIP, &(packet[5]), 4);
-        if (this->getIp() == finalDestination) {
+        if (this->getIp() == finalDestination || finalDestination == getIpFromString(BROADCAST_STR)) {
             // We are the final destinatin
             // Have socket handle the packet
             packet += HEADER_SIZE; // Get only the data part of the packet
             if(ports.count(port)){
+                std::cout << "[AODV]:[INFO]: Received packet on port " << port << endl; 
                 ports[port]->handlePacket(packet, length - HEADER_SIZE, source);
             }else{
                 fprintf(stderr, "[AODV]:[ERROR]: Received packet on port with no port handler\n");
@@ -445,7 +451,6 @@ void AODV::_handlePacket(int port, char *packet, int length, IP_ADDR source) {
         }else{
             // send the packet to final destination - will check routing table
             // strip header and send packet
-            // TODO: Most important time to check link state.
             packet += HEADER_SIZE;
             sendPacket(port, packet, length - HEADER_SIZE, finalDestination, origIP);
             packet -= HEADER_SIZE;
