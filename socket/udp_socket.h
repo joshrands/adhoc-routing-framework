@@ -98,7 +98,7 @@ public:
    */
   int sendTo(char* buffer, int length, uint32_t dest, int port);
 
-  /*! 
+  /**
    *  @brief Receive a packet from a remote endpoint
    *  @param remote The remote endpoint
    *  @param buffer The buffer for storing the incoming packet data. If a packet
@@ -108,7 +108,8 @@ public:
    */
   int receiveFrom(Endpoint &remote, char *buffer, int length);
 
-  /*! Continuously reads data from the port, placing messages onto the
+  /**
+   * @brief Continuously reads data from the port, placing messages onto the
    *  socket's message queue.
    */
   void receiveFromPortThread();

@@ -60,10 +60,11 @@ protected:
 
     // virtual function for waiting a predetermined interval. This will be implemented different for hardware vs. simulation
     // returns TRUE once complete, FALSE otherwise
-    virtual bool _sleep(int DURATION_MS) = 0;
+    virtual bool _sleep(int duration_ms) = 0;
 
     // abstract function for getting the current time 
     virtual uint32_t getCurrentTimeMS() = 0;
+
     // current time in milliseconds
     uint32_t m_clockMS;
 };
@@ -74,7 +75,7 @@ public:
     HelloTest(int portId, RoutingProtocol* routing) : HelloMonitor(portId, routing) { }
 
 protected:
-    bool _sleep(int DURATION_MS);
+    bool _sleep(int duration_ms) override;
 
     uint32_t getCurrentTimeMS() override;
 

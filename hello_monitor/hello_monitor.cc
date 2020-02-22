@@ -138,13 +138,14 @@ void HelloMonitor::receiveHelloMessage(IP_ADDR nodeIp)
     helloMux.unlock();
 }
 
-bool HelloTest::_sleep(int DURATION_MS)
+
+bool HelloTest::_sleep(int duration_ms)
 {
     if (HELLO_DEBUG)
-        std::cout << "[HELLO][DEBUG]: Sleeping for " << DURATION_MS << " ms" << std::endl;
+        std::cout << "[HELLO][DEBUG]: Sleeping for " << duration_ms << " ms" << std::endl;
 
     // wait sleep time 
-    for (int i = 0; i < DURATION_MS; i+=DURATION_MS/10)
+    for (int i = 0; i < duration_ms; i+=duration_ms/10)
     {
         m_clockMS += i;
         this_thread::sleep_for(chrono::milliseconds(i));

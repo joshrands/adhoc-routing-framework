@@ -1,8 +1,8 @@
 #include "hello_sim.h"
 
-bool SimHelloMonitor::_sleep(int DURATION_MS)
+bool SimHelloMonitor::_sleep(int duration_ms)
 {
-    waitSimulatedTime(DURATION_MS);
+    waitSimulatedTime(duration_ms);
 
     return true;
 }

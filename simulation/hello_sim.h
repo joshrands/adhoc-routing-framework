@@ -17,12 +17,12 @@ class SimHelloMonitor : public HelloMonitor
 public:
     SimHelloMonitor(int portId, RoutingProtocol* routing) : HelloMonitor(portId, routing) { }
 
-    void(*waitSimulatedTime)(int DURATION_MS);
+    void(*waitSimulatedTime)(int duration_ms);
     uint32_t(*getSimulatedTime)();
 
 protected:
     // override because we have different time systems depending on hardware, sim, etc
-    bool _sleep(int DURATION_MS) override;
+    bool _sleep(int duration_ms) override;
 
     // override because we have different time systems depending on hardware, sim, etc
     uint32_t getCurrentTimeMS() override;
