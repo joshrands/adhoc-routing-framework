@@ -159,7 +159,7 @@ void AdHocRoutingHelper::updateLinkBandwidth(uint32_t bandwidthBytes)
     Simulator::Schedule(Seconds(1.0), &RemovePacketFromBandwidthMetric, this, numberOfBits);
 }
 
-uint32_t AdHocRoutingHelper::getNs3SimulatedTimeMS()
+uint64_t AdHocRoutingHelper::getNs3SimulatedTimeMS()
 {
     return (uint32_t)Simulator::Now().GetMilliSeconds();
 }

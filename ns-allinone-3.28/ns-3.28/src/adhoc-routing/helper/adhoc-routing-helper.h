@@ -38,7 +38,7 @@ public:
 
     static int AdHocSendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source);
     static void receivePacket (Ptr<Socket> socket);
-    static uint32_t getNs3SimulatedTimeMS();
+    static uint64_t getNs3SimulatedTimeMS();
     static double getNs3SimulatedBattery(IP_ADDR nodeIp);
     static void waitSimulatedTimeForHelloMonitor(int DURATION_MS, SimHelloMonitor* waitingHello);
 
@@ -57,7 +57,6 @@ public:
 
 protected:
     Ptr<Node> m_node;
-    int HELLO_INTERVAL_MS = 1000;
 
     // Link RSS in decibels
     map<uint32_t, double> m_linkRssDb;

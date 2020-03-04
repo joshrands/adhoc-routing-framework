@@ -48,6 +48,7 @@ def build(bld):
 				'model/defines.h',
 				'model/hello_monitor.h',
 				'model/hello_sim.h',
+				'model/hello_defines.h',
 				'model/monitor_info.h',
 				'model/network_monitor.h',
 				'model/port.h',

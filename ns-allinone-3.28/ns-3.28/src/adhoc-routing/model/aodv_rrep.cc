@@ -56,7 +56,7 @@ rrepPacket RREPHelper::createRREPFromRREQ(rreqPacket rreq, IP_ADDR source)
     }
 
     rrep.origIP = rreq.origIP;
-    rrep.lifetime = MY_ROUTE_TIMEOUT_MS;
+    rrep.lifetime = ROUTE_TIMEOUT_MS;
 
     return rrep;
 }

@@ -113,7 +113,7 @@ void REM::handleMonitoringPacketBuffer(char* packet, int length, IP_ADDR source,
 
     // buffer is in REMModelPacket format 
     REMModelPacket modelPacket;
-    memcpy(&modelPacket, packet, sizeof(params));
+    memcpy(&modelPacket, packet, sizeof(modelPacket));
 
     params.ownerId = modelPacket.parentIp;
     params.type = (ModelType)modelPacket.type;

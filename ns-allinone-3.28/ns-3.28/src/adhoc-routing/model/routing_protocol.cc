@@ -114,10 +114,11 @@ bool RoutingProtocol::sendPacket(Port* p, char* data, int length, IP_ADDR dest, 
 }
 
 bool RoutingProtocol::linkExists(IP_ADDR dest) {
-    if (MONITOR_DEBUG)
+    if (MONITOR_DEBUG){
         cout << "[ROUTING]:[DEBUG]: Checking if link exists from "
              << getStringFromIp(getIp()) << " to " << getStringFromIp(dest)
              << endl;
+	}
 
 	// if this is a broadcast, the link always exists.
 	if (getStringFromIp(dest) == BROADCAST_STR)
