@@ -34,6 +34,7 @@
 #include <linux/wireless.h>
 #include <cstring>
 #include <errno.h>
+#include <atomic>
 
 using namespace std;
 
@@ -98,7 +99,7 @@ public:
    */
   int sendTo(char* buffer, int length, uint32_t dest, int port);
 
-  /*! 
+  /**
    *  @brief Receive a packet from a remote endpoint
    *  @param remote The remote endpoint
    *  @param buffer The buffer for storing the incoming packet data. If a packet
@@ -108,10 +109,18 @@ public:
    */
   int receiveFrom(Endpoint &remote, char *buffer, int length);
 
-  /*! Continuously reads data from the port, placing messages onto the
+  /**
+   * @brief Continuously reads data from the port, placing messages onto the
    *  socket's message queue.
    */
   void receiveFromPortThread();
+
+  /**
+   * @brief Continuously reads data from the port, placing messages onto the
+   *  socket's message queue.
+   * @param run an atomic boolean to stop the thread loop
+   */
+  void receiveFromPortThreadStoppable(std::atomic<bool>& run);
 
   /*!
    * @brief Get one message from the socket

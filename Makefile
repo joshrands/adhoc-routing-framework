@@ -25,17 +25,12 @@ STATIC_LIBRARIES = hardware/libhardware.a adhoc/libadhoc.a
 OBJ_FILES = ${OBJ_LIB_FILES} 
 INC_FILES = 
 
-SUBDIRS = aodv socket hardware adhoc
+SUBDIRS = aodv socket hardware adhoc hello_monitor rem 
 
 ${TARGET}: #${OBJ_FILES}
 	${CXX} -c ${CXXFLAGS} ${TARGET}.cc -o ${TARGET}.o
+	rm -f test.o
 	${LD} ${LDFLAGS} ${OBJ_FILES} ${TARGET}.o -o $@ ${STATIC_LIBRARIES}
-
-test: 
-	make clean	
-	${CXX} -c ${CXXFLAGS} test.cc -o test.o
-	${LD} ${LDFLAGS} test.o aodv/*.o adhoc/*.o -o test 
-#	./test
 
 test-all:
 	make all 
@@ -45,7 +40,6 @@ test-all:
 		cd ../; \
 	done
 	make clean
-	make test
 
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS} do-adhoc.cc -o $@ $<

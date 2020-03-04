@@ -5,7 +5,7 @@ double REMSim::getCurrentBatteryLevel()
     return getSimulatedBatteryLevel(this->m_parentIp);
 } 
 
-uint32_t REMSim::getCurrentTimeMS()
+uint64_t REMSim::_getCurrentTimeMS()
 {
     return getSimulatedTime();
 }

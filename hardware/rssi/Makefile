@@ -7,27 +7,28 @@ PKG_CONFIG ?= pkg-config
 
 MKDIR ?= mkdir -p
 INSTALL ?= install
-CC ?= "gcc"
+CC ?= "g++"
 
 CFLAGS ?= -MMD -O2 -g
-CFLAGS += -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common
+CFLAGS += -Wall -Wundef -Wno-trigraphs -fno-strict-aliasing -fno-common
 
 LIBS += -lpcap
 
 OBJS += ./radiotap.o
 OBJS += ./wicap.o
+OBJS += ./main.o
 
 -include $(OBJS:%.o=%.d)
 
-all: wicap
+all: main
 
-%.o: %.c $(DEPS)
+%.o: %.cc $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-wicap: $(OBJS)
+main: $(OBJS)
 	$(CC) -o $@ $^ $(LDFLAGS) $(LIBS)
 
 clean:
-	rm -f *.o wicap
+	rm -f *.o main
 
 .PHONY : clean

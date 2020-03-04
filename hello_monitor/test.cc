@@ -1,15 +1,11 @@
-#include "hello_monitor.h"
-
-#include "../aodv/aodv.h"
-#include "../aodv/aodv_test.h"
-#include "../defines.h"
-
 #include <assert.h>
 #include <cmath>
 #include <iostream>
 #include <thread>
-
 #include "string.h"
+#include "../aodv/aodv.h"
+#include "../aodv/aodv_test.h"
+#include "hello_monitor.h"
 
 using namespace std;
 
@@ -70,13 +66,13 @@ void test_hello()
 	aodv1.addPort(&hello1);
 	aodv2.addPort(&hello2);
 
-	thread helloThread1(dispatchHello, &hello1, HelloMonitor::HELLO_INTERVAL_MS*2);
-	thread helloThread2(dispatchHello, &hello2, HelloMonitor::HELLO_INTERVAL_MS*2);
+	thread helloThread1(dispatchHello, &hello1, HELLO_INTERVAL_MS*2);
+	thread helloThread2(dispatchHello, &hello2, HELLO_INTERVAL_MS*2);
 
 	helloThread1.join();
 	helloThread2.join();
 
-	this_thread::sleep_for(chrono::milliseconds(HelloMonitor::HELLO_INTERVAL_MS*2));
+	this_thread::sleep_for(chrono::milliseconds(HELLO_INTERVAL_MS*2));
 
 	globalMux.lock();
 	test(aodv2.isNeighbor(&aodv1) == true, "Nodes are neighbors because monitoring!");
@@ -86,13 +82,13 @@ void test_hello()
 	aodv1.removePhysicalNeighborOnly(&aodv2);
 	aodv2.removePhysicalNeighborOnly(&aodv1);
 
-	thread helloThread3(dispatchHello, &hello1, HelloMonitor::HELLO_INTERVAL_MS*2);
-	thread helloThread4(dispatchHello, &hello2, HelloMonitor::HELLO_INTERVAL_MS*2);
+	thread helloThread3(dispatchHello, &hello1, HELLO_INTERVAL_MS*2);
+	thread helloThread4(dispatchHello, &hello2, HELLO_INTERVAL_MS*2);
 
 	helloThread3.join();
 	helloThread4.join();
 
-	this_thread::sleep_for(chrono::milliseconds(HelloMonitor::HELLO_INTERVAL_MS*2));
+	this_thread::sleep_for(chrono::milliseconds(HELLO_INTERVAL_MS*2));
 
 	globalMux.lock();
 	test(aodv2.isNeighbor(&aodv1) == false, "Nodes are NOT neighbors because monitoring!");

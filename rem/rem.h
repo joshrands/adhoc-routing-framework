@@ -65,8 +65,8 @@ public:
 // NS3-TODO: abstractize?    Ptr<Socket> socket;
 protected:
     // get the current time in milliseconds. abstract function for sim and hardware implementations
-    virtual uint32_t getCurrentTimeMS() = 0;
-    uint32_t simStartTime;
+    virtual uint64_t _getCurrentTimeMS() = 0;
+    uint64_t simStartTime;
 
     IP_ADDR clusterHeadIp;
 
@@ -80,8 +80,8 @@ protected:
 class REMTest : public REM
 {
 public:
-    REMTest() : REM() { simStartTime = getCurrentTimeMS(); }
-    REMTest(IP_ADDR parentIp) : REM(parentIp) { simStartTime = getCurrentTimeMS(); }
+    REMTest() : REM() { simStartTime = _getCurrentTimeMS(); }
+    REMTest(IP_ADDR parentIp) : REM(parentIp) { simStartTime = _getCurrentTimeMS(); }
 
     double getCurrentBatteryLevel() override;
 
@@ -89,7 +89,7 @@ public:
 
 protected:
     // override because we have different time systems depending on hardware, sim, etc
-    uint32_t getCurrentTimeMS() override;
+    uint64_t _getCurrentTimeMS() override;
 
 };
 #endif

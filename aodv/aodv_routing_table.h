@@ -15,7 +15,6 @@
 #include "routing_protocol.h"
 #include "aodv_packets.h"
 
-
 class AODVInfo : public TableInfo
 {
 public:
@@ -29,10 +28,10 @@ public:
 class AODVRoutingTable : public RoutingTable
 {
 public:
+	const uint16_t DEFAULT_TTL = 1800; // 1800 seconds = 30 minutes 
+
 	AODVRoutingTable();
 	~AODVRoutingTable();
-
-	const uint16_t DEFAULT_TTL = 1800; // 1800 seconds = 30 minutes 
 
 	void updateAODVRoutingTableFromRREQ(rreqPacket* receivedRREQ, IP_ADDR sourceIP);
 	void updateAODVRoutingTableFromRREP(rrepPacket* receivedRREP, IP_ADDR sourceIP);

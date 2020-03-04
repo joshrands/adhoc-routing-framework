@@ -16,6 +16,7 @@
 #ifndef __RADIOTAP_H
 #define __RADIOTAP_H
 
+
 /**
  * struct ieee82011_radiotap_header - base radiotap header
  */
@@ -196,5 +197,6 @@ enum ieee80211_radiotap_timestamp_flags {
 	IEEE80211_RADIOTAP_TIMESTAMP_FLAG_32BIT = 0x01,
 	IEEE80211_RADIOTAP_TIMESTAMP_FLAG_ACCURACY = 0x02,
 };
+
 
 #endif /* __RADIOTAP_H */

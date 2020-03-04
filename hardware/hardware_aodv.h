@@ -14,12 +14,14 @@
 
 class HardwareAODV : public AODV{
 private:
-    vector<thread> portThreads;
+    void _hardwareAODV();
+    
+protected:
+    unordered_map<int, thread> portThreads;
     unordered_map<int, UDPSocket*> portSockets;
     UDPSocket* aodvSocket;
     thread aodving;
 
-    void _hardwareAODV();
 public:
     // Constructors
 
@@ -36,7 +38,7 @@ public:
     // Destructors
     ~HardwareAODV();
 
-    int handlePackets() override;
+    virtual int handlePackets() override;
 	
 	// Network Monitoring
 	// attempt to repair the link and then send the packet to its destination

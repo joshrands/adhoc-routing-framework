@@ -1,19 +1,6 @@
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <endian.h>
-#include <errno.h>
-#include <string.h>
-#include <pcap/pcap.h>
-#include "radiotap_iter.h"
+#include "wicap.h"
 
 static int fcshdr = 0;
-
-#define MAC2STR(a) (a)[0], (a)[1], (a)[2], (a)[3], (a)[4], (a)[5]
-#define MACSTR "%02x:%02x:%02x:%02x:%02x:%02x"
 
 struct ieee80211_hdr {
 	unsigned short frame_control;
@@ -25,17 +12,19 @@ struct ieee80211_hdr {
 	unsigned short addr4[6];
 } __attribute__ ((packed));
 
-static const struct radiotap_align_size align_size_000000_00[] = {
-	[0] = { .align = 1, .size = 4, },
-	[52] = { .align = 1, .size = 4, },
-};
+static const struct radiotap_align_size align_size_000000_00[53] = {{1,4}, 
+{4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, 
+{4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, 
+{4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, 
+{4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, 
+{4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {4,4}, {1,4}};
 
-static const struct ieee80211_radiotap_namespace vns_array[] = {
+static const ieee80211_radiotap_namespace vns_array[] = {																															
 	{
+		.align_size = align_size_000000_00,
+		.n_bits = sizeof(align_size_000000_00),
 		.oui = 0x000000,
 		.subns = 0,
-		.n_bits = sizeof(align_size_000000_00),
-		.align_size = align_size_000000_00,
 	},
 };
 
@@ -44,11 +33,26 @@ static const struct ieee80211_radiotap_vendor_namespaces vns = {
 	.n_ns = sizeof(vns_array)/sizeof(vns_array[0]),
 };
 
+
+int mac_in_network(const u_char *packet){	
+	int err = 0;
+	struct ieee80211_radiotap_iterator iter;
+    err = ieee80211_radiotap_iterator_init(&iter,(struct ieee80211_radiotap_header*) packet, 2014, &vns);
+	if (err) {
+		printf("malformed radiotap header (init returns %d)\n", err);
+		return 1;
+	}
+	struct ieee80211_hdr *hdr =(struct ieee80211_hdr *)(packet + iter._max_length);
+	char* mac_str = (char*) malloc(sizeof(char)*19);
+    sprintf(mac_str, MACSTR, MAC2STR(hdr->addr2));
+   	return(strcmp("b8:27:eb:87:af:f5", mac_str));
+}
+
 static void print_radiotap_namespace(struct ieee80211_radiotap_iterator *iter)
 {
 	switch (iter->this_arg_index) {
 	case IEEE80211_RADIOTAP_TSFT:
-		printf("\tTSFT: %llu\n", le64toh(*(unsigned long long *)iter->this_arg));
+		printf("\tTSFT: %lu\n", le64toh(*(unsigned long long *)iter->this_arg));
 		break;
 	case IEEE80211_RADIOTAP_FLAGS:
 		printf("\tflags: %02x\n", *iter->this_arg);
@@ -118,27 +122,11 @@ static const struct radiotap_override overrides[] = {
 	{ .field = 14, .align = 4, .size = 4, }
 };
 
-int save_packet(const pcap_t *pcap_handle, const struct pcap_pkthdr *header, 
-        const u_char *packet, const char *file_name)
-{
-	pcap_dumper_t *output_file;
-	
-    output_file = pcap_dump_open(pcap_handle, file_name);
-    if (output_file == NULL) {
-        printf("Fail to save captured packet.\n");
-        return -1;
-    }
-
-    pcap_dump((u_char *)output_file, header, packet);
-    pcap_dump_close(output_file);
-    
-    return 0;
-}
-
-
 
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
 {	
+	if(mac_in_network(packet)) return;
+
 	static int count = 1;
     int err;
     int i;
@@ -146,7 +134,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 
     printf("\n Packet (%d):\n", count);
 
-    err = ieee80211_radiotap_iterator_init(&iter, packet, 2014, &vns);
+    err = ieee80211_radiotap_iterator_init(&iter,(struct ieee80211_radiotap_header *)packet, 2014, &vns);
 	if (err) {
 		printf("malformed radiotap header (init returns %d)\n", err);
 		return;
@@ -181,63 +169,12 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 	}
 
     struct ieee80211_hdr *hdr =(struct ieee80211_hdr *)(packet + iter._max_length);
-    printf("\tsource address: "MACSTR"\n", MAC2STR(hdr->addr2));
-    printf("\tdestination address: "MACSTR"\n", MAC2STR(hdr->addr1));
-    printf("\tbssid: "MACSTR"\n", MAC2STR(hdr->addr3));
+    printf("\tsource address: " MACSTR "\n", MAC2STR(hdr->addr2));
+    printf("\tdestination address: " MACSTR "\n", MAC2STR(hdr->addr1));
+    printf("\tbssid: " MACSTR "\n", MAC2STR(hdr->addr3));
 	count ++;
 	
 	return;
-
 }
 
-int main(int argc, char *argv[])
-{
-    pcap_t *handle;			/* Session handle */
-    char *dev;			/* The device to sniff on */
-    bpf_u_int32 netp;
-    char errbuf[PCAP_ERRBUF_SIZE];	/* Error string */
-    struct bpf_program fp;		/* The compiled filter */
-    char filter_exp[] = "type mgt subtype beacon";	/* The filter expression */
-    int num_packets = 0;			/* number of packets to capture */
 
-    /* check for capture device name on command-line */
-	if (argc == 2) {
-		dev = argv[1];
-	}
-	else {
-		fprintf(stderr, "error: unrecognized command-line options\n\n");
-		return 1;
-	}
-    
-    /* Open the session in promiscuous mode */
-    handle = pcap_open_live(dev, BUFSIZ, 1, 100000, errbuf);
-    if (handle == NULL) {
-        fprintf(stderr, "Couldn't open device %s: %s\n", dev, errbuf);
-        return(2);
-    }
-    /* Compile and apply the filter */
-    if (pcap_compile(handle, &fp, filter_exp, 0, netp) == -1) {
-        fprintf(stderr, "Couldn't parse filter %s: %s\n", filter_exp, pcap_geterr(handle));
-        return(2);
-    }
-    if (pcap_setfilter(handle, &fp) == -1) {
-        fprintf(stderr, "Couldn't install filter %s: %s\n", filter_exp, pcap_geterr(handle));
-        return(2);
-    }
-    
-    /* print capture info */
-	printf("Device: %s\n", dev);
-	printf("Number of packets: %d\n", num_packets);
-	printf("Filter expression: %s\n", filter_exp);
-
-    /* now we can set our callback function */
-	pcap_loop(handle, num_packets, got_packet, handle);
-
-	/* cleanup */
-	pcap_freecode(&fp);
-	pcap_close(handle);
-
-	printf("\nCapture complete.\n");    
-    
-    return(0);
-}

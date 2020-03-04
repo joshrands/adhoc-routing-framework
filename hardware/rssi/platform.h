@@ -8,7 +8,7 @@
 ({								\
 	struct packed_dummy_struct {				\
 		typeof(*(p)) __val;				\
-	} __attribute__((packed)) *__ptr = (void *) (p);	\
+	} __attribute__((packed)) *__ptr = (packed_dummy_struct*) (p);	\
 								\
 	__ptr->__val;						\
 })

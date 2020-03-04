@@ -38,8 +38,6 @@ ${LIB_NAME} : ${OBJ_FILES}
 %.o : %.cc ${INC_FILES}
 	${CXX} -c ${CXXFLAGS}  -o $@ $< 
 
-
-
 #
 # Please remember not to submit objects or binarys.
 #

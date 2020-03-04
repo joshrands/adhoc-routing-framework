@@ -87,10 +87,10 @@ bool UDPSocket::joinMulticastGroup(const char *address) {
 
 bool UDPSocket::setBroadcasting(bool broadcast) {
   int option = (broadcast) ? (1) : (0);
-  return setOption(SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
   if(UDP_DEBUG){
     printf("[UDP SOCKET]:[DEBUG]: Setting udp socket to broadcast mode\n");
   }
+  return setOption(SOL_SOCKET, SO_BROADCAST, &option, sizeof(option));
 }
 
 // -1 if unsuccessful, else number of bytes written
@@ -158,6 +158,28 @@ void UDPSocket::receiveFromPortThread() {
     messages.push(Message(sender, buffer, n));
   }
 }
+
+void UDPSocket::receiveFromPortThreadStoppable(std::atomic<bool>& run) {
+  // Continually calls receiveFrom placing the returned messages on the message
+  // queue
+  while (run) {
+    char *buffer = (char *)malloc(MAXLINE * sizeof(char));
+    Endpoint sender;
+    int n = receiveFrom(sender, buffer, MAXLINE);
+    if (n <= 0) {
+      fprintf(stderr, "[UDP SOCKET]:[ERROR]: Receiving data on port failed\n");
+      if(UDP_DEBUG){
+        fprintf(stderr, "[UDP SOCKET]:[ERROR]: %s\n", strerror(errno));
+      }
+      exit(-1);
+    }
+    buffer[n] = '\0';
+
+    // Collect signal strength put in map
+    messages.push(Message(sender, buffer, n));
+  }
+}
+
 
 bool UDPSocket::getMessage(Message &message) { return messages.pop(message); }
 
