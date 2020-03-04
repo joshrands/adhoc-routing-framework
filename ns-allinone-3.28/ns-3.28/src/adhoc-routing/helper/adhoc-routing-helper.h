@@ -46,10 +46,14 @@ public:
 
     // Network monitoring helpers for Rss and Bandwidth 
     map<uint32_t, double> getLinkRssMap() { return m_linkRssDb; } 
-    map<uint32_t, uint32_t> getLinkBandwidthMap() { return m_linkBandwidth; } 
+    int getAvailableBandwidthBits() { return m_availableBandwidthBits; }
+    void setAvailableBandwidthBits(int availableBandwidth) { this->m_availableBandwidthBits = availableBandwidth; }
+    void increaseAvailableBandwidthByBits(int numberOfBits) { this->m_availableBandwidthBits += numberOfBits; }
 
     void updateLinkRss(uint32_t ip, double rss) { m_linkRssDb[ip] = rss; }
-    void updateLinkBandwidth(uint32_t ip, uint32_t bandwidth) { m_linkBandwidth[ip] = bandwidth; }
+    void updateLinkBandwidth(uint32_t bandwidthBytes);
+
+    string getIpAddressStr() { return getStringFromIp(this->ipAddress); }
 
 protected:
     Ptr<Node> m_node;
@@ -57,8 +61,9 @@ protected:
 
     // Link RSS in decibels
     map<uint32_t, double> m_linkRssDb;
-    // Link bandwidth in bytes
-    map<uint32_t, uint32_t> m_linkBandwidth;
+
+    // Local bandwidth calculation over the last second 
+    int m_availableBandwidthBits;
 
     // So nodes can send packets to each other 
     static std::map<IP_ADDR, Ptr<Node>> m_existingNodes;

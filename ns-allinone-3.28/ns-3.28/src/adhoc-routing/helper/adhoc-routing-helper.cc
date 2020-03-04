@@ -78,6 +78,10 @@ int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, 
 void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
 {
     Ptr<Packet> packet;
+
+    // Add this packet to the buffer of current packets and make callback to remove it in 1 second 
+    int packetSize = socket->GetRxAvailable();
+
     while (packet = socket->Recv ())
     {
         Ipv4Header header;
@@ -129,14 +133,30 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         adhocRoutingHelper->helloMonitor->receiveHelloMessage(source);
 
         // Update network statistics
+        // Update rss 
         adhocRoutingHelper->updateLinkRss(source, packetPairData.rss);
-        // TODO: Confirm that this statistic is what we want 
-        adhocRoutingHelper->updateLinkBandwidth(source, socket->GetRxAvailable());
+        // Update bandwidth 
+        adhocRoutingHelper->updateLinkBandwidth(packetSize); 
 
         // Push the packet onto the packet queue and then handle it
         adhocRoutingHelper->packetQueue.push(packet);
         adhocRoutingHelper->handlePackets();
     }
+}
+
+void RemovePacketFromBandwidthMetric(AdHocRoutingHelper* adhocRoutingHelper, int numberOfBits)
+{
+    adhocRoutingHelper->increaseAvailableBandwidthByBits(numberOfBits);
+}
+
+void AdHocRoutingHelper::updateLinkBandwidth(uint32_t bandwidthBytes)
+{
+    // Add this packet to current bandwidth and remove it after a second 
+    int numberOfBits = bandwidthBytes * 8;
+    this->m_availableBandwidthBits -= numberOfBits; 
+
+    // since our metric is in Mbps, we will remove these bits in 1 second 
+    Simulator::Schedule(Seconds(1.0), &RemovePacketFromBandwidthMetric, this, numberOfBits);
 }
 
 uint32_t AdHocRoutingHelper::getNs3SimulatedTimeMS()

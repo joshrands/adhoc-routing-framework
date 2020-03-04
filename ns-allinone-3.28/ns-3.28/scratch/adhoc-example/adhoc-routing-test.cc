@@ -61,6 +61,13 @@ void ReceiveCallback(Ptr<Socket> socket)
     AdHocRoutingHelper::receivePacket(socket);
 }
 
+void PrintBandwidth(AdHocRoutingHelper* adhocRoutingHelper, int freqMS)
+{
+  std::cout << adhocRoutingHelper->getIpAddressStr() << " bandwidth= " << adhocRoutingHelper->getAvailableBandwidthBits() << endl; 
+
+  Simulator::Schedule(MilliSeconds(freqMS), &PrintBandwidth, adhocRoutingHelper, freqMS);
+}
+
 void initialHellos()
 {
   std::cout << "[TEST]: Initial hellos!" << std::endl; 
@@ -122,6 +129,8 @@ void localMonitoring()
 int main (int argc, char *argv[])
 {
   std::string phyMode ("DsssRate1Mbps");
+  int dataRateMbps = 1;
+
   double rss = -80;  // -dBm
   uint16_t numNodes = NUM_NODES;
 
@@ -264,6 +273,9 @@ int main (int argc, char *argv[])
  
     adhocMap[nodes.Get(i)] = new AdHocRoutingHelper(nodes.Get(i), ip);
     nodes.Get(i)->m_AdHocRoutingHelper = adhocMap[nodes.Get(i)]; 
+    nodes.Get(i)->m_AdHocRoutingHelper->setAvailableBandwidthBits(dataRateMbps * 1000000);
+
+    Simulator::Schedule(Seconds(1 + i), &PrintBandwidth, nodes.Get(i)->m_AdHocRoutingHelper, 10);
 
     Vector pos = nodes.Get(i)->GetObject<RandomWaypointMobilityModel>()->GetPosition();
     if (DEBUG)
