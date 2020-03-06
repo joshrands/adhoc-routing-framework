@@ -34,9 +34,11 @@ void HelloMonitor::_updateNeighbors(uint64_t remaining_time_ms)
     // 0. Should we continue? 
     helloMux.lock();
 
-    if (remaining_time_ms <= 0)
+    if (signed(remaining_time_ms) <= 0)
     {
         m_active = false;
+        if (HELLO_DEBUG)
+            cout << "[HELLO]:[INFO]: Terminating hello _updateNeighbors." << endl;
         helloMux.unlock();
         return;
     }
