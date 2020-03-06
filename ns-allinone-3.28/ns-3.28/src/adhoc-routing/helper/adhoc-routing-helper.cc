@@ -11,6 +11,11 @@
 #include "ns3/tag.h"
 #include "ns3/udp-header.h"
 
+#include "ns3/network_monitor.h"
+#include "ns3/aodv_sim.h"
+#include "ns3/rem_sim.h"
+#include "ns3/port.h"
+
 #include <iostream>
 
 namespace ns3 {
@@ -19,12 +24,16 @@ std::map<IP_ADDR, Ptr<Node>> AdHocRoutingHelper::m_existingNodes;
 
 int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)
 {
+    if (DEBUG) 
+        std::cout << "[ADHOC_HELPER]:[DEBUG]: Source node = " << getStringFromIp(source) 
+                  << " to destinatio node = " << getStringFromIp(dest) << std::endl;
+
     Ptr<Node> sourceNode = AdHocRoutingHelper::m_existingNodes[source];
     Ptr<Node> destNode = AdHocRoutingHelper::m_existingNodes[dest];
 
     if (dest == getIpFromString(BROADCAST_STR))
     {
-        // set destination to broadcast  
+        // set destination to broadcast
         Ipv4Address destAddr(getIpFromString(BROADCAST_STR));
 
         // create socket between nodes 
@@ -42,11 +51,10 @@ int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, 
         header.SetSource(sourceNode->GetObject<Ipv4>()->GetAddress(1,0).GetLocal());
         packet->AddHeader(header);
 
-        socket->Send(packet);
+        return socket->Send(packet);
     }
     else 
     {
-        // set destination to this node and broadcast
         Ptr<Ipv4> destIpv4 = destNode->GetObject<Ipv4>(); // Get Ipv4 instance of the node
         Ipv4Address destAddr = destIpv4->GetAddress (1, 0).GetLocal();  
 
@@ -63,15 +71,17 @@ int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, 
         header.SetSource(sourceNode->GetObject<Ipv4>()->GetAddress(1,0).GetLocal());
         packet->AddHeader(header);
 
-        socket->Send(packet);
+        return socket->Send(packet);
     }
-
-    return 0;
 }
 
 void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
 {
     Ptr<Packet> packet;
+
+    // Add this packet to the buffer of current packets and make callback to remove it in 1 second 
+    int packetSize = socket->GetRxAvailable();
+
     while (packet = socket->Recv ())
     {
         Ipv4Header header;
@@ -88,14 +98,6 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         
         Ptr<Ipv4> ipv4 =  socket->GetNode()->GetObject<Ipv4> (); // Get Ipv4 instance of the node
 
-/*        Address address;
-        socket->GetPeerName (address);
-        InetSocketAddress iaddr = InetSocketAddress::ConvertFrom (address);
-
-        std::cout << "Received one packet!  Socket: " << iaddr.GetIpv4 () << " port: " << iaddr.GetPort ();
-        uint16_t port = iaddr.GetPort(); 
-*/
-
         if (DEBUG)
             std::cout << "[DEBUG]: Received data on port " << socket->m_port << std::endl;
 
@@ -110,19 +112,54 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         if (DEBUG)
             std::cout << "[DEBUG]: Node " << getStringFromIp(socket->GetNode()->m_nodeIp) << " from Node " << getStringFromIp(source) << std::endl;
 
-        pair_data data;
-        // TODO: Fill pair data 
-        data.pairIp = source; 
-        data.rss = tag.GetRssValue();
+        pair_data packetPairData;
+        packetPairData.pairIp = source; 
+        packetPairData.rss = tag.GetRssValue();
 
         if (DEBUG)
-            std::cout << "[DEBUG]: Received RSS: " << data.rss << std::endl;
+            std::cout << "[DEBUG]: Received RSS: " << packetPairData.rss << std::endl;
 
-        socket->GetNode()->m_AdHocRoutingHelper->receivePacketWithPairData((char*)(packetBuffer), length, source, socket->m_port, data);
+        // Add the packet to this nodes buffer 
+        SimPacket packet;
+        packet.data = (char*)packetBuffer;
+        packet.length = length;
+        packet.packetPairData = packetPairData;
+        packet.portId = socket->m_port;
+        packet.source = source;
+
+        AdHocRoutingHelper* adhocRoutingHelper = socket->GetNode()->m_AdHocRoutingHelper;
+
+        // Log this interaction as a 'hello' message
+        adhocRoutingHelper->helloMonitor->receiveHelloMessage(source);
+
+        // Update network statistics
+        // Update rss 
+        adhocRoutingHelper->updateLinkRss(source, packetPairData.rss);
+        // Update bandwidth 
+        adhocRoutingHelper->updateLinkBandwidth(packetSize); 
+
+        // Push the packet onto the packet queue and then handle it
+        adhocRoutingHelper->packetQueue.push(packet);
+        adhocRoutingHelper->handlePackets();
     }
 }
 
-uint32_t AdHocRoutingHelper::getNs3SimulatedTimeMS()
+void RemovePacketFromBandwidthMetric(AdHocRoutingHelper* adhocRoutingHelper, int numberOfBits)
+{
+    adhocRoutingHelper->increaseAvailableBandwidthByBits(numberOfBits);
+}
+
+void AdHocRoutingHelper::updateLinkBandwidth(uint32_t bandwidthBytes)
+{
+    // Add this packet to current bandwidth and remove it after a second 
+    int numberOfBits = bandwidthBytes * 8;
+    this->m_availableBandwidthBits -= numberOfBits; 
+
+    // since our metric is in Mbps, we will remove these bits in 1 second 
+    Simulator::Schedule(Seconds(1.0), &RemovePacketFromBandwidthMetric, this, numberOfBits);
+}
+
+uint64_t AdHocRoutingHelper::getNs3SimulatedTimeMS()
 {
     return (uint32_t)Simulator::Now().GetMilliSeconds();
 }
@@ -134,35 +171,66 @@ double AdHocRoutingHelper::getNs3SimulatedBattery(IP_ADDR nodeIp)
     return node->m_battery;
 }
 
-AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp)
+void AdHocRoutingHelper::waitSimulatedTimeForHelloMonitor(int DURATION_MS, SimHelloMonitor* waitingHello)
+{
+    // duration of 1 so we do 1 iteration and then stop
+    // we do this because in a discrete event simulator we can't keep track of time easily
+    // instead we schedule sends every DURATION_MS
+    waitingHello->sendHellos(1);
+
+    Simulator::Schedule(MilliSeconds(DURATION_MS), &waitSimulatedTimeForHelloMonitor, DURATION_MS, waitingHello);
+}
+
+void dumbySleep(int DURATION_MS)
+{
+}
+
+AdHocRoutingHelper::AdHocRoutingHelper(Ptr<Node> node, IP_ADDR nodeIp) : SimAODV(nodeIp)
 {
     m_node = node;
     m_node->m_AdHocRoutingHelper = this;
 
     AdHocRoutingHelper::m_existingNodes[nodeIp] = node;
+    // Override simSocketSendPacket to use ns3 sockets
+    this->simSocketSendPacket = &AdHocSendPacket;
+    std::cout << "[ADHOC_HELPER]:[INFO]: Using ns3 simSocketSendPacket" << std::endl;
 
-    // create a routing protocol 
-    AODVSim* aodv = new AODVSim(nodeIp);
-    this->routing = aodv;
-    std::cout << "[WARNING]: Must override AODV simSocketSend" << std::endl;
-    aodv->simSocketSendPacket = &AdHocSendPacket;
-    std::cout << "[INFO]: Override successful." << std::endl;
-
-    // create network monitoring 
+    // create network monitoring
+    // NOTE: This is for battery level ONLY right now 
     REMSim* rem = new REMSim(nodeIp);
     rem->getSimulatedBatteryLevel = &(AdHocRoutingHelper::getNs3SimulatedBattery);
     rem->getSimulatedTime = &(AdHocRoutingHelper::getNs3SimulatedTimeMS);
-    rem->routing = aodv;
+    rem->routing = this;
 
     rem->initialize(nodeIp);
-    this->monitor = rem;
-    std::cout << "[WARNING]: Must override REM getSimulatedBattery and getSimulatedTime" << std::endl;
-    std::cout << "[INFO]: Override successful." << std::endl;
+    // assign SimAODV networkMonitor to this rem
+    this->networkMonitor = rem;
+    rem->setPortId(MONITOR_PORT);
+
+    // add port to AdHocRoutingHelper
+    std::cout << "[ADHOC_HELPER]:[INFO]: Added REM port" << std::endl;
+    this->addPort(rem);
+
+    // create hello monitoring 
+    SimHelloMonitor* hello = new SimHelloMonitor(HELLO_PORT, this);
+    this->helloMonitor = hello;
+    // because this is a discrete event simulator, actually waiting doesn't make sense
+    // we need to schedule
+    hello->waitSimulatedTime = &(dumbySleep);
+    hello->getSimulatedTime = &(AdHocRoutingHelper::getNs3SimulatedTimeMS);
+
+    // add port to AdHocRoutingHelper
+    std::cout << "[ADHOC_HELPER]:[INFO]: Added hello monitor port" << std::endl;
+    this->addPort(hello);
+
+    // create print packet port 
+    PrintPort* printPort = new PrintPort(DATA_PORT);
+    this->addPort(printPort);
+    std::cout << "[ADHOC_HELPER]:[INFO]: Added print port" << std::endl;
 
     std::cout << "[WARNING]: Must start a recurring event to call monitor->updateLocalModels" << std::endl;
-
     std::cout << "[WARNING]: Use AdHocRoutingHelper sendPacket and receivePacket functions." << std::endl;
 }
 
+// close ns3 namespace
 }
-

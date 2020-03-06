@@ -17,18 +17,16 @@
 #include "aodv_rerr.h"
 #include "aodv_params.h"
 
-#include "send_packet.h"
+#include "routing_protocol.h"
 
 #include <vector>
 #include <functional>
 #include <queue>
 
-struct packet
-{
+struct BufferedPacket{
+	int portId;
 	char* buffer;
-	uint32_t length;
-	uint32_t id;
-	uint16_t ttl;
+	int length;
 };
 
 class AODV : public RoutingProtocol
@@ -40,46 +38,29 @@ public:
 	AODV(IP_ADDR ip);
 	~AODV();
 
-	// handle received data. if not in routing table, attempt local fix and then RERR 
-	void receivePacket(char* packet, int length, IP_ADDR source);
-	// try to send data to a destination - the next hop is determined from the routing table  
-	void sendPacket(char* packet, int length, IP_ADDR finalDestination, IP_ADDR origIP = -1);
-
-//	static int ROUTING_PORT;
-
-	// decode a received packet buffer from UPD port 654
-	void decodeReceivedPacketBuffer(char* packet, int length, IP_ADDR source, int port);
-
-	// RREQ - Route Request 
-	RREQHelper rreqHelper;
-	// broadcast rreq to all neighbors
-	void broadcastRREQBuffer(rreqPacket rreq);
-	// make a decision on a received rreq packet using the rreq helper 
-	void handleRREQ(char* buffer, int length, IP_ADDR source);
-
-	// RREP - Route Reply
-	RREPHelper rrepHelper;
-	// handle a received rrep message 
-	void handleRREP(char* buffer, int length, IP_ADDR source);
-
-	// RERR - Route Error
-	RERRHelper rerrHelper;
-	// handle a received rerr message 
-	void handleRERR(char* buffer, int length, IP_ADDR source);
-
+	/**
+     * @brief Send a packet to a given ip address using a specified port
+     * 
+     * @param portId the port number to use
+     * @param packet the packet to send
+     * @param length the length of the packet
+     * @param dest the destination ip address
+     * @param origIP IP address where the packet was from
+     */
+	//TODO: Actually make this return false on a failure, currently is a silent failure
+    virtual bool sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADDR origIP = -1) override;
+	
 	// Network Monitoring
-	void repairLink(IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP, int port);
-	bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
-	void getOneHopNeighbors();
+	// attempt to repair the link and then send the packet to its destination
+	virtual void repairLink(int port, IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP);
+	// attempt to repair the link
+	virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
 
 	// output the current contents of the routing table 
 	void logRoutingTable();
 
 	// get the routing table 
-	AODVRoutingTable* getTable() { return m_aodvTable; } 
-
-	// map of rreq ids and their corresponding packet to be sent once the route is established
-	map<IP_ADDR, queue<pair<char*, int>>> rreqPacketBuffer;
+	AODVRoutingTable* getTable() { return (AODVRoutingTable*) m_pRoutingTable; } 
 
 protected:
 	// node sequence number. MUST increment on a route discovery
@@ -87,56 +68,63 @@ protected:
 	// node rreq id. Incremented by one during route discovery
 	uint32_t rreqID;
 	// aodv routing table
-	AODVRoutingTable* m_aodvTable;
+//	AODVRoutingTable* m_aodvTable;
 	// current packet id index
 	uint32_t packetIdCount;	
-	// map of destination and recently sent packets (packets will time out after a short time) 
-	map<IP_ADDR, queue<packet>> unackedPacketBuffer;
-	// store received data packets which are for this ip
-	vector<pair<char*, int>> receivedPackets;
-};
+	// map of rreq ids and their corresponding packet to be sent once the route is established
+	// TODO: Fix up for port stuff
+	map<IP_ADDR, queue<BufferedPacket>> rreqPacketBuffer;
 
-/* AODVTest class
- * For testing AODV with unit tests. */
-class AODVTest : public AODV
-{
-public: 	
-	// debugging values 
-	static int globalPacketCount;
-	static IP_ADDR lastNode; 
-	static IP_ADDR lastReceive;
+	// RREQ - Route Request 
+	RREQHelper rreqHelper;
+	// broadcast rreq to all neighbors
+	void _broadcastRREQBuffer(rreqPacket rreq);
+	// make a decision on a received rreq packet using the rreq helper 
+	void _handleRREQ(char* buffer, int length, IP_ADDR source);
 
-	AODVTest(IP_ADDR ip) : AODV(ip) {}
-	AODVTest(const char* ip) : AODV(ip) {}
-	~AODVTest() { m_physicalNeighbors.clear(); }
+	// RREP - Route Reply
+	RREPHelper rrepHelper;
+	// handle a received rrep message 
+	void _handleRREP(char* buffer, int length, IP_ADDR source);
 
-	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port);
+	// RERR - Route Error
+	RERRHelper rerrHelper;
+	// handle a received rerr message 
+	void _handleRERR(char* buffer, int length, IP_ADDR source);
 
-	// Network Monitoring 
+	// Functions
+	/**
+	 * @brief Takes in a packet and routes it in the network or to the desired port
+	 * 
+	 * @param portId the port id to send from/to
+	 * @param buffer the data to be sent, needs to contain the AODV header
+	 * @param length the length of that data
+	 * @param source the ip address the packet was received from
+	 */
+	virtual void _handlePacket(int portId, char *buffer, int length, IP_ADDR source);
+	/**
+	 * @brief Takes in a packet and routes it in the network or to the desired port
+	 * 
+	 * @param port the port class to send from/to
+	 * @param buffer the data to be sent, needs to contain the AODV header
+	 * @param length the length of that data
+	 * @param source the ip address the packet was received from
+	 */
+	void _handlePacket(Port* p, char *buffer, int length, IP_ADDR source);
 
-	// add/remove node to neighbor list
-	void addNeighbor(AODVTest* node);
-	void removeNeighbor(AODVTest* node);
+	// handle data for AODV
+	void _handleAODVPacket(char *buffer, int length, IP_ADDR source);
 
-	// return true if node is neighbor
-	bool isNeighbor(AODVTest node);
+	// Send the data over a socket
+	bool _socketSendPacket(Port* port, char *buffer, int length, IP_ADDR dest);
 
-	// see if packet was put in queue
-	bool packetInRreqBuffer(IP_ADDR dest);
-
-private:
-	vector<AODVTest*> m_physicalNeighbors;
-
-};
-
-class AODVMonitorTest : public AODVTest 
-{
-public:
-	int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) override;
-
+	// Virtual Functions
+	virtual bool _socketSendPacket(int portId, char *buffer, int length, IP_ADDR dest) = 0;
 };
 
 // retry the route request message if you don't receive one
 void retryRouteRequestIfNoRREP(AODV* aodv, rreqPacket sendRREQ, int numberOfRetriesRemaining);
+
+
 
 #endif

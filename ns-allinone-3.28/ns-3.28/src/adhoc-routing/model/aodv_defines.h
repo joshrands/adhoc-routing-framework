@@ -4,9 +4,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "defines.h"
 
-#define BROADCAST_STR       "255.255.255.255"
+#include "defines.h"
+#include "adhoc_defines.h"
+
 #define HEADER_SIZE         9
 
 #define GLOBAL_AODV_DEBUG   1
@@ -17,7 +18,7 @@
 #define RREQ_DEBUG		    DEBUG && 1 && GLOBAL_AODV_DEBUG
 #define RREP_DEBUG		    DEBUG && 1 && GLOBAL_AODV_DEBUG
 #define RERR_DEBUG          DEBUG && 1 && GLOBAL_AODV_DEBUG
-#define TABLE_DEBUG         DEBUG && 1 && GLOBAL_AODV_DEBUG
-#define MONITOR_DEBUG       DEBUG && 1 && GLOBAL_AODV_DEBUG
+#define AODV_WARNING        1
+
 
 #endif

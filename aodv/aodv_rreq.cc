@@ -25,14 +25,14 @@ bool RREQHelper::shouldGenerateRREP(rreqPacket receivedRREQ)
 	if (receivedRREQ.destIP == this->m_ip)
 	{
 		if (RREQ_DEBUG)
-			cout << "[DEBUG]: RREQ reached final destination. Generating RREP..." << endl;
+			cout << "[RREQ]:[DEBUG]: RREQ reached final destination. Generating RREP..." << endl;
 
 		return true;
 	}
 	else if (this->m_pTable->getNextHop(receivedRREQ.destIP) != 0 && this->m_pTable->getIsRouteActive(receivedRREQ.destIP))
 	{
 		if (RREQ_DEBUG)
-			cout << "[DEBUG]: This node " << getStringFromIp(this->m_ip) << " has a path to the final node in its routing table." << endl;
+			cout << "[RREQ]:[DEBUG]: This node " << getStringFromIp(this->m_ip) << " has a path to the final node in its routing table." << endl;
 
 		return true;
 	}
@@ -71,7 +71,7 @@ bool RREQHelper::isDuplicateRREQ(rreqPacket receivedRREQ)
 		if (m_receivedRREQIds[receivedRREQ.origIP].size() > OLD_RREQ_COUNT)
 		{
 			if (RREQ_DEBUG)
-				cout << "[DEBUG]: RREQ ID buffer at capacity, erasing old IDs" << endl;
+				cout << "[RREQ]:[DEBUG]: RREQ ID buffer at capacity, erasing old IDs" << endl;
 			// add capacity... remove an old rreqId
 			m_receivedRREQIds[receivedRREQ.origIP].erase(m_receivedRREQIds[receivedRREQ.origIP].begin());
 		}
@@ -83,7 +83,7 @@ rreqPacket RREQHelper::createRREQ(const IP_ADDR destIP, const uint32_t destSeqNu
 {
 	// Section 6.3 rfc3561
 	if (RREQ_DEBUG)
-		cout << "[DEBUG]: Creating Route Request message from " << getStringFromIp(this->m_ip) << " to " << getStringFromIp(destIP) << endl;
+		cout << "[RREQ]:[DEBUG]: Creating Route Request message from " << getStringFromIp(this->m_ip) << " to " << getStringFromIp(destIP) << endl;
 
 	// there is no current path to the destination, create a RREQ 
 	rreqPacket rreq; 

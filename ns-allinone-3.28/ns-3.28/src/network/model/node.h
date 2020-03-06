@@ -27,10 +27,11 @@
 #include "ns3/callback.h"
 #include "ns3/ptr.h"
 #include "ns3/net-device.h"
-//#include "ns3/basic-energy-source-helper.h"
-//#include "ns3/basic-energy-source.h"
 
+/**** CSM SmallSat Includes ****/
+#include "ns3/defines.h"
 #include "ns3/adhoc-routing-helper.h"
+/*******************************/
 
 namespace ns3 {
 

@@ -1,3 +1,0 @@
-    // start this thread for hardware implementations... 
-//    localUpdateThread = thread(runLocalModelUpdateThread, this, &(this->localUpdateMutex));
-//    localUpdateThread.detach();

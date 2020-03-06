@@ -10,6 +10,7 @@
  ********************************/
 
 #include "aodv_defines.h"
+#include "aodv_params.h"
 #include "aodv_packets.h"
 #include "aodv_routing_table.h"
 
@@ -19,8 +20,6 @@ public:
 	// default constructor
 	RREPHelper();
 	RREPHelper(IP_ADDR ip, AODVRoutingTable* table, uint32_t* seqNum);
-
-	uint32_t MY_ROUTE_TIMEOUT_MS = 10000;
 
 	void setIp(const IP_ADDR ip) { this->m_ip = ip; }
 	void setRoutingTable(AODVRoutingTable* table) { this->m_pTable = table; }

@@ -8,6 +8,11 @@
  ********************************/
 
 #define NET_TRAVERSAL_TIME_MS       1000
-#define RREQ_RETRIES                0
+#define ROUTE_TIMEOUT_MS 10000
+#define RREQ_RETRIES 0
 
 #define OLD_RREQ_COUNT              100
+
+
+
+
