@@ -1,4 +1,4 @@
-# Ad hoc Network Routing Protocol Implementations
+# Ad-hoc Routing Framework for Hardware and Simulation
 
 ### NASA SmallSat Project - Colorado School of Mines
 
@@ -28,37 +28,37 @@ The tests for this module should run. PASS indicates the test passed and FAIL in
 
 ### ADHOC
 
-Desc: Infrastructure for providing ad-hoc communication. 
+Infrastructure for providing ad-hoc communication. 
 [code here](adhoc)
 
 ### HARDWARE
 
-Desc: Hardware interfacing for components of ad-hoc routing.
+Hardware interfacing for components of ad-hoc routing.
 [code here](hardware)
 
 ### SIMULATION
 
-Desc: Simulation interfacing for components of ad-hoc routing.
+Simulation interfacing for components of ad-hoc routing.
 [code here](simulation)
 
 ### AODV 
 
-Desc: AODV Protocol implemented from AODV RFC3561 (https://www.ietf.org/rfc/rfc3561.txt)
+AODV Protocol implemented from AODV RFC3561 (https://www.ietf.org/rfc/rfc3561.txt)
 [code here](aodv)
 
 ### HELLO_MONITOR
 
-Desc: Hello messages to provide primitive network monitoring of one hop neighbors. 
+Hello messages to provide primitive network monitoring of one hop neighbors. 
 [code here](hello_monitor)
 
 ### REM
 
-Desc: Implementation of REgression-based network Monitoring (https://dl.acm.org/doi/abs/10.1145/3360774.3360795)
+Implementation of REgression-based network Monitoring (https://dl.acm.org/doi/abs/10.1145/3360774.3360795)
 [code here](rem)
 
 ### SOCKET
 
-Desc: UDP Sockets and helper classes. 
+UDP Sockets and helper classes. 
 [code here](socket)
 
 ## Bugs
