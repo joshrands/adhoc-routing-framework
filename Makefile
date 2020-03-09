@@ -10,7 +10,7 @@
 CXX = g++
 LD = g++
 LIB = ar
-INC_DIRS = -I./aodv -I./monitoring -I./hardware -I./socket -I./adhoc -I./ 
+INC_DIRS = -I./aodv -I./monitoring -I./hardware -I./socket -I./adhoc -I./ -I./data_structures
 
 CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
 LDFLAGS = -g -pthread ${INC_DIRS}
@@ -25,7 +25,7 @@ STATIC_LIBRARIES = hardware/libhardware.a adhoc/libadhoc.a
 OBJ_FILES = ${OBJ_LIB_FILES} 
 INC_FILES = 
 
-SUBDIRS = aodv socket hardware adhoc hello_monitor rem 
+SUBDIRS = aodv socket hardware adhoc hello_monitor rem data_structures
 
 ${TARGET}: #${OBJ_FILES}
 	${CXX} -c ${CXXFLAGS} ${TARGET}.cc -o ${TARGET}.o

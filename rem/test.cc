@@ -46,6 +46,7 @@ int main (int argc, char *argv[])
 
 
 	cout << "[TESTS]: TESTS COMPLETE." << endl;
+	printf("________________________________\n\n");
 
 	return 0;
 }
