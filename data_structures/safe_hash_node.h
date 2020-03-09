@@ -14,14 +14,14 @@
 
 // Class representing a templatized hash node
 template <typename K, typename V>
-class HashNode
+class SafeHashNode
 {
     public:
-        HashNode() : next(nullptr)
+        SafeHashNode() : next(nullptr)
         {}
-        HashNode(K key_, V value_) : next(nullptr), key(key_), value(value_)
+        SafeHashNode(K key_, V value_) : next(nullptr), key(key_), value(value_)
         {}
-        ~HashNode() 
+        ~SafeHashNode() 
         {
             next = nullptr;
         }
@@ -30,7 +30,7 @@ class HashNode
         void setValue(V value_) {value = value_;}
         const V& getValue() const {return value;}
 
-        HashNode *next; //Pointer to the next node in the same bucket
+        SafeHashNode *next; //Pointer to the next node in the same bucket
     private:
         K key;   //the hash key
         V value; //the value corresponding to the key
@@ -58,7 +58,7 @@ class HashBucket
         {
             // A shared mutex is used to enable mutiple concurrent reads
             std::shared_lock<std::shared_timed_mutex> lock(mutex_); 
-            HashNode<K, V> * node = head;
+            SafeHashNode<K, V> * node = head;
 
             while (node != nullptr)
             {
@@ -78,8 +78,8 @@ class HashBucket
         {
             //Exclusive lock to enable single write in the bucket
             std::unique_lock<std::shared_timed_mutex> lock(mutex_);
-            HashNode<K, V> * prev = nullptr;
-            HashNode<K, V> * node = head;
+            SafeHashNode<K, V> * prev = nullptr;
+            SafeHashNode<K, V> * node = head;
 
             while (node != nullptr && node->getKey() != key)
             {
@@ -91,11 +91,11 @@ class HashBucket
             {
                 if(nullptr == head)
                 {
-                    head = new HashNode<K, V>(key, value);
+                    head = new SafeHashNode<K, V>(key, value);
                 }
                 else
                 {
-                    prev->next = new HashNode<K, V>(key, value);                 
+                    prev->next = new SafeHashNode<K, V>(key, value);                 
                 }
             }
             else
@@ -110,8 +110,8 @@ class HashBucket
         {
             //Exclusive lock to enable single write in the bucket
             std::unique_lock<std::shared_timed_mutex> lock(mutex_);
-            HashNode<K, V> *prev  = nullptr;
-            HashNode<K, V> * node = head;
+            SafeHashNode<K, V> *prev  = nullptr;
+            SafeHashNode<K, V> * node = head;
 
             while (node != nullptr && node->getKey() != key)
             {
@@ -142,8 +142,8 @@ class HashBucket
         {
             //Exclusive lock to enable single write in the bucket
             std::unique_lock<std::shared_timed_mutex> lock(mutex_);
-            HashNode<K, V> * prev = nullptr;
-            HashNode<K, V> * node = head;
+            SafeHashNode<K, V> * prev = nullptr;
+            SafeHashNode<K, V> * node = head;
             while(node != nullptr)
             {
                 prev = node;
@@ -154,7 +154,7 @@ class HashBucket
         }
 
     private:
-        HashNode<K, V> * head; //The head node of the bucket
+        SafeHashNode<K, V> * head; //The head node of the bucket
         mutable std::shared_timed_mutex mutex_; //The mutex for this bucket
 };
 

@@ -26,23 +26,23 @@ constexpr size_t HASH_SIZE_DEFAULT = 1031; // A prime number as hash size gives 
 //during the creation of the bucket. All the hash buckets are created during the construction of the map.
 //Locks are taken per bucket, hence multiple threads can write simultaneously in different buckets in the hash map
 template <typename K, typename V, typename F = std::hash<K> >
-class HashMap
+class SafeHashMap
 {
     public:
-        HashMap(size_t hashSize_ = HASH_SIZE_DEFAULT) : hashSize(hashSize_)
+        SafeHashMap(size_t hashSize_ = HASH_SIZE_DEFAULT) : hashSize(hashSize_)
         {
             hashTable = new HashBucket<K, V>[hashSize]; //create the hash table as an array of hash buckets
         }
 
-        ~HashMap()
+        ~SafeHashMap()
         {
             delete [] hashTable;
         }
         //Copy and Move of the HashMap are not supported at this moment
-        HashMap(const HashMap&) = delete;
-        HashMap(HashMap&&) = delete;
-        HashMap& operator=(const HashMap&) = delete;  
-        HashMap& operator=(HashMap&&) = delete;
+        SafeHashMap(const SafeHashMap&) = delete;
+        SafeHashMap(SafeHashMap&&) = delete;
+        SafeHashMap& operator=(const SafeHashMap&) = delete;  
+        SafeHashMap& operator=(SafeHashMap&&) = delete;
     
         //Function to find an entry in the hash map matching the key.
         //If key is found, the corresponding value is copied into the parameter "value" and function returns true.
