@@ -1,64 +1,69 @@
-# Ad hoc Network Routing Protocol Implementations
+# Ad-hoc Routing Framework for Hardware and Simulation
 
 ### NASA SmallSat Project - Colorado School of Mines
 
-Classes designed for physical implementation and simulated implementation of an ad-hoc network on a single decentralized subnet.
-
-Author: Josh Rands
-
-## To Do
-
-### Overhaul
-
-Planned overhaul of code architecture:
-
-AdHocRouting - wrapper for sending and receive packets on the network
-
-Monitoring - handle the monitoring of the network and links for routing 
-
-RoutingProtocol - send and recieve packets using underlying routing protocol and also deliver to the correct Port (Transport layer) 
-
-Update AdhocRouting receive packet to use high level abstract receive packet of member routing protocol 
-  - adhoc-routing-helper receive packet should be in AODVSim handlePackets
-
-### Other Things
-
-1. Make update local models abstract? Or at least make time match current system some how... 
-2. Update aodv get neighbors when local models are updated
-3. Move aodv updateNeighbors to generic NetworkMonitor
-
-### Bugs
-
-0. Aodv's decodeReceivedPacket does not care about ports... if a data packet is sent with 0x01 as the first byte it will be classified as a RREQ message. 
-
-### AODV 
-
-AODV Protocol: https://www.ietf.org/rfc/rfc3561.txt
-[code here](aodv)
-
-### SOCKET
-[code here](socket)
-
-### ADHOC-HARDWARE
-[code here](hardware)
-
-### AODV-REM
-1. Add network monitoring 
-
-### ns3 Simulation
-1. Create a module with this aodv
-  - https://www.nsnam.org/docs/manual/html/new-modules.html
+Classes designed for physical implementation as well as simulated implementation of an ad-hoc network on a single decentralized subnet.
 
 ## Running the code
 
-This code is currently stand alone classes, but I added test.cc to so we can test while we develop. 
+This codebase is organized into several 'modules'. Modules are code grouped in a subdirectory of the main directory. Each module has been developed with a built in test framework and is compiled into a shared object (.so) file for linking capabilities. 
 
-1. Clone this repository 
-2. Using a terminal, type 'make clean-all & make all'
-3. Code should compile and you can run ./do-adhoc to start doing ad hoc! 
+### Testing Modules
 
-I use Visual Studio Code to develop. It has a nice built in terminal. <- Cool story bro <<-- Thanks mayn 
+Each module has a 'test.cc' file used for testing. Use the following tests to test a module: 
 
+1. Navigate to the module directory in a terminal
+2. Type 'make clean'
+3. Type 'make'
+4. Type './test'
+
+The tests for this module should run. PASS indicates the test passed and FAIL indicates that the test failed. 
+
+### Using NS3
+
+1. Create a module with this aodv
+  - https://www.nsnam.org/docs/manual/html/new-modules.html
+
+## Code Overview
+
+### ADHOC
+
+Infrastructure for providing ad-hoc communication. 
+[code here](adhoc)
+
+### HARDWARE
+
+Hardware interfacing for components of ad-hoc routing.
+[code here](hardware)
+
+### SIMULATION
+
+Simulation interfacing for components of ad-hoc routing.
+[code here](simulation)
+
+### AODV 
+
+AODV Protocol implemented from AODV RFC3561 (https://www.ietf.org/rfc/rfc3561.txt)
+[code here](aodv)
+
+### HELLO_MONITOR
+
+Hello messages to provide primitive network monitoring of one hop neighbors. 
+[code here](hello_monitor)
+
+### REM
+
+Implementation of REgression-based network Monitoring (https://dl.acm.org/doi/abs/10.1145/3360774.3360795)
+[code here](rem)
+
+### SOCKET
+
+UDP Sockets and helper classes. 
+[code here](socket)
+
+## Bugs
+
+0. Aodv's decodeReceivedPacket does not care about ports... if a data packet is sent with 0x01 as the first byte it will be classified as a RREQ message. 
 
 ## Questions
 [better route vs duplicate?](aodv/aodv_rreq.cc:57)

@@ -68,7 +68,6 @@ public:
   /*! Close the socket
    */
   void sclose();
-
 protected:
   int sockfd;
   bool initSocket(int type);

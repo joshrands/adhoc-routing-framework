@@ -42,6 +42,7 @@
 
 using namespace ns3;
 
+/*
 NodeContainer c;
 //AODVns3* aodvArray[NUM_NODES];
 map< IP_ADDR, Ptr<Node> > nodeMap;
@@ -276,3 +277,4 @@ int main (int argc, char *argv[])
 
   return 0;
 }
+*/

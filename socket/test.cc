@@ -1,6 +1,3 @@
-#include "endpoint.h"
-#include "safe_circular_queue.h"
-#include "udp_socket.h"
 #include <assert.h>
 #include <iomanip>
 #include <iostream>
@@ -10,6 +7,9 @@
 #include <thread>
 #include <time.h>
 #include <utility>
+
+#include "endpoint.h"
+#include "udp_socket.h"
 using namespace std;
 
 const string RED = "\033[1;31m";
@@ -24,11 +24,11 @@ void test(bool condition, string desc)
 		cout << RED << "[FAIL]: " << desc << END;
 }
 
-void test(bool condition, char *desc) {
+void test(bool condition, const char *desc) {
     if (condition) {
-        cout << GREEN << "[PASS]: " << desc << endl;
+        cout << GREEN << "[PASS]: " << desc << END;
     } else
-        cout << RED << "[FAIL]: " << desc <<endl;
+        cout << RED << "[FAIL]: " << desc << END;
 }
 
 bool getYesNo(string message) {
@@ -146,47 +146,6 @@ void broadcastMessage(UDPSocket *broadcastingSocket, Endpoint end,
     } while (broadcastingSocket->getMessage(messageReceive));
 }
 
-void testCircularQueue() {
-    SafeCircularQueue<int> q(5);
-    // Cannot pop empty queue
-
-    // push 3 things on, pull them off check that they are good
-    for (int i = 0; i < 5; i++) {
-        q.push(i);
-    }
-    for (int i = 0; i < 5; i++) {
-        int elem;
-        q.pop(elem);
-        test(elem == i, "Basic pushing and popping");
-    }
-    test(q.empty(), "Queue is empty after all elements popped");
-    test(!q.pop(), "Cannot pop empty queue");
-    // Do that again check for wrapping
-    for (int i = 0; i < 3; i++) {
-        q.push(i);
-    }
-    for (int i = 0; i < 3; i++) {
-        int elem;
-        q.pop(elem);
-        test(elem == i, "Wrapping during pushing and popping");
-    }
-    test(q.empty(), "Queue is empty after all elements popped");
-    test(!q.pop(), "Cannot pop empty queue");
-
-    // Filler up, fill some more see what happens (it should overwrite the
-    // oldest data but still access oldest to youngest)
-    for (int i = 0; i < 7; i++) {
-        q.push(i);
-    }
-    for (int i = 2; i < 7; i++) {
-        int elem;
-        q.pop(elem);
-        test(elem == i, "Handles overfilling correctly");
-    }
-    test(q.empty(), "Queue is empty after all elements popped");
-    test(!q.pop(), "Cannot pop empty queue");
-}
-
 /*!
  * @brief Create a Threaded Socket object
  *
@@ -207,10 +166,6 @@ UDPSocket *createThreadedSocket(thread &returnThread, int port) {
 }
 
 int main() {
-    // Test circular queue
-    { testCircularQueue(); }
-    printf("________________________________\n\n");
-
     // Test initialization and ports
     {
         UDPSocket nonboundSocket;

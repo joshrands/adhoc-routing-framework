@@ -6,12 +6,13 @@
 #  Modified by Josh Rands on 9/2/19
 #  Copyright 2012 Colorado School of Mines. All rights reserved.
 #
-
 CXX = g++
 LD = g++
 LIB = ar
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK 
-LDFLAGS = -g -pthread
+INC_DIRS = -I../ -I../data_structures
+
+CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
+LDFLAGS = -g -std=c++11 -pthread ${INC_DIRS}
 LIBFLAGS = -cvq
 
 #
@@ -22,11 +23,10 @@ LIB_NAME = libsocket.a
 OBJ_LIB_FILES = endpoint.o socket.o udp_socket.o  message.o 
 
 OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES} 
-INC_FILES = endpoint.h socket.h udp_socket.h message.h safe_queue.h ../defines.h socket_defines.h
+INC_FILES = endpoint.h socket.h udp_socket.h message.h ../data_structures/* ../defines.h socket_defines.h
 
 # Any libraries we might need.
 LIBRARYS = -lpthread
-
 
 ${TARGET}: ${OBJ_FILES}
 	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}

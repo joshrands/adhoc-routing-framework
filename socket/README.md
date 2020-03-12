@@ -6,10 +6,8 @@ UDP Sockets and helper classes. Sockets can have threaded listening on a port wh
 which will be stored in a circular queue which overwrites the oldest data in the queue
 
 ## To-Do
-0. Add rssi metric monitoring to message class 
-    - ioctl failed, look into packet sniffing (libpcap)
-1. Rework code to make Message a struct and remove Endpoint
-2. Comment code
+0. Rework code to make Message a struct and remove Endpoint
+1. Comment code
 
 ## How to test this code:
 0. In a terminal, cd into the socket directory
@@ -28,16 +26,10 @@ which will be stored in a circular queue which overwrites the oldest data in the
 
 [message](message.h) - Stores packets and their endpoint
 
-[circular queue](circular_queue.h) - Implementation of a circular queue where when the queue is full new data overwrites previous data
-
-[safe circular queue](safe_circular_queue.h) - Wrapper of [circular queue](circular_queue.h) which is thread safe
-
-[safe queue](safe_queue.h) - Wrapper of std::queue which is thread safe (can be swapped in instead of circular queue in threaded receiving)
-
 [socket](socket.h) - Base class for a socket supports socket initialization and setting socket options
 
 [udp socket](udp_socket.h) - Inherits from socket but implements a UDP Socket with the ability to send packets and safely thread the socket to listen to a specified port
 
 [socket defines](socket_defines.h) - Global defines used for debugging, logging, also sets the maxSize of the circular queue used in threading
 
-[test](test.cc) - Tests udp_socket and circular queue functionality
+[test](test.cc) - Tests udp_socket functionality

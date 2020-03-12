@@ -14,12 +14,14 @@
 
 class HardwareAODV : public AODV{
 private:
-    UDPSocket* aodvSocket;
-    UDPSocket* dataSocket;
-    thread aodving;
-    thread dataing;
-
     void _hardwareAODV();
+    
+protected:
+    unordered_map<int, thread> portThreads;
+    unordered_map<int, UDPSocket*> portSockets;
+    UDPSocket* aodvSocket;
+    thread aodving;
+
 public:
     // Constructors
 
@@ -31,30 +33,25 @@ public:
      * @param ip the ip address of the current device
      */
     HardwareAODV(uint32_t ip);
-    HardwareAODV(uint32_t ip, int aodv_port, int data_port);
     HardwareAODV(const char* ip);
 
     // Destructors
     ~HardwareAODV();
 
-    // Override functions
-    int socketSendPacket(char *buffer, int length, IP_ADDR dest, int port) override;
-    
-    // Class methods
-    
-    /*!
-     * @brief Reads all messages from sockets and has AODV handle them accordingly
-     * 
-     * @return -1 if no packets or the number of packets handled
-     */
-    int handlePackets();
+    virtual int handlePackets() override;
+	
+	// Network Monitoring
+	// attempt to repair the link and then send the packet to its destination
+	//virtual void repairLink(int port, IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP);
+	// attempt to repair the link
+	//virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
+	// get the next door neighbors in the network
+	//virtual void getOneHopNeighbors();
 
-    /*!
-     * @brief Returns one of the packets on the data socket
-     * 
-     * @return vector of received packets
-     */
-    vector<Message> getDataPackets();
+protected:
+    bool _socketSendPacket(int portId, char *buffer, int length, IP_ADDR dest) override;
+	void _buildPort(Port*) override;
+    void _destroyPort(Port*) override;
 };
 
 /*!

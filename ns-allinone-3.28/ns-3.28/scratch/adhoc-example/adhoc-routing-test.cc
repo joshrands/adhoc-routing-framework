@@ -27,8 +27,8 @@
 
 #define minSpeed_mpers    3
 #define maxSpeed_mpers    5
-#define xSize_m           500
-#define ySize_m           500
+#define xSize_m           400
+#define ySize_m           400
 #define LOCAL_MONITOR_INTERVAL  2
 
 #define NUM_NODES         10
@@ -39,6 +39,10 @@
 #include "ns3/internet-module.h"
 #include "ns3/packet.h"
 #include "ns3/basic-energy-source-helper.h"
+
+/**** CSM SmallSat ns3 includes ****/
+#include "ns3/routing_protocol.h"
+/***********************************/
 
 #include "battery-drain.h"
 
@@ -51,9 +55,17 @@ map<Ptr<Node>, AdHocRoutingHelper*> adhocMap;
 map< IP_ADDR, Ptr<Node> > nodeMap;
 EnergySourceContainer energySources;
 
+// Set the socket receive packet callback to the adhoc routing helper 
 void ReceiveCallback(Ptr<Socket> socket)
 {
     AdHocRoutingHelper::receivePacket(socket);
+}
+
+void PrintBandwidth(AdHocRoutingHelper* adhocRoutingHelper, int freqMS)
+{
+  std::cout << adhocRoutingHelper->getIpAddressStr() << " bandwidth= " << adhocRoutingHelper->getAvailableBandwidthBits() << endl; 
+
+  Simulator::Schedule(MilliSeconds(freqMS), &PrintBandwidth, adhocRoutingHelper, freqMS);
 }
 
 void initialHellos()
@@ -72,7 +84,7 @@ void initialHellos()
     // send data from first node to last node 
     AdHocRoutingHelper* adhoc = adhocMap[it->second];
     IP_ADDR dest = getIpFromString(BROADCAST_STR); 
-    adhoc->routing->socketSendPacket(buffer, msg.length(), dest, DATA_PORT); 
+    adhoc->sendPacket(DATA_PORT, buffer, msg.length(), dest); 
 
     delete buffer;
 
@@ -93,10 +105,9 @@ void testAdHoc()
   auto it = nodeMap.begin();
   // send data from first node to last node 
   AdHocRoutingHelper* adhoc = adhocMap[it->second];
-//  i;ut += NUM_NODES - 1;
   it++;
   IP_ADDR dest = it->first;
-  adhoc->sendPacket(buffer, msg.length(), dest); 
+  adhoc->sendPacket(DATA_PORT, buffer, msg.length(), dest); 
 
   Simulator::Schedule(Seconds(2.0), &testAdHoc);
 
@@ -108,7 +119,7 @@ void localMonitoring()
   auto it = adhocMap.begin();
   while (it != adhocMap.end())
   {
-    it->second->monitor->updateLocalModels();
+    it->second->networkMonitor->updateLocalModels();
     it++;
   }
 
@@ -118,6 +129,8 @@ void localMonitoring()
 int main (int argc, char *argv[])
 {
   std::string phyMode ("DsssRate1Mbps");
+  int dataRateMbps = 1;
+
   double rss = -80;  // -dBm
   uint16_t numNodes = NUM_NODES;
 
@@ -240,6 +253,12 @@ int main (int argc, char *argv[])
     monitorSink->SetRecvCallback(MakeCallback(&ReceiveCallback));
     monitorSink->m_port = MONITOR_PORT;
 
+    Ptr<Socket> helloSink = Socket::CreateSocket(nodes.Get(i), UdpSocketFactory::GetTypeId());
+    InetSocketAddress localHello = InetSocketAddress (Ipv4Address::GetAny (), HELLO_PORT);
+    helloSink->Bind(localHello);
+    helloSink->SetRecvCallback(MakeCallback(&ReceiveCallback));
+    helloSink->m_port = HELLO_PORT;
+
     Ptr<Ipv4> ipv4 = nodes.Get(i)->GetObject<Ipv4>(); // Get Ipv4 instance of the node
     Ipv4Address addr = ipv4->GetAddress (1, 0).GetLocal ();  
     // add aodv object 
@@ -254,25 +273,23 @@ int main (int argc, char *argv[])
  
     adhocMap[nodes.Get(i)] = new AdHocRoutingHelper(nodes.Get(i), ip);
     nodes.Get(i)->m_AdHocRoutingHelper = adhocMap[nodes.Get(i)]; 
+    nodes.Get(i)->m_AdHocRoutingHelper->setAvailableBandwidthBits(dataRateMbps * 1000000);
+
+    Simulator::Schedule(Seconds(1 + i), &PrintBandwidth, nodes.Get(i)->m_AdHocRoutingHelper, 10);
 
     Vector pos = nodes.Get(i)->GetObject<RandomWaypointMobilityModel>()->GetPosition();
     if (DEBUG)
       cout << "[DEBUG]: Node " << i << " at " << pos.x << ", " << pos.y << endl;
     currentPositions.push_back(pos);
+
+    Simulator::Schedule(MilliSeconds(1001 + i), &AdHocRoutingHelper::waitSimulatedTimeForHelloMonitor, 2000, adhocMap[nodes.Get(i)]->helloMonitor);
   }
 
-  // Tracing
-//  Simulator::Schedule (Seconds (1.0), &GenerateTraffic,
-//                       c, packetSize, numPackets, Seconds(1));
-
-  Simulator::Schedule(Seconds(1.0), &initialHellos);
-  Simulator::Schedule(Seconds(2.0), &initialHellos);
-  Simulator::Schedule(Seconds(3.0), &initialHellos);
-
-  Simulator::Schedule(Seconds(5.0), &testAdHoc);// &(aodvArray[1]->socketSendPacket), buffer, msg.length() + 5, aodvArray[1]->getIp(), 654, aodvArray[3]->getIp());
-  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
+  Simulator::Schedule(Seconds(2.0), &testAdHoc);
+  // TODO: Add network monitroing back.
+//  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
   // Drain battery
-  Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);
+//  Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);
 
   Simulator::Stop (Seconds (duration + 10.0));
   Simulator::Run ();
