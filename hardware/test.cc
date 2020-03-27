@@ -11,6 +11,7 @@
 #include "hardware_aodv.h"
 #include "hardware_hello.h"
 #include "hardware_aodv_hello.h"
+#include "hardware_rssi.h"
 
 using namespace std;
 
@@ -32,6 +33,7 @@ bool testHardwareAodv();
 bool testHardwareHello();
     bool testMS();
     bool testWait();
+bool testRSSI();
 
 int main() {
     bool allPass = true;
@@ -40,6 +42,9 @@ int main() {
     printf("________________________________\n\n");
     // Testing of hardware hello
     allPass &= testHardwareHello();
+    printf("________________________________\n\n");
+    // Testing of hardware rssi
+    allPass &= testRSSI();
     printf("________________________________\n\n");
     printf("HARWARE TESTS COMPLETE\n");
     return allPass;
@@ -108,4 +113,14 @@ bool testWait(){
     uint64_t elapsed = end-start;
     delete basicRoutingProt;
     return test((elapsed > 98 && elapsed < 102), std::string("Hardware hello waits properly"));
+}
+
+bool testRSSI(){
+    HardwareRSSI* hRSSI = new HardwareRSSI(true);
+    thread capturing = thread(&HardwareRSSI::captureData, hRSSI);
+    capturing.detach();
+
+    delete hRSSI;
+
+    return true;
 }

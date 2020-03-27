@@ -4,6 +4,7 @@
 #include "../defines.h"
 
 #define HARDWARE_DEBUG DEBUG && 1
+#define RSSI_DEBUG HARDWARE_DEBUG && 1
 
 #define RSSI_NETWORK_FILER ""
 

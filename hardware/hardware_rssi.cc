@@ -4,7 +4,7 @@
  * @brief Construct a new Hardware RSSI object
  *
  */
-HardwareRSSI::HardwareRSSI() {
+HardwareRSSI::HardwareRSSI(bool _collectAll) : collectAll(_collectAll) {
   // Set up libpcap
   handle = pcap_open_live(INTERFACE_NAME, BUFSIZ, 1, 100, errbuf);
   if (handle == NULL) {
@@ -22,9 +22,6 @@ HardwareRSSI::HardwareRSSI() {
             pcap_geterr(handle));
     exit(2);
   }
-  // run capturing thread
-  capturing = thread(&HardwareRSSI::captureData, this);
-  capturing.detach();
 }
 
 HardwareRSSI::~HardwareRSSI() {
@@ -33,10 +30,7 @@ HardwareRSSI::~HardwareRSSI() {
   pcap_close(handle);
 }
 
-/**
- * @brief captures and handles a single packet
- *
- */
+
 void _capturePacket(u_char *args, const struct pcap_pkthdr *header,
                         const u_char *packet) {
   HardwareRSSI *capturer = reinterpret_cast<HardwareRSSI *>(args);
@@ -44,22 +38,63 @@ void _capturePacket(u_char *args, const struct pcap_pkthdr *header,
   RadiotapData data = getRadiotapData(args, header, packet);
   if(data.dbmAntsignal != defaultData.dbmAntsignal){
     IP_ADDR ip;
-    if(capturer->MACToIP.find(data.srcAddr,ip)){
-      capturer->rssiMap.insert(ip, data.dbmAntsignal);
-    } else {
-      fprintf(stderr, "[ERROR]:[RSSI]: Invalid MAC Address: %s\n",
-              data.srcAddr);
+    if(capturer->collectAll || capturer->MACToIP.find(data.srcAddr, ip)){
+      capturer->rssiMap.insert(data.srcAddr, data.dbmAntsignal);
+      if(RSSI_DEBUG)
+        printf("[DEBUG]:[RSSI]: Captured RSSI data for %s\n", data.srcAddr);
     }
   }
 }
 
-/**
- * @brief Continuously captures packets and stores the more recent rssi data
- *
- */
 void HardwareRSSI::captureData() {
   while (true) {
     /* now we can set our callback function */
     pcap_loop(handle, 0, _capturePacket, (u_char *)this);
   }
+}
+
+void HardwareRSSI::addNeighbors(char* mac, IP_ADDR ip){
+  MACToIP.insert(mac, ip);
+  IPToMAC.insert(ip, mac);
+}
+
+set<IP_ADDR> HardwareRSSI::getIPNeighbors(){
+  throw(runtime_error("TODO: Implement getIPNeighbors (Add .keys() to SafeHashMap)"));
+  return set<IP_ADDR>();
+}
+
+set<char*> HardwareRSSI::getMACNeighbors(){
+  throw(runtime_error("TODO: Implement getMACNeighbors (Add .keys() to SafeHashMap)"));
+  return set<char*>();
+}
+
+set<IP_ADDR> HardwareRSSI::getIPAvailable(){
+  throw(runtime_error("TODO: Implement getMACNeighbors (Add .keys() to SafeHashMap)"));
+  return set<IP_ADDR>();
+}
+
+set<char*> HardwareRSSI::getMACAvailable(){
+  throw(runtime_error("TODO: Implement getMACAvailable (Add .keys() to SafeHashMap)"));
+  return set<char*>();
+}
+
+int HardwareRSSI::getRSSI(IP_ADDR ip){
+  char* mac;
+  if(IPToMAC.find(ip, mac)){
+    int rssi;
+    if(rssiMap.find(mac,rssi)){
+      return rssi;
+    }
+  }
+
+  return 0;
+}
+
+int HardwareRSSI::getRSSI(char* mac){
+  int rssi;
+  if(rssiMap.find(mac,rssi)){
+    return rssi;
+  }
+
+  return 0;
 }
