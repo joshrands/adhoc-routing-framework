@@ -61,9 +61,13 @@ Implementation of REgression-based network Monitoring (https://dl.acm.org/doi/ab
 UDP Sockets and helper classes. 
 [code here](socket)
 
-## Bugs
-
-0. Aodv's decodeReceivedPacket does not care about ports... if a data packet is sent with 0x01 as the first byte it will be classified as a RREQ message. 
-
-## Questions
-[better route vs duplicate?](aodv/aodv_rreq.cc:57)
+## TODOS
+- Completely redo the file system and makefiles to use dependencies and actually use the static libraries, the Makefiles currently are awful
+  - Use hidden directories to store build files and dependency files
+  - Use structures in each file system to hold src (.cc) and include (.h)
+  - Make sure all include paths are not relative ("../rssi/")
+  - Use -L -l to link the static libraries
+  - Figure out how to avoid recompiling every file every time we make
+- Fully doxygen document the code base
+- Unify the Style to use one style guideline
+- Create stoppable threads

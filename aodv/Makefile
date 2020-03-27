@@ -12,7 +12,7 @@ LD = g++
 LIB = ar
 INC_DIRS = -I../ -I../monitoring -I../adhoc
 
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
+CXXFLAGS = -g -fPIC -pthread -std=c++17 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
 LDFLAGS = -g -pthread ${INC_DIRS}
 LIBFLAGS = -cvq
 
@@ -21,29 +21,32 @@ LIBFLAGS = -cvq
 #
 TARGET = test
 LIB_NAME = libaodv.a
-OBJ_LIB_FILES = aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o aodv_test.o ../adhoc/*.o
+OBJ_FILES = aodv.o aodv_rreq.o aodv_rrep.o aodv_rerr.o aodv_routing_table.o aodv_test.o
+OBJ_LIB_FILES = ${OBJ_FILES} ../adhoc/*.o
+OBJ_INCLUDE_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
+OBJ_BUILD_FILES = ${TARGET}.o ${OBJ_FILES}
 
-OBJ_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
 INC_FILES = ${TARGET}.h aodv.h aodv_rreq.h aodv_rrep.h aodv_rerr.h aodv_routing_table.h aodv_test.h aodv_params.h defines.h network_monitor.h monitor_info.h
 
 SUBDIRS = ../adhoc
 
-${TARGET}: ${OBJ_FILES}
+${TARGET} : ${OBJ_BUILD_FILES}
 	for dir in $(SUBDIRS); do \
 		$(MAKE) -C $$dir; \
 	done
-	${LD} ${LDFLAGS} ${OBJ_FILES} -o $@ ${LIBRARYS}
+	${LD} ${LDFLAGS} ${OBJ_INCLUDE_FILES} -o $@ ${LIBRARYS}
 	rm test.o
 	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES}
 	rm -f "*.o"
 
 %.o : %.cc ${INC_FILES} ${INC_DIRS}
-	${CXX} -c ${CXXFLAGS} $ -o $@ $<
+	${CXX} -c ${CXXFLAGS} -o $@ $< 
 
 run:
 	make 
 	./test
 
 clean:
-	rm -f core ${TARGET} ${OBJ_FILES} ${LIB_NAME}
-	rm -f "*.o"
+	rm -f core ${TARGET} ${LIB_NAME}
+	rm -f *.o
+	rm -f *.d

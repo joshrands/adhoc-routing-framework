@@ -7,7 +7,7 @@ which will be stored in a circular queue which overwrites the oldest data in the
 
 ## To-Do
 0. Rework code to make Message a struct and remove Endpoint
-1. Comment code
+1. 
 
 ## How to test this code:
 0. In a terminal, cd into the socket directory

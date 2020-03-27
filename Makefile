@@ -12,7 +12,7 @@ LD = g++
 LIB = ar
 INC_DIRS = -I./aodv -I./monitoring -I./hardware -I./socket -I./adhoc -I./ -I./data_structures
 
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
+CXXFLAGS = -g -fPIC -pthread -std=c++17 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
 LDFLAGS = -g -pthread ${INC_DIRS}
 LIBFLAGS = -cvq
 

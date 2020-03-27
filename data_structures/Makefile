@@ -11,7 +11,7 @@ CXX = g++
 LD = g++
 INC_DIRS = 
 
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
+CXXFLAGS = -g -fPIC -pthread -std=c++17 -DBOOST_LOG_DYN_LINK ${INC_DIRS}
 LDFLAGS = -g -pthread ${INC_DIRS}
 
 # You should be able to add object files here without changing anything else

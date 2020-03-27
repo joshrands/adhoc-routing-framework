@@ -12,7 +12,7 @@
  * license, see COPYING for more details.
  * 
  * 2/10/2020:
- * Modified by: Zachary Smeton <zsmeton@yahoo.com>2020
+ * Modified by: Zachary Smeton <zsmeton@yahoo.com>
  * to be a C++ compatible API
  */
 #include "radiotap_iter.h"

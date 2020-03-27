@@ -5,4 +5,6 @@
 
 #define HARDWARE_DEBUG DEBUG && 1
 
+#define RSSI_NETWORK_FILER ""
+
 #endif
