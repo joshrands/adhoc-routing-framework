@@ -4,7 +4,7 @@
  * @brief Construct a new Hardware RSSI object
  *
  */
-HardwareRSSI::HardwareRSSI(bool _collectAll) : collectAll(_collectAll) {
+HardwareRSSI::HardwareRSSI(bool _collectAll) : collectAll(_collectAll), count(0) {
   // Set up libpcap
   handle = pcap_open_live(INTERFACE_NAME, BUFSIZ, 1, 100, errbuf);
   if (handle == NULL) {
@@ -38,10 +38,11 @@ void _capturePacket(u_char *args, const struct pcap_pkthdr *header,
   RadiotapData data = getRadiotapData(args, header, packet);
   if(data.dbmAntsignal != defaultData.dbmAntsignal){
     IP_ADDR ip;
-    if(capturer->collectAll || capturer->MACToIP.find(data.srcAddr, ip)){
+    if(capturer->collectAll || capturer->MACToIP.find(string(strdup(data.srcAddr)), ip)){
       capturer->rssiMap.insert(data.srcAddr, data.dbmAntsignal);
+      capturer->count ++;
       if(RSSI_DEBUG)
-        printf("[DEBUG]:[RSSI]: Captured RSSI data for %s\n", data.srcAddr);
+        printf("[DEBUG]:[RSSI]: RSSI data for %s -> %d dbm\n", data.srcAddr, data.dbmAntsignal);
     }
   }
 }
@@ -53,9 +54,9 @@ void HardwareRSSI::captureData() {
   }
 }
 
-void HardwareRSSI::addNeighbors(char* mac, IP_ADDR ip){
-  MACToIP.insert(mac, ip);
-  IPToMAC.insert(ip, mac);
+void HardwareRSSI::addNeighbors(const char* mac, IP_ADDR ip){
+  MACToIP.insert(string(strdup(mac)), ip);
+  IPToMAC.insert(ip, string(strdup(mac)));
 }
 
 set<IP_ADDR> HardwareRSSI::getIPNeighbors(){
@@ -63,9 +64,9 @@ set<IP_ADDR> HardwareRSSI::getIPNeighbors(){
   return set<IP_ADDR>();
 }
 
-set<char*> HardwareRSSI::getMACNeighbors(){
+set<const char*> HardwareRSSI::getMACNeighbors(){
   throw(runtime_error("TODO: Implement getMACNeighbors (Add .keys() to SafeHashMap)"));
-  return set<char*>();
+  return set<const char*>();
 }
 
 set<IP_ADDR> HardwareRSSI::getIPAvailable(){
@@ -73,16 +74,16 @@ set<IP_ADDR> HardwareRSSI::getIPAvailable(){
   return set<IP_ADDR>();
 }
 
-set<char*> HardwareRSSI::getMACAvailable(){
+set<const char*> HardwareRSSI::getMACAvailable(){
   throw(runtime_error("TODO: Implement getMACAvailable (Add .keys() to SafeHashMap)"));
-  return set<char*>();
+  return set<const char*>();
 }
 
 int HardwareRSSI::getRSSI(IP_ADDR ip){
-  char* mac;
+  string mac;
   if(IPToMAC.find(ip, mac)){
     int rssi;
-    if(rssiMap.find(mac,rssi)){
+    if(rssiMap.find(mac, rssi)){
       return rssi;
     }
   }
@@ -90,9 +91,9 @@ int HardwareRSSI::getRSSI(IP_ADDR ip){
   return 0;
 }
 
-int HardwareRSSI::getRSSI(char* mac){
+int HardwareRSSI::getRSSI(const char* mac){
   int rssi;
-  if(rssiMap.find(mac,rssi)){
+  if(rssiMap.find(string(strdup(mac)),rssi)){
     return rssi;
   }
 

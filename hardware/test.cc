@@ -33,7 +33,9 @@ bool testHardwareAodv();
 bool testHardwareHello();
     bool testMS();
     bool testWait();
-bool testRSSI();
+bool testHardwareRSSI();
+    bool testCollectAll();
+    bool testSelective();
 
 int main() {
     bool allPass = true;
@@ -44,7 +46,7 @@ int main() {
     allPass &= testHardwareHello();
     printf("________________________________\n\n");
     // Testing of hardware rssi
-    allPass &= testRSSI();
+    allPass &= testHardwareRSSI();
     printf("________________________________\n\n");
     printf("HARWARE TESTS COMPLETE\n");
     return allPass;
@@ -115,12 +117,41 @@ bool testWait(){
     return test((elapsed > 98 && elapsed < 102), std::string("Hardware hello waits properly"));
 }
 
-bool testRSSI(){
+bool testHardwareRSSI(){
+    bool allPass = true;
+    allPass &= testCollectAll();
+    allPass &= testSelective();
+    return allPass;
+}
+
+bool testCollectAll(){
     HardwareRSSI* hRSSI = new HardwareRSSI(true);
     thread capturing = thread(&HardwareRSSI::captureData, hRSSI);
     capturing.detach();
 
-    delete hRSSI;
+    sleep(2);
 
-    return true;
+    delete hRSSI;
+    return test(hRSSI->count > 1, string("Collecting all RSSI data works properly"));
+}
+
+bool testSelective(){
+    bool allPass = true;
+
+    HardwareRSSI* hRSSI = new HardwareRSSI(false);
+    thread capturing = thread(&HardwareRSSI::captureData, hRSSI);
+    capturing.detach();
+
+    sleep(2);
+    allPass &= test(hRSSI->count == 0, string("Selective Hardware RSSI doesn't collect any data when no neighbors are provided"));
+
+    const char* mac = "7c:9a:54:ea:8e:97";
+    hRSSI->addNeighbors(mac, getIpFromString("192.168.1.2"));
+
+    sleep(2);
+    allPass &= test(hRSSI->count > 0, string("Selective Hardware RSSI collects rssi data when Zach's Wifi router is near by"));
+
+
+    delete hRSSI;
+    return allPass;
 }

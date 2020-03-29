@@ -30,9 +30,9 @@ using namespace std;
  */
 class HardwareRSSI {
 protected:
-  SafeHashMap<char *, int> rssiMap;
-  SafeHashMap<char *, IP_ADDR> MACToIP;
-  SafeHashMap<IP_ADDR, char *> IPToMAC;
+  SafeHashMap<string, int> rssiMap;
+  SafeHashMap<string, IP_ADDR> MACToIP;
+  SafeHashMap<IP_ADDR, string> IPToMAC;
   pcap_t *handle; /* Session handle */
   bpf_u_int32 netp;
   char errbuf[PCAP_ERRBUF_SIZE]; /* Error string */
@@ -40,6 +40,9 @@ protected:
   bool collectAll;
 
 public:
+  // Member
+  unsigned int count;
+
   // Constructors
   /**
    * @brief Construct a new HardwareRSSI object
@@ -69,7 +72,7 @@ public:
    * 
    * @param mac 
    */
-  void addNeighbors(char* mac, IP_ADDR ip);
+  void addNeighbors(const char* mac, IP_ADDR ip);
 
   /**
    * @brief Returns the set of all known IP addresses. Theses addresses must have been added to the listening set via addNeighbors()
@@ -81,9 +84,9 @@ public:
   /**
    * @brief Returns the set of all known MAC addresses. Theses addresses must have been added to the listening set via addNeighbors()
    * 
-   * @return set<char*> 
+   * @return set<const char*> 
    */
-  set<char*> getMACNeighbors();
+  set<const char*> getMACNeighbors();
 
   /**
    * @brief Returns the set of IP Addresses with available data. Even when in collectAll mode getIPAvailable() is a subset of getIPNeighbors()
@@ -95,9 +98,9 @@ public:
   /**
    * @brief Returns the set of MAC Addresses with available data
    * 
-   * @return set<char*> mac addresses
+   * @return set<const char*> mac addresses
    */
-  set<char*> getMACAvailable();
+  set<const char*> getMACAvailable();
 
   /**
    * @brief Gets the rssi data for the specificied IP Address
@@ -113,7 +116,7 @@ public:
    * @param mac the MAC address
    * @return int the rssi (dbm)
    */
-  int getRSSI(char* mac);
+  int getRSSI(const char* mac);
 };
 
 #endif
