@@ -11,7 +11,7 @@
 CXX = g++
 LD = g++
 LIB = ar
-INC_DIRS = -I../aodv -I../socket -I../adhoc -I../hello_monitor -I../ -I../data_structures/ -I./rssi
+INC_DIRS = -I../aodv -I../socket -I../adhoc -I../hello_monitor -I../ -I../data_structures/ -I../hardware/rssi/ -I../hardware/
 
 CXXFLAGS = -g -fPIC -pthread -std=c++17 -DBOOST_LOG_DYN_LINK -O2 -g -Wall -Wundef -Wno-trigraphs -fno-strict-aliasing -fno-common ${INC_DIRS}
 LDFLAGS = -g -pthread -Wall -O2 -g -Wall -Wundef -Wno-trigraphs -fno-strict-aliasing -fno-common ${INC_DIRS}
@@ -21,15 +21,14 @@ LIBFLAGS = -cvq
 # You should be able to add object files here without changing anything else
 #
 TARGET = test
-LIB_NAME = libhardware.a
-OBJ_FILES = hardware_aodv.o hardware_hello.o hardware_hello_aodv.o hardware_rssi.o
-OBJ_LIB_FILES = ${OBJ_FILES} ../aodv/*.o ../socket/*.o ../adhoc/*.o ../hello_monitor/*.o ./rssi/radiotap_capture.o ./rssi/radiotap.o
+OBJ_FILES = 
+OBJ_LIB_FILES = ${OBJ_FILES} ../aodv/*.o ../socket/*.o ../adhoc/*.o ../hello_monitor/*.o ../hardware/*.o ../hardware/rssi/*.o
 OBJ_INCLUDE_FILES = ${TARGET}.o ${OBJ_LIB_FILES}
 OBJ_BUILD_FILES = ${TARGET}.o ${OBJ_FILES}
 
-INC_FILES = hardware_aodv.h hardware_defines.h hardware_hello.h hardware_hello_aodv.h hardware_rssi.h
+INC_FILES = 
 
-SUBDIRS = ../aodv ../socket ../adhoc ../hello_monitor ./rssi
+SUBDIRS = ../aodv ../socket ../adhoc ../hello_monitor ../hardware
 
 #
 # Any libraries we might need.
@@ -37,16 +36,18 @@ SUBDIRS = ../aodv ../socket ../adhoc ../hello_monitor ./rssi
 LIBRARYS = -lpthread -lpcap
 
 ${TARGET} : ${OBJ_BUILD_FILES}
-	for dir in $(SUBDIRS); do \
-		$(MAKE) -C $$dir; \
-	done
+	
 	${LD} ${LDFLAGS} ${OBJ_INCLUDE_FILES} -o $@ ${LIBRARYS}
 	rm ${TARGET}.o
-	${LIB} ${LIBFLAGS} ${LIB_NAME} ${OBJ_LIB_FILES}
-	rm -f "*.o"
 
 %.o : %.cc ${INC_FILES} ${INC_DIRS}
 	${CXX} -c ${CXXFLAGS} -o $@ $< 
+
+all:
+	for dir in $(SUBDIRS); do \
+		$(MAKE) -C $$dir; \
+	done
+	make
 
 #
 # Please remember not to submit objects or binarys.

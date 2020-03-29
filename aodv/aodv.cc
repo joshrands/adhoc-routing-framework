@@ -89,8 +89,6 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
             nextHop = m_pRoutingTable->getNextHop(dest);
         }
 
-        cout << "CHECK";
-
         if (false == getTable()->getIsRouteActive(dest)) {
             BufferedPacket bufferedPacket;
             bufferedPacket.buffer = (char *)(malloc(length));

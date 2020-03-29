@@ -9,8 +9,7 @@
 
 #include "../aodv/test.h"
 #include "hardware_aodv.h"
-#include "hardware_hello.h"
-#include "hardware_aodv_hello.h"
+#include "hardware_hello_aodv.h"
 #include "hardware_rssi.h"
 
 using namespace std;
