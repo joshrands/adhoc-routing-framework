@@ -29,8 +29,6 @@ Modeled after RFC 3561: https://www.ietf.org/rfc/rfc3561.txt
 
 ## File Insights
 
-[RoutingProtocol](RoutingProtocol.h) - Base class for a routing protocol with basic functionality that all routing protocols should have. 
-
 [aodv](aodv.h) - Abstract AODV class. Brings everything together to make AODV happen. The AODV class itself is abstract because there needs to be a method for transmitting data. To create an implementation of AODV, inherit from this class and implement the virtual function socketSendData. AODVTest is a basic example of how to do this. 
 
 [aodv_packets](aodv_packets.h) - Basic structs to represent the different types of packets sent during aodv. 
