@@ -87,6 +87,7 @@ void sendMessageBetweenThreadedSockets(UDPSocket *socket1, UDPSocket *socket2,
     test(count < MAX_ATTEMPTS, &maxAttemptsMessage[0]);
     string messageSentMessage = "Socket 1 sent '" + data1 + "' to socket 2";
     test(strcmp(message1to2.getData(), &data1[0]) == 0, messageSentMessage);
+    printf("received %s from %s (%s)\n", message1to2.getData(), message1to2.getEndpoint().getAddressC(), message1to2.getAddressC());
 
     // Send data from 2 to 1
     Message message2to1;
@@ -96,6 +97,8 @@ void sendMessageBetweenThreadedSockets(UDPSocket *socket1, UDPSocket *socket2,
         socket2->sendTo(message1to2.getEndpoint(), &data2[0], data2.length());
         sleep(1);
     } while ((!socket1->getMessage(message2to1) && count < MAX_ATTEMPTS));
+    printf("received %s from %s (%s)\n", message2to1.getData(), message2to1.getEndpoint().getAddressC(), message2to1.getAddressC());
+
     // Check if test was successful
     sprintf(&maxAttemptsMessage[0],
             "Can send message to another socket with < %d attempts",
