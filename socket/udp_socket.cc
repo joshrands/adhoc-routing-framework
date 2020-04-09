@@ -110,7 +110,7 @@ int UDPSocket::sendTo(Endpoint &remote, const char *packet, int length) {
                 (const struct sockaddr *)&remote.remoteHost,
                 sizeof(remote.remoteHost));
   if(returnVal < 0){
-    fprintf(stderr, "[UDP SOCKET]:[ERROR] Could not send packet %s to %d\n", packet, remote.getAddressI());
+    fprintf(stderr, "[UDP SOCKET]:[ERROR] Could not send packet %s to %s\n", packet, remote.getAddressC());
     fprintf(stderr, "[UDP SOCKET]:[ERROR]: %s\n", strerror(errno));
   }
   return returnVal;

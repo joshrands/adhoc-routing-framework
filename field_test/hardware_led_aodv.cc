@@ -30,8 +30,13 @@ int HardwareLedAODV::handlePackets() {
     helloMonitor->receiveHelloMessage(message.getAddressI());
     count++;
     
-    // Light up the led
-    _lightLed(AODV_LED, LIGHT_MS);
+    // Light up the led if not a message from ourselves
+    if(message.getEndpoint().getAddressI() != this->ipAddress){
+      printf("[LED AODV]:[DEBUG]: Received AODV message from %s\n", message.getEndpoint().getAddressC());
+      _lightLed(AODV_LED, LIGHT_MS);
+    }else{
+      printf("[LED AODV]:[DEBUG]: Received AODV message from self\n");
+    }
   }
   // Handle packets on the ports
   for (auto socketPair : portSockets) {
@@ -43,10 +48,19 @@ int HardwareLedAODV::handlePackets() {
 
       // Light hello led if hello
       if(socketPair.first == HELLO_PORT){
-        _lightLed(HELLO_LED, LIGHT_MS);
+        if(message.getEndpoint().getAddressI() != this->ipAddress){
+          printf("[LED AODV]:[DEBUG]: Received HELLO message from %d (self: %d)\n", message.getEndpoint().getAddressI(), this->getIp());
+          _lightLed(HELLO_LED, LIGHT_MS);
+        }else{
+          printf("[LED AODV]:[DEBUG]: Received HELLO message from self\n");
+        }
       }else{
-        // Light other
-        _lightLed(OTHER_LED, LIGHT_MS);
+        if(message.getEndpoint().getAddressI() != this->ipAddress){
+          printf("[LED AODV]:[DEBUG]: Received DATA message from %s\n", message.getEndpoint().getAddressC());
+         _lightLed(HELLO_LED, LIGHT_MS);
+        }else{
+          printf("[LED AODV]:[DEBUG]: Received message from self\n");
+        }
       }
 
     }
