@@ -4,13 +4,13 @@
 #include <thread>
 #include <utility>
 #include <fstream>
-#include "hardware/hardware_hello_aodv.h"
-#include "aodv/test.h"
+#include "hardware_led_aodv.h"
+#include "aodv_test.h"
 
 using namespace std;
 
 int main(){
-    RoutingProtocol* haodv = new HardwareHelloAODV("192.168.1.1");
+    RoutingProtocol* haodv = new HardwareLedAODV("192.168.1.1");
     PrintPort* printPort = new PrintPort(DATA_PORT);
     haodv->addPort(printPort);
 
@@ -28,9 +28,9 @@ int main(){
         for(auto ip : ips){
             uint32_t dest = getIpFromString(ip);
             if(!haodv->sendPacket(printPort->getPortId(), msg, message.length(), dest)){
-                fprintf(stderr, "[DO ADHOC]:[ERROR]: Muy angry send, much mad\n");
+                fprintf(stderr, "[TEST ADHOC]:[ERROR]: Muy angry send, much mad\n");
             }
-            printf("[DO ADHOC]:[DEBUG]: Sent ");
+            printf("[TEST ADHOC]:[DEBUG]: Sent ");
             printPacket(stdout, msg, message.length());
             printf(" to %s\n", ip.c_str());
         }
@@ -38,7 +38,7 @@ int main(){
         // Handle packets
         int handleCount = haodv->handlePackets();
         if(handleCount > 0){
-            printf("[DO ADHOC]:[DEBUG]: Handled %d AODV packets\n", handleCount);
+            printf("[TEST ADHOC]:[DEBUG]: Handled %d AODV packets\n", handleCount);
         }
 
         sleep(1);
