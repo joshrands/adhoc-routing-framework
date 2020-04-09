@@ -1,9 +1,6 @@
 #ifndef HARDWARERSSI_H
 #define HARDWARERSSI_H
 
-#include "hardware_defines.h"
-#include "radiotap_capture.h"
-#include "safe_hash_map.h"
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +9,10 @@
 #include <utility>
 #include <set>
 #include <stdexcept>
+
+#include "hardware_defines.h"
+#include "radiotap_capture.h"
+#include "safe_hash_map.h"
 
 using namespace std;
 

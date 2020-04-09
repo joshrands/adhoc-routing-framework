@@ -248,8 +248,8 @@ int main() {
 
     // Test broadcasting
     {
-        system("./testing_utils/call_test_broadcast.sh");
-        sleep(3);
+        system("python3 ./testing_utils/test_broadcasting.py > /dev/null &");
+        sleep(2);
 
         int port1 = 58080;
         thread broadcasting;

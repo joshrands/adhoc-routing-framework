@@ -8,17 +8,17 @@ HardwareRSSI::HardwareRSSI(bool _collectAll) : collectAll(_collectAll), count(0)
   // Set up libpcap
   handle = pcap_open_live(INTERFACE_NAME, BUFSIZ, 1, 100, errbuf);
   if (handle == NULL) {
-    fprintf(stderr, "[ERROR]:[RSSI]:Couldn't open device %s: %s\n", INTERFACE_NAME, errbuf);
+    fprintf(stderr, "[RSSI]:[ERROR]: Couldn't open device %s: %s\n", INTERFACE_NAME, errbuf);
     exit(2);
   }
   /* Compile and apply the filter */
   if (pcap_compile(handle, &fp, RSSI_NETWORK_FILER, 0, netp) == -1) {
-    fprintf(stderr, "[ERROR]:[RSSI]:Couldn't parse filter %s: %s\n", RSSI_NETWORK_FILER,
+    fprintf(stderr, "[RSSI]:[ERROR]: Couldn't parse filter %s: %s\n", RSSI_NETWORK_FILER,
             pcap_geterr(handle));
     exit(2);
   }
   if (pcap_setfilter(handle, &fp) == -1) {
-    fprintf(stderr, "[ERROR]:[RSSI]:Couldn't set filter %s: %s\n", RSSI_NETWORK_FILER,
+    fprintf(stderr, "[RSSI]:[ERROR]: Couldn't set filter %s: %s\n", RSSI_NETWORK_FILER,
             pcap_geterr(handle));
     exit(2);
   }
@@ -42,7 +42,7 @@ void _capturePacket(u_char *args, const struct pcap_pkthdr *header,
       capturer->rssiMap.insert(data.srcAddr, data.dbmAntsignal);
       capturer->count ++;
       if(RSSI_DEBUG)
-        printf("[DEBUG]:[RSSI]: RSSI data for %s -> %d dbm\n", data.srcAddr, data.dbmAntsignal);
+        printf("[RSSI]:[DEBUG]: RSSI data for %s -> %d dbm\n", data.srcAddr, data.dbmAntsignal);
     }
   }
 }
