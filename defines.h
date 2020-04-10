@@ -8,6 +8,8 @@
 #define IP_ADDR			    uint32_t
 #define BROADCAST_STR       "255.255.255.255"
 
+#define INTERFACE_NAME "wlp0s20f0u2"
+
 #define ROUTING_PORT        5969
 #define DATA_PORT           5432
 #define MONITOR_PORT        5123

@@ -1,5 +1,5 @@
-#ifndef HARDWARE_AODV_HELLO_H
-#define HARDWARE_AODV_HELLO_H
+#ifndef HARDWARE_HELLO_AODV_H
+#define HARDWARE_HELLO_AODV_H
 
 #include "hardware_aodv.h"
 #include "hardware_hello.h"
@@ -12,7 +12,7 @@ private:
      * @brief this function is a while loop that called sendHellos, it is meant to be threaded 
      * 
      */
-    void _sendHelloThreaded();
+    virtual void _sendHelloThreaded();
 
 protected:
     HardwareHelloMonitor* helloMonitor;

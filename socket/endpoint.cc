@@ -71,21 +71,17 @@ bool Endpoint::setAddress(const uint32_t host, const int port) {
 }
 
 char *Endpoint::getAddressC() {
-    if ((ipAddress[0] == '\0') && (remoteHost.sin_addr.s_addr != 0))
-        return inet_ntoa(remoteHost.sin_addr);
-    return ipAddress;
+    return inet_ntoa(remoteHost.sin_addr);
 }
 
 uint32_t Endpoint::getAddressI(void) const {
-    if ((ipAddress[0] == '\0') && (remoteHost.sin_addr.s_addr != 0))
-        return remoteHost.sin_addr.s_addr;
-    return inet_addr(ipAddress);
+    return remoteHost.sin_addr.s_addr;
 }
 
 int Endpoint::getPort() const { return ntohs(remoteHost.sin_port); }
 
 bool Endpoint::operator==(Endpoint &rhs) {
-    return (strcmp(this->getAddressC(), rhs.getAddressC()) == 0 &&
+    return (this->getAddressI() == rhs.getAddressI() &&
             this->getPort() == rhs.getPort());
 }
 

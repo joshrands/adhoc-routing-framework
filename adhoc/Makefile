@@ -13,7 +13,7 @@ LD = g++
 LIB = ar
 INC_DIRS = -I../adhoc -I../
 
-CXXFLAGS = -g -fPIC -pthread -std=c++11 -DBOOST_LOG_DYN_LINK -Wall ${INC_DIRS}
+CXXFLAGS = -g -fPIC -pthread -std=c++17 -DBOOST_LOG_DYN_LINK -Wall ${INC_DIRS}
 LIBFLAGS = ru
 
 #

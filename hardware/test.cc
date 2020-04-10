@@ -9,8 +9,8 @@
 
 #include "../aodv/test.h"
 #include "hardware_aodv.h"
-#include "hardware_hello.h"
-#include "hardware_aodv_hello.h"
+#include "hardware_hello_aodv.h"
+#include "hardware_rssi.h"
 
 using namespace std;
 
@@ -32,6 +32,9 @@ bool testHardwareAodv();
 bool testHardwareHello();
     bool testMS();
     bool testWait();
+bool testHardwareRSSI();
+    bool testCollectAll();
+    bool testSelective();
 
 int main() {
     bool allPass = true;
@@ -41,6 +44,9 @@ int main() {
     // Testing of hardware hello
     allPass &= testHardwareHello();
     printf("________________________________\n\n");
+    // Testing of hardware rssi
+    allPass &= testHardwareRSSI();
+    printf("________________________________\n\n");
     printf("HARWARE TESTS COMPLETE\n");
     return allPass;
 }
@@ -49,17 +55,17 @@ int main() {
 bool testHardwareAodv(){
     bool pass = true;
 
-    RoutingProtocol* haodv = new HardwareHelloAODV(getIpFromString("127.0.0.1"), 3000);
+    RoutingProtocol* haodv = new HardwareHelloAODV("127.0.0.1", 3000);
     PrintPort* printPort = new PrintPort(DATA_PORT);
     haodv->addPort(printPort);
 
-    char *msg = (char *)(malloc(16));
+    char *msg = (char *)(malloc(17));
     string message = "Hello World!";
-    memcpy(msg, &message, 16);
+    memcpy(msg, message.c_str(), 17);
 
     bool send = true;
-    send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.2"));
-    send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.2"));
+    send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.1"));
+    send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.1"));
     pass &= test(send, "Can attempt to send message to node on network");
     sleep(1);
     pass &= test(4 == haodv->handlePackets(), "RREQ are broadcasted and handled");
@@ -108,4 +114,43 @@ bool testWait(){
     uint64_t elapsed = end-start;
     delete basicRoutingProt;
     return test((elapsed > 98 && elapsed < 102), std::string("Hardware hello waits properly"));
+}
+
+bool testHardwareRSSI(){
+    bool allPass = true;
+    allPass &= testCollectAll();
+    allPass &= testSelective();
+    return allPass;
+}
+
+bool testCollectAll(){
+    HardwareRSSI* hRSSI = new HardwareRSSI(true);
+    thread capturing = thread(&HardwareRSSI::captureData, hRSSI);
+    capturing.detach();
+
+    sleep(2);
+
+    delete hRSSI;
+    return test(hRSSI->count > 1, string("Collecting all RSSI data works properly"));
+}
+
+bool testSelective(){
+    bool allPass = true;
+
+    HardwareRSSI* hRSSI = new HardwareRSSI(false);
+    thread capturing = thread(&HardwareRSSI::captureData, hRSSI);
+    capturing.detach();
+
+    sleep(2);
+    allPass &= test(hRSSI->count == 0, string("Selective Hardware RSSI doesn't collect any data when no neighbors are provided"));
+
+    const char* mac = "7c:9a:54:ea:8e:97";
+    hRSSI->addNeighbors(mac, getIpFromString("192.168.1.2"));
+
+    sleep(2);
+    allPass &= test(hRSSI->count > 0, string("Selective Hardware RSSI collects rssi data when Zach's Wifi router is near by"));
+
+
+    delete hRSSI;
+    return allPass;
 }

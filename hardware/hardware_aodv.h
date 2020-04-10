@@ -7,9 +7,9 @@
 #include <string>
 #include <thread>
 #include <utility>
-#include "../socket/endpoint.h"
-#include "../socket/udp_socket.h"
-#include "../aodv/aodv.h"
+#include "endpoint.h"
+#include "udp_socket.h"
+#include "aodv.h"
 #include "hardware_defines.h"
 
 class HardwareAODV : public AODV{
@@ -39,14 +39,6 @@ public:
     ~HardwareAODV();
 
     virtual int handlePackets() override;
-	
-	// Network Monitoring
-	// attempt to repair the link and then send the packet to its destination
-	//virtual void repairLink(int port, IP_ADDR brokenLink, IP_ADDR finalDest, char* buffer, int length, IP_ADDR origIP);
-	// attempt to repair the link
-	//virtual bool attemptLocalRepair(IP_ADDR brokenLink, IP_ADDR finalDest);
-	// get the next door neighbors in the network
-	//virtual void getOneHopNeighbors();
 
 protected:
     bool _socketSendPacket(int portId, char *buffer, int length, IP_ADDR dest) override;
