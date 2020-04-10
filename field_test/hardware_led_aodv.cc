@@ -57,7 +57,7 @@ int HardwareLedAODV::handlePackets() {
       }else{
         if(message.getEndpoint().getAddressI() != this->ipAddress){
           printf("[LED AODV]:[DEBUG]: Received DATA message from %s\n", message.getEndpoint().getAddressC());
-         _lightLed(HELLO_LED, LIGHT_MS);
+         _lightLed(OTHER_LED, LIGHT_MS);
         }else{
           printf("[LED AODV]:[DEBUG]: Received message from self\n");
         }

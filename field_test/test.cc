@@ -4,6 +4,7 @@
 #include <thread>
 #include <utility>
 #include <fstream>
+
 #include "hardware_led_aodv.h"
 #include "aodv_test.h"
 
@@ -27,11 +28,11 @@ int main(){
         // Send packets to all ips
         for(auto ip : ips){
             uint32_t dest = getIpFromString(ip);
-            if(!haodv->sendPacket(printPort->getPortId(), msg, message.length(), dest)){
+            if(!haodv->sendPacket(printPort->getPortId(), msg, message.length()+1, dest)){
                 fprintf(stderr, "[TEST ADHOC]:[ERROR]: Muy angry send, much mad\n");
             }
             printf("[TEST ADHOC]:[DEBUG]: Sent ");
-            printPacket(stdout, msg, message.length());
+            printPacket(stdout, msg, message.length()+1);
             printf(" to %s\n", ip.c_str());
         }
 
