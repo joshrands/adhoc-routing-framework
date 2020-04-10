@@ -68,30 +68,6 @@ void PrintBandwidth(AdHocRoutingHelper* adhocRoutingHelper, int freqMS)
   Simulator::Schedule(MilliSeconds(freqMS), &PrintBandwidth, adhocRoutingHelper, freqMS);
 }
 
-void initialHellos()
-{
-  std::cout << "[TEST]: Initial hellos!" << std::endl; 
-
-  auto it = nodeMap.begin();
-  while (it != nodeMap.end())
-  {
-
-    string msg = "Hello all!";
-    uint32_t length = msg.length();
-    char* buffer = (char*)(malloc(length));
-    for (uint32_t i = 0; i < length; i++)
-          buffer[i] = msg.at(i);
-    // send data from first node to last node 
-    AdHocRoutingHelper* adhoc = adhocMap[it->second];
-    IP_ADDR dest = getIpFromString(BROADCAST_STR); 
-    adhoc->sendPacket(DATA_PORT, buffer, msg.length(), dest); 
-
-    delete buffer;
-
-    it++;
-  }
-}
-
 void testAdHoc()
 {
   std::cout << "[TEST]: Sending message from node 1 to node 2" << std::endl;

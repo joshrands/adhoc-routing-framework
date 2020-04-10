@@ -12,6 +12,8 @@
 
 #include <map>
 
+#define PRINT_PACKETS       0
+
 namespace ns3 {
 
 class PrintPort : public Port{
@@ -19,17 +21,18 @@ public:
     PrintPort(int portId):Port(portId){}
     ~PrintPort(){}
     void handlePacket(char* data, int length, IP_ADDR source){
-        std::cout << "[PRINT PORT]: Received ";
-        for(int i = 0; i < length; i++){
-            std::cout << data[i];
+        if (PRINT_PACKETS){
+            std::cout << "[PRINT PORT]: Received ";
+            for(int i = 0; i < length; i++){
+                std::cout << data[i];
+            }
+            std::cout << " from\n" << getStringFromIp(source) << std::endl;
         }
-        std::cout << " from\n" << getStringFromIp(source) << std::endl;
     }
 
 };
 
 /* ... */
-// TODO: Create a helper with ns3 aodv and sim rem 
 class AdHocRoutingHelper : public SimAODV
 {
 public:
