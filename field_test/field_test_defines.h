@@ -1,6 +1,6 @@
 #include "defines.h"
 
-#define HELLO_LED 12
-#define AODV_LED 13
-#define OTHER_LED 14
-#define LIGHT_MS 50
+#define HELLO_LED 18
+#define AODV_LED 19
+#define OTHER_LED 20
+#define LIGHT_MS 1

@@ -12,10 +12,10 @@ password = 'smallsat'
 adhoc_network_name = 'SmallSat'
 wifi_network_name = 'CSMwireless'
 interface = 'wlan0'
-state_file = '/home/pi/AdHocRouting/rpi_utils/last_setting.txt'
+state_file = '/home/pi/adhoc-routing-framework/rpi_utils/last_setting.txt'
 adhoc_state = 0
-states_w_i = {"adhoc" : 0, "wifi" : 1}
-states_i_w = {0 : "adhoc", 1 : "wifi"}
+states_w_i = {"adhoc" : 1, "wifi" : 0}
+states_i_w = {1 : "adhoc", 0 : "wifi"}
 
 def bash(*commands):
     """
