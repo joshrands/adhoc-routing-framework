@@ -43,7 +43,8 @@ AODV::AODV(IP_ADDR ip) {
 }
 
 AODV::~AODV() {
-    cout << "[AODV]:[WARNING]: TABLE MEMORY NOT BEING CLEARED" << endl;
+    if(AODV_WARNING)
+        cout << "[AODV]:[WARNING]: TABLE MEMORY NOT BEING CLEARED" << endl;
     // TODO: Figure out why this is crashing 
 //    delete this->m_aodvTable;
 //    m_aodvTable = NULL;
@@ -81,7 +82,7 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
         // if entry exists in routing table, send it!
         // check routing table
         if(this->m_pRoutingTable == nullptr){
-            printf("[AODV]:[ERROR]: The routing table is NULL\n");
+            fprintf(stderr, "[AODV]:[ERROR]: The routing table is NULL\n");
             exit(255);
         }else{
             if (AODV_DEBUG)
@@ -440,7 +441,8 @@ void AODV::_handlePacket(int port, char *packet, int length, IP_ADDR source) {
             // Have socket handle the packet
             packet += HEADER_SIZE; // Get only the data part of the packet
             if(ports.count(port)){
-                std::cout << "[AODV]:[INFO]: Received packet on port " << port << endl; 
+                if(AODV_DEBUG)
+                    std::cout << "[AODV]:[INFO]: Received packet on port " << port << endl; 
                 ports[port]->handlePacket(packet, length - HEADER_SIZE, source);
             }else{
                 fprintf(stderr, "[AODV]:[ERROR]: Received packet on port with no port handler\n");

@@ -12,7 +12,7 @@ private:
      * @brief this function is a while loop that called sendHellos, it is meant to be threaded 
      * 
      */
-    void _sendHelloThreaded();
+    virtual void _sendHelloThreaded();
 
 protected:
     HardwareHelloMonitor* helloMonitor;

@@ -123,7 +123,7 @@ bool RoutingProtocol::linkExists(IP_ADDR dest) {
 	// if this is a broadcast, the link always exists.
 	if (getStringFromIp(dest) == BROADCAST_STR)
 	{
-		if (ROUTING_DEBUG)
+		if(ROUTING_DEBUG)
 			cout << "[ROUTING]:[DEBUG]: Broadcast link always exists" << endl;
 		return true;
 	}	

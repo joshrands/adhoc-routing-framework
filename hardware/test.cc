@@ -55,17 +55,17 @@ int main() {
 bool testHardwareAodv(){
     bool pass = true;
 
-    RoutingProtocol* haodv = new HardwareHelloAODV(getIpFromString("127.0.0.1"), 3000);
+    RoutingProtocol* haodv = new HardwareHelloAODV("127.0.0.1", 3000);
     PrintPort* printPort = new PrintPort(DATA_PORT);
     haodv->addPort(printPort);
 
-    char *msg = (char *)(malloc(16));
+    char *msg = (char *)(malloc(17));
     string message = "Hello World!";
-    memcpy(msg, &message, 16);
+    memcpy(msg, message.c_str(), 17);
 
     bool send = true;
-    send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.2"));
-    send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.2"));
+    send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.1"));
+    send = send && haodv->sendPacket(printPort->getPortId(), msg, 16, getIpFromString("127.0.0.1"));
     pass &= test(send, "Can attempt to send message to node on network");
     sleep(1);
     pass &= test(4 == haodv->handlePackets(), "RREQ are broadcasted and handled");
