@@ -11,19 +11,28 @@
 using namespace std;
 
 int main(){
+    /// Setup
     RoutingProtocol* haodv = new HardwareLedAODV("192.168.1.1");
     PrintPort* printPort = new PrintPort(DATA_PORT);
     haodv->addPort(printPort);
 
+    // Light up all LEDs to avoid random lighting
+    printf("[TEST ADHOC]:[DEBUG]: Cleaning LED pins...\n");
+    lightLed(AODV_LED, 1);
+    lightLed(HELLO_LED, 1);
+    lightLed(OTHER_LED, 1);
+    printf("[TEST ADHOC]:[DEBUG]: Cleaning LED pins...done\n");
+
+    /// Networking Settings
     string message = "Hello World!";
     char* msg = strdup(message.c_str());
-
 
     vector<string> ips = { 
         "192.168.1.2",
         "192.168.1.3"
     };
 
+    // Network
     while(true){
         // Send packets to all ips
         for(auto ip : ips){
