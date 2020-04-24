@@ -60,6 +60,7 @@ if __name__=="__main__":
     GPIO.setup(adhoc_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
     time.sleep(1) 
     get_last_setting(GPIO.input(adhoc_pin)) 
+    save_setting()
 
     while True:
         current_state = GPIO.input(adhoc_pin)
