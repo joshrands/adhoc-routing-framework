@@ -155,6 +155,13 @@ void AdHocRoutingHelper::updateLinkBandwidth(uint32_t bandwidthBytes)
     int numberOfBits = bandwidthBytes * 8;
     this->m_availableBandwidthBits -= numberOfBits; 
 
+    if (signed(this->m_availableBandwidthBits) < 0)
+    {
+        int difference = abs(signed(this->m_availableBandwidthBits));
+        this->m_availableBandwidthBits += difference;
+        numberOfBits -= difference;
+    }
+
     // since our metric is in Mbps, we will remove these bits in 1 second 
     Simulator::Schedule(Seconds(1.0), &RemovePacketFromBandwidthMetric, this, numberOfBits);
 }
