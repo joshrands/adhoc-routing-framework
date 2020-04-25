@@ -7,9 +7,8 @@ IP_ADDR lastReceive;
 int sendBuffer(char* buffer, int length, IP_ADDR dest, int port)
 {
     if (DEBUG)
-        cout << "[DEBUG]: Sending buffer from " << getStringFromIp(port) << " to " << getStringFromIp(dest) << endl;
+        cout << "[ADHOC]:[DEBUG]: Sending buffer from " << getStringFromIp(port) << " to " << getStringFromIp(dest) << endl;
 
-//    lastSource = source;
     incrementGlobalPacketCount();
 
 		return length;
