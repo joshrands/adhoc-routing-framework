@@ -18,13 +18,10 @@ int main(){
 
     // Light up all LEDs to avoid random lighting
     printf("[TEST ADHOC]:[DEBUG]: Cleaning LED pins...\n");
-    std::chrono::milliseconds start = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
     lightLed(AODV_LED_PIN, 50);
     lightLed(HELLO_LED_PIN, 50);
     lightLed(OTHER_LED_PIN, 50);
-    std::chrono::milliseconds end = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());
     printf("[TEST ADHOC]:[DEBUG]: Cleaning LED pins...done\n");
-    printf("AHH: time %ld ms\n", (end-start).count());
 
     /// Networking Settings
     string message = "Hello World!";
@@ -57,4 +54,5 @@ int main(){
     // Clean memory up
     delete printPort;
     delete haodv;
+    delete msg;
 }
