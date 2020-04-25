@@ -12,5 +12,5 @@ if __name__ == "__main__":
         GPIO.output(int(sys.argv[1]),GPIO.HIGH)
         time.sleep(float(sys.argv[2])/1000)
         GPIO.output(int(sys.argv[1]), GPIO.LOW)
-        time.sleep(float(sys.argv[2])/1000)
+        time.sleep(.1)
     GPIO.cleanup()

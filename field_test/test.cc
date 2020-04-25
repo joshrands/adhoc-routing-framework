@@ -48,7 +48,7 @@ int main(){
         // Handle packets
         int handleCount = haodv->handlePackets();
         if(handleCount > 0){
-            printf("[TEST ADHOC]:[DEBUG]: Handled %d AODV packets\n", handleCount);
+            printf("[TEST ADHOC]:[DEBUG]: Handled %d packets\n", handleCount);
         }
 
         sleep(1);
