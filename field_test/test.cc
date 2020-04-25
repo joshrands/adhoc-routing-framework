@@ -18,9 +18,9 @@ int main(){
 
     // Light up all LEDs to avoid random lighting
     printf("[TEST ADHOC]:[DEBUG]: Cleaning LED pins...\n");
-    lightLed(AODV_LED, 1);
-    lightLed(HELLO_LED, 1);
-    lightLed(OTHER_LED, 1);
+    lightLed(AODV_LED_PIN, 1);
+    lightLed(HELLO_LED_PIN, 1);
+    lightLed(OTHER_LED_PIN, 1);
     printf("[TEST ADHOC]:[DEBUG]: Cleaning LED pins...done\n");
 
     /// Networking Settings
