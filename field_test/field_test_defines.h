@@ -3,7 +3,7 @@
 #define LED_AODV_DEBUG 1 && DEBUG
 
 // If we actually flash that LED
-#define HELLO_LED_ON 0
+#define HELLO_LED_ON 1
 #define AODV_LED_ON 1
 #define OTHER_LED_ON 1
 
