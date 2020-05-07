@@ -23,22 +23,22 @@ The tests for this module should run. PASS indicates the test passed and FAIL in
 
 NS3 is a network simulator. 
 
-At the time of writing, to install the NS3 libraries, you should run:
-Install it by following the instructions in the [NS3 tutorial](https://www.nsnam.org/docs/release/3.28/tutorial/html/getting-started.html). The simulator has currently been tested using ns-3.28. 
+A bash script has been created to aid in the installation of ns3. NOTE: If you decide to not use this script and instead use a different version of ns3, you will have to manually install the CSM patch and adhoc-routing module located in the ns-3-allinone/ns-3.28 directory of this repository. 
 
 ```bash
-git clone https://gitlab.com/nsnam/ns-3-allinone.git
 cd ns-3-allinone
-python3 download.py -n ns-3.28
+bash install-ns3-csm.sh
 cd ns-3.28
-./waf configure --build-profile=optimized --enable-examples --enable-tests
+./waf configure --build-profile=optimized
 ./waf
 sudo ./waf install
 ```
 
-#### Add CSM Module and Patches
+The CSM custom adhoc-routing module should now be successfully build and installed on your system. To test this, run the following example from inside the ns-3.28 directory: 
 
-In order to accomplish network monitoring, some patches and modules were built into the NS3 source code. Download the patches at the following repository and replace the associated files in your local ns-3.28 directory: https://github.com/joshrands/adhoc-routing-framework/tree/master/ns-allinone-3.28/ns-3.28 
+```bash
+./waf --run adhoc-example --vis
+```
 
 ## Modules Overview
 
