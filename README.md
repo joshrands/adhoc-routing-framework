@@ -21,10 +21,26 @@ The tests for this module should run. PASS indicates the test passed and FAIL in
 
 ### Using NS3
 
-1. Create a module with this aodv
-  - https://www.nsnam.org/docs/manual/html/new-modules.html
+NS3 is a network simulator. 
 
-## Code Overview
+At the time of writing, to install the NS3 libraries, you should run:
+Install it by following the instructions in the [NS3 tutorial](https://www.nsnam.org/docs/release/3.28/tutorial/html/getting-started.html). The simulator has currently been tested using ns-3.28. 
+
+```bash
+git clone https://gitlab.com/nsnam/ns-3-allinone.git
+cd ns-3-allinone
+python3 download.py -n ns-3.28
+cd ns-3.28
+./waf configure --build-profile=optimized --enable-examples --enable-tests
+./waf
+sudo ./waf install
+```
+
+#### Add CSM Module and Patches
+
+In order to accomplish network monitoring, some patches and modules were built into the NS3 source code. Download the patches at the following repository and replace the associated files in your local ns-3.28 directory: https://github.com/joshrands/adhoc-routing-framework/tree/master/ns-allinone-3.28/ns-3.28 
+
+## Modules Overview
 
 ### ADHOC
 
