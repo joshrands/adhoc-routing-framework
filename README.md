@@ -34,7 +34,7 @@ cd ns-3.28
 sudo ./waf install
 ```
 
-The CSM custom adhoc-routing module should now be successfully build and installed on your system. To test this, run the following example from inside the ns-3.28 directory: 
+The CSM custom adhoc-routing module should now be successfully built and installed on your system. To test this, run the following example from inside the ns-3.28 directory. You should see a window pop up with a bunch of nodes communicating using the CSM adhoc-routing module. 
 
 ```bash
 ./waf --run adhoc-example --vis
