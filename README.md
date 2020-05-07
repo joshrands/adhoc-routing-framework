@@ -40,6 +40,8 @@ The CSM custom adhoc-routing module should now be successfully built and install
 ./waf --run adhoc-example --vis
 ```
 
+#### IMPORTANT: If any changes are made to modules in this repository that you would like to see reflected in ns3 you must run the update-ns3.sh bash script. This script copies this repository's modules into the correct folder in the ns3 adhoc-routing module. Similarly, if you create a NEW module in this repository, you will have to update the update-ns3.sh bash script to copy your module into the ns3 adhoc-routing module. 
+
 ## Modules Overview
 
 ### ADHOC
