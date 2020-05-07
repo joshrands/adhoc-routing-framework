@@ -6,7 +6,7 @@ Classes designed for physical implementation as well as simulated implementation
 
 ## Running the code
 
-This codebase is organized into several 'modules'. Modules are code grouped in a subdirectory of the main directory. Each module has been developed with a built in test framework and is compiled into a shared object (.so) file for linking capabilities. 
+This codebase is organized into several 'modules'. Modules are code grouped in a subdirectory of the main directory. Each module has been developed with a built in test framework and is compiled into a static library (.a) file for linking capabilities. 
 
 ### Testing Modules
 
