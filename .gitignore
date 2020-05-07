@@ -1,12 +1,10 @@
 test
 /aodv/test
 /*/test
-/ns-allinone-3.28
+/ns-3-allinone
+!/ns-3-allinone/install-ns3-csm.sh
 !/ns-3-allinone/ns-3.28/scratch/*
 !/ns-3-allinone/ns-3.28/src/adhoc-routing/*
-!/ns-allinone-3.28/ns-3.28/scratch/*
-!/ns-allinone-3.28/ns-3.28/src/adhoc-routing/*
-/ns-allinone-3.28/ns-3.28/src/custom/aodv/model/*
 /.vscode
 do-adhoc
 /hardware_testing/pi
