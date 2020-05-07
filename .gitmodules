@@ -1,6 +1,3 @@
 [submodule "monitoring/monitor-mode/kernel"]
 	path = monitoring/monitor-mode/kernel
 	url = https://github.com/mfruba/kernel.git
-[submodule "ns-3-allinone"]
-	path = ns-3-allinone
-	url = https://gitlab.com/nsnam/ns-3-allinone.git

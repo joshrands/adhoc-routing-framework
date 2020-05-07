@@ -17,7 +17,7 @@ NetworkMonitor::NetworkMonitor(IP_ADDR nodeIp)
     m_parentIp = nodeIp;
 
     if (MONITOR_DEBUG)
-        cout << "[DEBUG]: New monitoring service for Node " << m_parentIp << endl;
+        cout << "[MONITOR]:[DEBUG]: New monitoring service for Node " << m_parentIp << endl;
 
     // start thread for local data monitoring 
     // start this thread for hardware implementations... 
@@ -53,7 +53,7 @@ bool NetworkMonitor::isNodeOneHopNeighbor(IP_ADDR nodeIp)
     for (pair_data data : localPairData)
     {
         if (MONITOR_DEBUG)
-            cout << "[DEBUG]: Node " << data.pairIp << " is a neighbor" << endl;
+            cout << "[MONITOR]:[DEBUG]: Node " << data.pairIp << " is a neighbor" << endl;
 
         if (data.pairIp == nodeIp)
             return true;
