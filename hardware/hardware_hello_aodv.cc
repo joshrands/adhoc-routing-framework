@@ -68,6 +68,6 @@ int HardwareHelloAODV::handlePackets() {
 
 void HardwareHelloAODV::_sendHelloThreaded() {
   while (true) {
-    helloMonitor->sendHellos(HELLO_NEIGHBOR_TTL_MS * 2);
+    helloMonitor->sendHellos(HELLO_NEIGHBOR_TTL_MS * 100);
   }
 }

@@ -11,6 +11,7 @@ do-adhoc
 /monitoring/pcap-fun/read-packet
 logs
 wicap/wicap
+*/main
 
 #
 hardware_monitoring_testing

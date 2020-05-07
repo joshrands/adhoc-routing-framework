@@ -10,7 +10,7 @@
 using namespace std;
 
 int main(){
-    RoutingProtocol* haodv = new HardwareAODV("192.168.1.1");
+    RoutingProtocol* haodv = new HardwareAODV(MY_IP_ADDR);
     PrintPort* printPort = new PrintPort(DATA_PORT);
     haodv->addPort(printPort);
 

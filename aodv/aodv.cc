@@ -15,11 +15,7 @@ AODV::AODV() {
     
 }
 
-AODV::AODV(const char* ip) : AODV(getIpFromString(ip))
-{
-	if (AODV_DEBUG)
-		cout << "[AODV]:[DEBUG]: Created new aodv routing protocol." << endl;
-}
+AODV::AODV(const char* ip) : AODV(getIpFromString(ip)){}
 
 AODV::AODV(IP_ADDR ip) {
     if (AODV_DEBUG)

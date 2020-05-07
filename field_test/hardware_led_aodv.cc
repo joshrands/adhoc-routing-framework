@@ -1,11 +1,5 @@
 #include "hardware_led_aodv.h"
 
-void HardwareLedAODV::_lightLed(int pin, uint duration_ms){
-  std::stringstream commandStream;
-  commandStream << "python3 light_led.py " << pin << " " << duration_ms;
-  system(commandStream.str().c_str());
-}
-
 HardwareLedAODV::HardwareLedAODV() : HardwareHelloAODV() {}
 
 HardwareLedAODV::HardwareLedAODV(uint32_t ip) : HardwareHelloAODV(ip) {}
@@ -21,7 +15,11 @@ HardwareLedAODV::HardwareLedAODV(const char* ip, uint64_t helloDurationMS)
 HardwareLedAODV::~HardwareLedAODV() {}
 
 int HardwareLedAODV::handlePackets() {
+  int aodvCount = 0;
+  int helloCount = 0;
+  int otherCount = 0;
   int count = 0;
+
   Message message;
   // Handle aodv packets
   while (aodvSocket->getMessage(message)) {
@@ -32,12 +30,15 @@ int HardwareLedAODV::handlePackets() {
     
     // Light up the led if not a message from ourselves
     if(message.getEndpoint().getAddressI() != this->ipAddress){
-      printf("[LED AODV]:[DEBUG]: Received AODV message from %s\n", message.getEndpoint().getAddressC());
-      _lightLed(AODV_LED, LIGHT_MS);
+      aodvCount ++;
+      if(LED_AODV_DEBUG)
+        printf("[LED AODV]:[DEBUG]: Received AODV message from %s\n", message.getEndpoint().getAddressC());
     }else{
-      printf("[LED AODV]:[DEBUG]: Received AODV message from self\n");
+      if(LED_AODV_DEBUG)
+        printf("[LED AODV]:[DEBUG]: Received AODV message from self\n");
     }
   }
+
   // Handle packets on the ports
   for (auto socketPair : portSockets) {
     while (socketPair.second->getMessage(message)) {
@@ -49,21 +50,33 @@ int HardwareLedAODV::handlePackets() {
       // Light hello led if hello
       if(socketPair.first == HELLO_PORT){
         if(message.getEndpoint().getAddressI() != this->ipAddress){
-          printf("[LED AODV]:[DEBUG]: Received HELLO message from %d (self: %d)\n", message.getEndpoint().getAddressI(), this->getIp());
-          _lightLed(HELLO_LED, LIGHT_MS);
+          helloCount++;
+          if(LED_AODV_DEBUG)
+            printf("[LED AODV]:[DEBUG]: Received HELLO message from %d (self: %d)\n", message.getEndpoint().getAddressI(), this->getIp());
         }else{
-          printf("[LED AODV]:[DEBUG]: Received HELLO message from self\n");
+          if(LED_AODV_DEBUG)
+            printf("[LED AODV]:[DEBUG]: Received HELLO message from self\n");
         }
       }else{
         if(message.getEndpoint().getAddressI() != this->ipAddress){
-          printf("[LED AODV]:[DEBUG]: Received DATA message from %s\n", message.getEndpoint().getAddressC());
-         _lightLed(OTHER_LED, LIGHT_MS);
+          otherCount ++;
+          if(LED_AODV_DEBUG)
+            printf("[LED AODV]:[DEBUG]: Received DATA message from %s\n", message.getEndpoint().getAddressC());
         }else{
-          printf("[LED AODV]:[DEBUG]: Received message from self\n");
+          if(LED_AODV_DEBUG)
+            printf("[LED AODV]:[DEBUG]: Received message from self\n");
         }
       }
-
     }
   }
+
+  // Flash the LEDS
+  if(AODV_LED_ON)
+    lightLed(AODV_LED_PIN, LIGHT_MS, aodvCount);
+  if(HELLO_LED_ON)
+    lightLed(HELLO_LED_PIN, LIGHT_MS, helloCount);
+  if(OTHER_LED_ON)
+    lightLed(OTHER_LED_PIN, LIGHT_MS, otherCount);
+
   return count;
 }
