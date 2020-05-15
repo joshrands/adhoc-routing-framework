@@ -20,7 +20,7 @@
 #define RERR_DEBUG          DEBUG && 1 && GLOBAL_AODV_DEBUG
 #define AODV_WARNING        1
 
-#define PACKET_BUFFER_SIZE  5
+#define PACKET_BUFFER_SIZE  1
 
 
 #endif
