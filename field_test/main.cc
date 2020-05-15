@@ -13,7 +13,7 @@ using namespace std;
 int main(){
     /// Setup
     RoutingProtocol* haodv = new HardwareLedAODV(MY_IP_ADDR);
-    PrintPort* printPort = new PrintPort(DATA_PORT);
+    Port* printPort = new PrintPort(DATA_PORT);
     haodv->addPort(printPort);
 
     // Light up all LEDs to avoid random lighting
@@ -27,7 +27,7 @@ int main(){
     string message = "Hello World!";
     char* msg = strdup(message.c_str());
 
-    vector<string> ips = { "192.168.1.1" };
+    vector<string> ips = { "192.168.1.2" };
 
     // Network
     std::chrono::milliseconds last_send_time = std::chrono::duration_cast< std::chrono::milliseconds >(std::chrono::system_clock::now().time_since_epoch());

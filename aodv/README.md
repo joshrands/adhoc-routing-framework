@@ -1,7 +1,13 @@
 # Generic AODV
 
-### Colorado School of Mines NASA SmallSat Project
+### NASA SmallSat Project - Colorado School of Mines
 
+Name | Email | Cell
+--- | --- | ---
+Joshua Rands | joshrands1@gmail.com
+
+
+## Description
 Abstract implementation of the Ad-hoc On demand Distance Vector routing protocol. It can be used in simulation as well as on a physical testbed by implementing the SocketSendData function to send data across the desired medium.
 
 Modeled after RFC 3561: https://www.ietf.org/rfc/rfc3561.txt

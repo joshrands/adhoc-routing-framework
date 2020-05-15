@@ -69,9 +69,10 @@ public:
   
   
   /**
-   * @brief Adds the mac address to th
+   * @brief Adds the mac address to the neighbors to watch in selective mode
    * 
-   * @param mac 
+   * @param mac String of mac address ex. "7c:9a:54:ea:8e:97"
+   * @param ip the ip address that is associated with that mac address
    */
   void addNeighbors(const char* mac, IP_ADDR ip);
 
@@ -115,7 +116,7 @@ public:
    * @brief Gets the rssi data for the specificied MAC Address
    * 
    * @param mac the MAC address
-   * @return int the rssi (dbm)
+   * @return int the rssi (dbm) (0 on error)
    */
   int getRSSI(const char* mac);
 };

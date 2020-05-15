@@ -7,5 +7,7 @@ Using libpcap to capture 802.11 wifi packets, and then parsing radiotap header a
 - http://www.radiotap.org/
 - http://www.tcpdump.org/pcap.html
 
-## TODO
+## To-Do
 0. Refactor to use current style guidelines
+
+## File Insights

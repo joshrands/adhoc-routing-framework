@@ -46,7 +46,10 @@ public:
      * @return true if it is
      * @return false if it is not
      */
-    bool empty() const { return storage.empty(); }
+    bool empty() { 
+        std::lock_guard<std::mutex> lock(m);
+        return storage.empty(); 
+    }
 
     /*!
      * @brief Places the data on the queue will overwrite data at back
@@ -64,7 +67,7 @@ public:
      * @return true queue not empty
      * @return false queue empty
      */
-    bool peek(T &elem){
+    bool peek(T &elem) {
         std::lock_guard<std::mutex> lock(m);
         return storage.peek(elem);
     }

@@ -51,12 +51,6 @@ public:
    */
   void resetAddress(void);
 
-  /** Set the address of this endpoint
-  \param host The endpoint address (it can either be an IP Address or a hostname
-  that will be resolved with DNS). \param port The endpoint port \return 0 on
-  success, -1 on failure (when an hostname cannot be resolved by DNS).
-  */
-
   /*! Set the address of this endpoint
    *  @param host The endpoint IP address
    *  @param port The endpoint port

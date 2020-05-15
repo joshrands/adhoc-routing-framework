@@ -1,6 +1,13 @@
 # Network Monitoring 
 
-### Colorado School of Mines NASA SmallSat Project
+### NASA SmallSat Project - Colorado School of Mines
+
+Name | Email | Cell
+--- | --- | ---
+Joshua Rands | joshrands1@gmail.com
+
+
+## Description
 
 Abstract implementation of network monitoring for virtual and physical environments. 
 

@@ -2,6 +2,14 @@
 
 ### NASA SmallSat Project - Colorado School of Mines
 
+Name | Email | Cell
+--- | --- | ---
+Zachary Smeton | zsmeton@yahoo.com | (303) 880-9437
+Joshua Rands | joshrands1@gmail.com
+
+
+## Description
+
 Classes designed for physical implementation as well as simulated implementation of an ad-hoc network on a single decentralized subnet.
 
 ## Running the code
@@ -43,7 +51,7 @@ Simulation interfacing for components of ad-hoc routing.
 
 ### AODV 
 
-AODV Protocol implemented from AODV RFC3561 (https://www.ietf.org/rfc/rfc3561.txt)
+AODV Protocol implemented from AODV RFC3561 (https://www.ietf.org/rfc/rfc3561.txt).
 [code here](aodv)
 
 ### HELLO_MONITOR
@@ -61,7 +69,7 @@ Implementation of REgression-based network Monitoring (https://dl.acm.org/doi/ab
 UDP Sockets and helper classes. 
 [code here](socket)
 
-## TODOS
+## To-Do
 - Completely redo the file system and makefiles to use dependencies and actually use the static libraries, the Makefiles currently are awful
   - Use hidden directories to store build files and dependency files
   - Use structures in each file system to hold src (.cc) and include (.h)

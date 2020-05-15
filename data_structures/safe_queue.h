@@ -51,6 +51,48 @@ public:
         q.pop();
         return true;
     }
+
+    /*! Pops the top element off the queue
+     *
+     * @return true queue not empty
+     * @return false queue empty
+     */
+    bool pop() {
+        std::lock_guard<std::mutex> lock(m);
+        if (q.empty()) {
+            return false;
+        }
+        q.pop();
+        return true;
+    }
+
+    /*!
+     * @brief Looks at the top element does not pop()
+     *
+     * @param elem a pass by reference variable to place the top in
+     * @return true queue not empty
+     * @return false queue empty
+     */
+    bool peek(T &elem) {
+        std::lock_guard<std::mutex> lock(m);
+        if (q.empty()) {
+            return false;
+        }
+        elem = q.front();
+        return true;
+    }
+
+    /*!
+     * @brief Checks if the queue is empty
+     *
+     * @return true if it is
+     * @return false if it is not
+     */
+    bool empty() { 
+        std::lock_guard<std::mutex> lock(m);
+        return q.empty(); 
+    }
+
 };
 
 #endif
