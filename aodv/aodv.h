@@ -19,9 +19,10 @@
 
 #include "routing_protocol.h"
 
+#include "safe_circular_queue.h"
+
 #include <vector>
 #include <functional>
-#include <queue>
 
 struct BufferedPacket{
 	int portId;
@@ -73,7 +74,7 @@ protected:
 	uint32_t packetIdCount;	
 	// map of rreq ids and their corresponding packet to be sent once the route is established
 	// TODO: Fix up for port stuff
-	map<IP_ADDR, queue<BufferedPacket>> rreqPacketBuffer;
+	map<IP_ADDR, SafeCircularQueue<BufferedPacket>*> rreqPacketBuffer;
 
 	// RREQ - Route Request 
 	RREQHelper rreqHelper;

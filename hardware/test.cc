@@ -30,8 +30,6 @@ bool test(bool condition, string desc)
 
 bool testHardwareAodv();
 bool testHardwareHello();
-    bool testMS();
-    bool testWait();
 bool testHardwareRSSI();
     bool testCollectAll();
     bool testSelective();
@@ -83,36 +81,21 @@ bool testHardwareAodv(){
     pass &= test(4 == haodv->handlePackets(), "RREQ are broadcasted and handled");
     haodv->removePort(printPort);
     pass &= test(0 == haodv->handlePackets(), "Messages aren't sent mutiple times");
-    
-    delete printPort;
-    delete haodv;
 
-    return !pass;
+    return pass;
 }
 
 
 bool testHardwareHello(){
-    return testMS() && testWait();
-}
-
-bool testMS(){
     RoutingProtocol* basicRoutingProt = new AODVTest(getIpFromString("127.0.0.1"));
-    HHMTest hello(HELLO_PORT, basicRoutingProt);
-    printf("current time: %lu \n", hello.getCurrentTimeMS());
-    delete basicRoutingProt;
-    return true;
-}
-
-bool testWait(){
-    RoutingProtocol* basicRoutingProt = new AODVTest(getIpFromString("127.0.0.1"));
-    HHMTest hello(HELLO_PORT, basicRoutingProt);
+    HHMTest* hello = new HHMTest(HELLO_PORT, basicRoutingProt);
+    printf("current time: %lu \n", hello->getCurrentTimeMS());
     
-    uint64_t start = hello.getCurrentTimeMS();
-    hello.sleep(100);
-    uint64_t end = hello.getCurrentTimeMS();
+    uint64_t start = hello->getCurrentTimeMS();
+    hello->sleep(100);
+    uint64_t end = hello->getCurrentTimeMS();
 
     uint64_t elapsed = end-start;
-    delete basicRoutingProt;
     return test((elapsed > 98 && elapsed < 102), std::string("Hardware hello waits properly"));
 }
 

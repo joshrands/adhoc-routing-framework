@@ -41,18 +41,15 @@ AODV::AODV(IP_ADDR ip) {
 AODV::~AODV() {
     if(AODV_WARNING)
         cout << "[AODV]:[WARNING]: TABLE MEMORY NOT BEING CLEARED" << endl;
-    // TODO: Figure out why this is crashing 
-//    delete this->m_aodvTable;
-//    m_aodvTable = NULL;
 
     for (auto it = rreqPacketBuffer.begin(); it != rreqPacketBuffer.end(); ++it) {
         // remove all packets from this queue
-        queue<BufferedPacket> packetQueue = it->second;
-        while (packetQueue.size() > 0) {
-            BufferedPacket package = packetQueue.front();
-            packetQueue.pop();
+        while (it->second->empty()) {
+            BufferedPacket package;
+            it->second->pop(package);
             free(package.buffer);
         }
+        free(it->second);
     }
 }
 
@@ -95,9 +92,11 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
 
             // Put this packet in a buffer to be sent when a route opens up
             if (this->rreqPacketBuffer.count(dest)) {
-                this->rreqPacketBuffer[dest].push(bufferedPacket);
+                this->rreqPacketBuffer[dest]->push(bufferedPacket);
             } else {
-                this->rreqPacketBuffer[dest] = queue<BufferedPacket>({bufferedPacket});
+                SafeCircularQueue<BufferedPacket>* q = new SafeCircularQueue<BufferedPacket>(PACKET_BUFFER_SIZE);
+                q->push(bufferedPacket);
+                this->rreqPacketBuffer[dest] = q;
             }
 
             if (nextHop != 0) {
@@ -357,12 +356,10 @@ void AODV::_handleRREP(char *buffer, int length, IP_ADDR source) {
             }
 
             // Pull all the packets off the queue and send them
-            queue<BufferedPacket> *packetQueue = &rreqPacketBuffer[rrep.destIP];
-            while (packetQueue->size() > 0) {
-                BufferedPacket packet = packetQueue->front();
+            while (!this->rreqPacketBuffer[rrep.destIP]->empty()) {
+                BufferedPacket packet;
+                this->rreqPacketBuffer[rrep.destIP]->pop(packet);
                 sendPacket(packet.portId, packet.buffer, packet.length, rrep.destIP);
-                delete packet.buffer;
-                packetQueue->pop();
             }
         }
         this->rreqPacketBuffer.erase(rrep.destIP);

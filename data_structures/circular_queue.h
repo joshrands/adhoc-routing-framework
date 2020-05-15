@@ -21,7 +21,6 @@ private:
     int front;
     int rear;
     T *storage;
-    std::mutex m;
 
 public:
     /*!

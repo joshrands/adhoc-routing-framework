@@ -14,6 +14,8 @@
 #include "routing_protocol.h"
 #include "hello_defines.h"
 
+using namespace std;
+
 class HelloMonitor : public Port
 {
 public:
