@@ -26,7 +26,7 @@ int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, 
 {
     if (DEBUG) 
         std::cout << "[ADHOC_HELPER]:[DEBUG]: Source node = " << getStringFromIp(source) 
-                  << " to destinatio node = " << getStringFromIp(dest) << std::endl;
+                  << " to destination node = " << getStringFromIp(dest) << std::endl;
 
     Ptr<Node> sourceNode = AdHocRoutingHelper::m_existingNodes[source];
     Ptr<Node> destNode = AdHocRoutingHelper::m_existingNodes[dest];
