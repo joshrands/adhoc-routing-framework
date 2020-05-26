@@ -71,11 +71,11 @@ int HardwareLedAODV::handlePackets() {
   }
 
   // Flash the LEDS
-  if(AODV_LED_ON)
+  if(AODV_LED_ON && aodvCount)
     lightLed(AODV_LED_PIN, LIGHT_MS, aodvCount);
-  if(HELLO_LED_ON)
+  if(HELLO_LED_ON && helloCount)
     lightLed(HELLO_LED_PIN, LIGHT_MS, helloCount);
-  if(OTHER_LED_ON)
+  if(OTHER_LED_ON && otherCount)
     lightLed(OTHER_LED_PIN, LIGHT_MS, otherCount);
 
   return count;
