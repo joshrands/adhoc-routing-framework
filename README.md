@@ -29,9 +29,11 @@ The tests for this module should run. PASS indicates the test passed and FAIL in
 
 ### Using NS3
 
-NS3 is a network simulator. 
+NS3 is a network simulator.
 
-A bash script has been created to aid in the installation of ns3. NOTE: If you decide to not use this script and instead use a different version of ns3, you will have to manually install the CSM patch and adhoc-routing module located in the ns-3-allinone/ns-3.28 directory of this repository. 
+Prior to running these commands, ensure that you have the prerequisites for running NS3 completed. Instructions on this process are summarized in the Ad-hoc Communication document (2.2 Getting NS3 to work) in the group’s shared smallsat folder. Alternatively, you can follow NS3's [installation instructions](https://www.nsnam.org/wiki/Installation). This project was built using NS3.28.
+
+A bash script has been created to aid in the installation of ns3 for the adhoc-routing-framework. NOTE: If you decide to not use this script and instead use a different version of ns3, you will have to manually install the CSM patch and adhoc-routing module located in the ns-3-allinone/ns-3.28 directory of this repository. 
 
 ```bash
 cd ns-3-allinone
