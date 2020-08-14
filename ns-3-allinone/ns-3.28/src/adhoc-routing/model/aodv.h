@@ -58,6 +58,8 @@ public:
 
 	// output the current contents of the routing table 
 	void logRoutingTable();
+	// ask if there is a direct link to another node's IP
+	bool directLink(IP_ADDR toIP);
 
 	// get the routing table 
 	AODVRoutingTable* getTable() { return (AODVRoutingTable*) m_pRoutingTable; } 

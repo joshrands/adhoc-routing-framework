@@ -50,6 +50,7 @@ public:
     // Network monitoring helpers for Rss and Bandwidth 
     map<uint32_t, double> getLinkRssMap() { return m_linkRssDb; } 
     int getAvailableBandwidthBits() { return m_availableBandwidthBits; }
+    int getLinkBandwidthBits(IP_ADDR linkIp);
     void setAvailableBandwidthBits(int availableBandwidth) { this->m_availableBandwidthBits = availableBandwidth; }
     void increaseAvailableBandwidthByBits(int numberOfBits) { this->m_availableBandwidthBits += numberOfBits; }
 

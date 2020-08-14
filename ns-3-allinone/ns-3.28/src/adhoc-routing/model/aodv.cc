@@ -249,6 +249,23 @@ void AODV::logRoutingTable() {
     while (logFile.is_open());
 }
 
+bool AODV::directLink(IP_ADDR toIP)
+{
+	if(this->m_pRoutingTable == nullptr){
+		fprintf(stderr, "[AODV]:[ERROR]: The routing table is NULL\n");
+		exit(255);
+	}
+
+	if(this->m_pRoutingTable->getNextHop(toIP) == toIP)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 
 
 /******************************

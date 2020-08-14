@@ -144,6 +144,19 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
     }
 }
 
+
+int AdHocRoutingHelper::getLinkBandwidthBits(IP_ADDR linkIp)
+{
+	// Determine if we have a direct link to linkIp Node
+	if(!this->directLink(linkIp))
+	{
+		// No direct link, link bandwidth is 0
+		return 0;
+	}
+	// Return available Bandwidth TODO: to free BW + used
+	return m_availableBandwidthBits;
+}
+
 void RemovePacketFromBandwidthMetric(AdHocRoutingHelper* adhocRoutingHelper, int numberOfBits)
 {
     adhocRoutingHelper->increaseAvailableBandwidthByBits(numberOfBits);
