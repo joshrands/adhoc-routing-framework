@@ -78,12 +78,12 @@ int AdHocRoutingHelper::AdHocSendPacket(char* buffer, int length, IP_ADDR dest, 
 void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
 {
     Ptr<Packet> packet;
+    int packetSize = 0;
 
     // Add this packet to the buffer of current packets and make callback to remove it in 1 second 
-    int packetSize = socket->GetRxAvailable();
-
     while (packet = socket->Recv ())
     {
+        packetSize = packet->GetSize();
         Ipv4Header header;
         packet->RemoveHeader(header); 
 
@@ -136,7 +136,7 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         // Update rss 
         adhocRoutingHelper->updateLinkRss(source, packetPairData.rss);
         // Update bandwidth 
-        adhocRoutingHelper->updateLinkBandwidth(packetSize); 
+        adhocRoutingHelper->updateLinkBandwidth(source, packetSize);
 
         // Push the packet onto the packet queue and then handle it
         adhocRoutingHelper->packetQueue.push(packet);
@@ -153,16 +153,50 @@ int AdHocRoutingHelper::getLinkBandwidthBits(IP_ADDR linkIp)
 		// No direct link, link bandwidth is 0
 		return 0;
 	}
-	// Return available Bandwidth TODO: to free BW + used
-	return m_availableBandwidthBits;
+
+	int bandwidthByLink = 0;
+
+	// Determine bandwidth used by IP link
+	std::map<IP_ADDR, int>::iterator it = m_bandwidthUsedMap.find(linkIp);
+	if(it != m_bandwidthUsedMap.end())
+	{
+		bandwidthByLink = it->second;
+	}
+	return m_availableBandwidthBits + bandwidthByLink;
 }
 
-void RemovePacketFromBandwidthMetric(AdHocRoutingHelper* adhocRoutingHelper, int numberOfBits)
+void AdHocRoutingHelper::increaseAvailableBandwidthByBits(IP_ADDR linkIP, int numberOfBits)
 {
-    adhocRoutingHelper->increaseAvailableBandwidthByBits(numberOfBits);
+	// Remove packet size to bandwidth usage map
+	std::map<IP_ADDR, int>::iterator it = m_bandwidthUsedMap.find(linkIP);
+	if(it != m_bandwidthUsedMap.end())
+	{
+		if(it->second >= numberOfBits)
+		{
+			it->second = it->second - numberOfBits;
+		}
+		else
+		{
+			// something went wrong... just clear map
+	        fprintf(stderr, "[ADHOC_HELPER]:[ERROR]: Removing unaccounted for bandwidth\n");
+			it->second = 0;
+		}
+	}
+	else
+	{
+		// something went wrong... add IP to map
+        fprintf(stderr, "[ADHOC_HELPER]:[ERROR]: Tried to remove bandwidth used by none-familiar IP address\n");
+		m_bandwidthUsedMap.insert(std::pair<int, int>(linkIP, 0));
+	}
+	this->m_availableBandwidthBits += numberOfBits;
 }
 
-void AdHocRoutingHelper::updateLinkBandwidth(uint32_t bandwidthBytes)
+void RemovePacketFromBandwidthMetric(AdHocRoutingHelper* adhocRoutingHelper, IP_ADDR linkIP, int numberOfBits)
+{
+    adhocRoutingHelper->increaseAvailableBandwidthByBits(linkIP, numberOfBits);
+}
+
+void AdHocRoutingHelper::updateLinkBandwidth(IP_ADDR linkIP, uint32_t bandwidthBytes)
 {
     // Add this packet to current bandwidth and remove it after a second 
     int numberOfBits = bandwidthBytes * 8;
@@ -175,8 +209,19 @@ void AdHocRoutingHelper::updateLinkBandwidth(uint32_t bandwidthBytes)
         numberOfBits -= difference;
     }
 
+    // Add packet size to bandwidth usage map
+    std::map<IP_ADDR, int>::iterator it = m_bandwidthUsedMap.find(linkIP);
+    if(it != m_bandwidthUsedMap.end())
+    {
+        it->second = it->second + numberOfBits;
+    }
+    else
+    {
+        m_bandwidthUsedMap.insert(std::pair<int, int>(linkIP, numberOfBits));
+    }
+
     // since our metric is in Mbps, we will remove these bits in 1 second 
-    Simulator::Schedule(Seconds(1.0), &RemovePacketFromBandwidthMetric, this, numberOfBits);
+    Simulator::Schedule(Seconds(1.0), &RemovePacketFromBandwidthMetric, this, linkIP, numberOfBits);
 }
 
 uint64_t AdHocRoutingHelper::getNs3SimulatedTimeMS()

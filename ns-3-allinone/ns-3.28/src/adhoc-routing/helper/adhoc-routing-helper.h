@@ -52,10 +52,10 @@ public:
     int getAvailableBandwidthBits() { return m_availableBandwidthBits; }
     int getLinkBandwidthBits(IP_ADDR linkIp);
     void setAvailableBandwidthBits(int availableBandwidth) { this->m_availableBandwidthBits = availableBandwidth; }
-    void increaseAvailableBandwidthByBits(int numberOfBits) { this->m_availableBandwidthBits += numberOfBits; }
+    void increaseAvailableBandwidthByBits(IP_ADDR linkIP, int numberOfBits);
 
     void updateLinkRss(uint32_t ip, double rss) { m_linkRssDb[ip] = rss; }
-    void updateLinkBandwidth(uint32_t bandwidthBytes);
+    void updateLinkBandwidth(IP_ADDR linkIP, uint32_t bandwidthBytes);
 
     string getIpAddressStr() { return getStringFromIp(this->ipAddress); }
 
@@ -67,6 +67,8 @@ protected:
 
     // Local bandwidth calculation over the last second 
     int m_availableBandwidthBits;
+	// Holds how much bandwidth is used by each node over the last minute
+	std::map<IP_ADDR, int> m_bandwidthUsedMap;
 
     // So nodes can send packets to each other 
     static std::map<IP_ADDR, Ptr<Node>> m_existingNodes;
