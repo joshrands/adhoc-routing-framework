@@ -71,7 +71,7 @@ void PrintBandwidth(AdHocRoutingHelper* adhocRoutingHelper, int freqMS)
 void testAdHoc()
 {
   std::cout << "[TEST]: Sending message from node 1 to node 2" << std::endl;
-  // Test sending from node 1 to node 3
+  // Test sending from node 1 to node 2
   string msg = "Hello friend!";
   uint32_t length = msg.length();
   char* buffer = (char*)(malloc(length));
@@ -85,7 +85,16 @@ void testAdHoc()
   IP_ADDR dest = it->first;
   adhoc->sendPacket(DATA_PORT, buffer, msg.length(), dest); 
 
-  Simulator::Schedule(Seconds(2.0), &testAdHoc);
+  // Print per-link bandwidth for all nodes connected to node 2
+  for(uint32_t i = 0; i < nodes.GetN(); i++)
+  {
+    std::cout << "[TEST]: Per-link bandwidth from " << it->second->m_AdHocRoutingHelper->getIpAddressStr()
+        << " to " << nodes.Get(i)->m_AdHocRoutingHelper->getIpAddressStr() << ": "
+        << it->second->m_AdHocRoutingHelper->getLinkBandwidthBits(nodes.Get(i)->m_AdHocRoutingHelper->getIp())
+        << std::endl;
+  }
+
+  Simulator::Schedule(Seconds(0.5), &testAdHoc);
 
   delete buffer;
 }
@@ -251,7 +260,7 @@ int main (int argc, char *argv[])
     nodes.Get(i)->m_AdHocRoutingHelper = adhocMap[nodes.Get(i)]; 
     nodes.Get(i)->m_AdHocRoutingHelper->setAvailableBandwidthBits(dataRateMbps * 1000000);
 
-    Simulator::Schedule(Seconds(1 + i), &PrintBandwidth, nodes.Get(i)->m_AdHocRoutingHelper, 10);
+//    Simulator::Schedule(Seconds(1 + i), &PrintBandwidth, nodes.Get(i)->m_AdHocRoutingHelper, 10);
 
     Vector pos = nodes.Get(i)->GetObject<RandomWaypointMobilityModel>()->GetPosition();
     if (DEBUG)
@@ -261,7 +270,7 @@ int main (int argc, char *argv[])
     Simulator::Schedule(MilliSeconds(1001 + i), &AdHocRoutingHelper::waitSimulatedTimeForHelloMonitor, 2000, adhocMap[nodes.Get(i)]->helloMonitor);
   }
 
-  Simulator::Schedule(Seconds(2.0), &testAdHoc);
+  Simulator::Schedule(Seconds(10.0), &testAdHoc);
   // TODO: Add network monitroing back.
 //  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
   // Drain battery
