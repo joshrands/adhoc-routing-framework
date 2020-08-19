@@ -18,6 +18,7 @@ def build(bld):
 				'model/hello_monitor.cc',
 				'model/hello_sim.cc',
 				'model/network_monitor.cc',
+				'model/packet_buffer.cc',
 				'model/port.cc',
 				'model/rem.cc',
 				'model/rem_model.cc',
@@ -36,6 +37,7 @@ def build(bld):
     headers.source = [
  				'model/defines.h',
 				'model/adhoc_defines.h',
+				'model/adhoc_structs.h',
 				'model/aodv_defines.h',
 				'model/aodv.h',
 				'model/aodv_packets.h',
@@ -51,6 +53,7 @@ def build(bld):
 				'model/hello_defines.h',
 				'model/monitor_info.h',
 				'model/network_monitor.h',
+				'model/packet_buffer.h',
 				'model/port.h',
 				'model/rem_defines.h',
 				'model/rem.h',

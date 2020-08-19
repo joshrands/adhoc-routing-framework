@@ -16,18 +16,14 @@
 #include "aodv_rrep.h"
 #include "aodv_rerr.h"
 #include "aodv_params.h"
+#include "packet_buffer.h"
+#include "adhoc_structs.h"
 
 #include "routing_protocol.h"
 
 #include <vector>
 #include <functional>
 #include <queue>
-
-struct BufferedPacket{
-	int portId;
-	char* buffer;
-	int length;
-};
 
 class AODV : public RoutingProtocol
 {
@@ -74,11 +70,12 @@ protected:
 	// current packet id index
 	uint32_t packetIdCount;	
 	// map of rreq ids and their corresponding packet to be sent once the route is established
-	// TODO: Fix up for port stuff
+	// TODO: Update unit-testing
 	map<IP_ADDR, queue<BufferedPacket>> rreqPacketBuffer;
-
 	// RREQ - Route Request 
 	RREQHelper rreqHelper;
+	// Packet buffer for packets waiting to be sent
+	PacketBuffer m_oPacketBuffer;
 	// broadcast rreq to all neighbors
 	void _broadcastRREQBuffer(rreqPacket rreq);
 	// make a decision on a received rreq packet using the rreq helper 

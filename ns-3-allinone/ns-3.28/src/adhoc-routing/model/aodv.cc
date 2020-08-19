@@ -44,16 +44,6 @@ AODV::~AODV() {
     // TODO: Figure out why this is crashing 
 //    delete this->m_aodvTable;
 //    m_aodvTable = NULL;
-
-    for (auto it = rreqPacketBuffer.begin(); it != rreqPacketBuffer.end(); ++it) {
-        // remove all packets from this queue
-        queue<BufferedPacket> packetQueue = it->second;
-        while (packetQueue.size() > 0) {
-            BufferedPacket package = packetQueue.front();
-            packetQueue.pop();
-            free(package.buffer);
-        }
-    }
 }
 
 /******************************
@@ -87,18 +77,15 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
         }
 
         if (false == getTable()->getIsRouteActive(dest)) {
+
             BufferedPacket bufferedPacket;
+            bufferedPacket.dest = dest;
             bufferedPacket.buffer = (char *)(malloc(length));
             memcpy(bufferedPacket.buffer, packet, length);
             bufferedPacket.length = length;
             bufferedPacket.portId = portId;
 
-            // Put this packet in a buffer to be sent when a route opens up
-            if (this->rreqPacketBuffer.count(dest)) {
-                this->rreqPacketBuffer[dest].push(bufferedPacket);
-            } else {
-                this->rreqPacketBuffer[dest] = queue<BufferedPacket>({bufferedPacket});
-            }
+            m_oPacketBuffer.storePacket(bufferedPacket);
 
             if (nextHop != 0) {
                 // this route is temporarily unavailable... check if actively
@@ -362,27 +349,22 @@ void AODV::_handleRREP(char *buffer, int length, IP_ADDR source) {
         // packet made it back!
         if (AODV_DEBUG)
             cout << "[AODV]:[DEBUG]: Route discovery complete! Sending buffered "
-                    "packets, if they exist."
+                 << "packets, if they exist."
                  << endl;
 
         // Send any queued packages for that destination
-        if (this->rreqPacketBuffer.count(rrep.destIP)) {
+        while(m_oPacketBuffer.packetsWaiting(rrep.destIP))
+        {
             if (AODV_DEBUG){
                 cout << "[AODV]:[DEBUG]: There are packets in the queue. Sending "
-                        "data..."
+                     << "data..."
                      << endl;
             }
 
-            // Pull all the packets off the queue and send them
-            queue<BufferedPacket> *packetQueue = &rreqPacketBuffer[rrep.destIP];
-            while (packetQueue->size() > 0) {
-                BufferedPacket packet = packetQueue->front();
-                sendPacket(packet.portId, packet.buffer, packet.length, rrep.destIP);
-                delete packet.buffer;
-                packetQueue->pop();
-            }
+            BufferedPacket packet = m_oPacketBuffer.getPacket(rrep.destIP);
+            sendPacket(packet.portId, packet.buffer, packet.length, packet.dest);
+            delete packet.buffer;
         }
-        this->rreqPacketBuffer.erase(rrep.destIP);
 
     } else {
         // forward this packet
