@@ -40,12 +40,21 @@ void PacketBuffer::storePacket(BufferedPacket bufferedPacket)
 	}
 	else
 	{
-		// Throw away oldest packet waiting to go to this destination
-		free(m_oRREQPacketBuffer.at(bufferedPacket.dest).front().buffer);
-		m_oRREQPacketBuffer.at(bufferedPacket.dest).pop();
+		if(m_oRREQPacketBuffer.at(bufferedPacket.dest).size() > 0)
+		{
+			// Throw away oldest packet waiting to go to this destination
+			free(m_oRREQPacketBuffer.at(bufferedPacket.dest).front().buffer);
+			m_oRREQPacketBuffer.at(bufferedPacket.dest).pop();
 
-		// Save newest packet
-		m_oRREQPacketBuffer.at(bufferedPacket.dest).push(bufferedPacket);
+			// Save newest packet
+			m_oRREQPacketBuffer.at(bufferedPacket.dest).push(bufferedPacket);
+		}
+		else
+		{
+			// Buffer is full and there are no old packets to throw away for this destination
+			// Just throw away this packet
+			free(bufferedPacket.buffer);
+		}
 	}
 }
 
