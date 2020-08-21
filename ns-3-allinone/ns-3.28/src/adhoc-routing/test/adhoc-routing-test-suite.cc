@@ -1,7 +1,14 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
+/* This is a blank example of how to write test suits and test
+ * cases.
+ *
+ * Be sure to add the path to this file in the sscript under the
+ * module_test.source section
+ */
+
 // Include a header file from your module to test.
-#include "ns3/adhoc_routing.h"
+//#include "ns3/adhoc_routing.h"
 
 // An essential include is test.h
 #include "ns3/test.h"
