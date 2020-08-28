@@ -3,6 +3,7 @@
 // Header files from module
 #include "ns3/defines.h"
 #include "ns3/packet_buffer.h"
+#include "ns3/adhoc_structs.h"
 #include "ns3/test.h"
 
 #include <string.h>
@@ -46,26 +47,45 @@ PacketBufferTestCase::DoRun (void)
 	char* packet = (char *)"Hello World";
 	int length = (int)strlen(packet), portId = 0;
 
-    BufferedPacket bufferedPacket;
-    bufferedPacket.dest = testIP;
-    bufferedPacket.buffer = (char *)(malloc(length));
-    memcpy(bufferedPacket.buffer, packet, length);
-    bufferedPacket.length = length;
-    bufferedPacket.portId = portId;
-    testPBuffer.storePacket(bufferedPacket);
+	BufferedPacket bufferedPacket;
+	bufferedPacket.dest = testIP;
+	bufferedPacket.buffer = (char *)(malloc(length));
+	memcpy(bufferedPacket.buffer, packet, length);
+	bufferedPacket.length = length;
+	bufferedPacket.portId = portId;
+	testPBuffer.storePacket(bufferedPacket);
 
 	NS_TEST_ASSERT_MSG_EQ (testPBuffer.packetsWaiting(testIP), true, "Added packet to buffer, but buffer does not report a packet waiting.");
 
 	// Remove packet from buffer
 	bufferedPacket = testPBuffer.getPacket(testIP);
+	free(bufferedPacket.buffer);
 
 	NS_TEST_ASSERT_MSG_EQ (testPBuffer.packetsWaiting(testIP), false, "Empty buffer thinks it has a packet...");
 
-	for(int i = 0; i < 10; i++)
+	// Fill queue
+	for(int i = 0; i <= 10; i++)
 	{
-	    testPBuffer.storePacket(bufferedPacket);
+		BufferedPacket bufferedPacket;
+		bufferedPacket.dest = testIP;
+		bufferedPacket.buffer = (char *)(malloc(length));
+		memcpy(bufferedPacket.buffer, packet, length);
+		bufferedPacket.length = length;
+		bufferedPacket.portId = portId;
+
+		testPBuffer.storePacket(bufferedPacket);
+
+		NS_TEST_ASSERT_MSG_EQ (testPBuffer.packetsWaiting(testIP), true, "Non-empty buffer thinks it is empty...");
 	}
 
+    // Empty queue
+    while(testPBuffer.packetsWaiting(testIP))
+    {
+        BufferedPacket packet = testPBuffer.getPacket(testIP);
+    	free(packet.buffer);
+    }
+
+	NS_TEST_ASSERT_MSG_EQ (testPBuffer.packetsWaiting(testIP), false, "Empty buffer thinks it has a packet...");
 }
 
 // TestSuite class for AdHocRoutingHelper and its related classes
