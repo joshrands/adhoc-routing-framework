@@ -25,7 +25,7 @@
 #include <functional>
 #include <queue>
 
-class AODV : public RoutingProtocol
+class AODV : public AdhocRoutingProtocol
 {
 public:
 	// default constructor 

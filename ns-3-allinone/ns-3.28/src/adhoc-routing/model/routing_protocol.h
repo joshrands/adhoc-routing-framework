@@ -1,5 +1,5 @@
-#ifndef ROUTINGPROTOCOL_H
-#define ROUTINGPROTOCOL_H
+#ifndef ADHOSROUTINGPROTOCOL_H
+#define ADHOSROUTINGPROTOCOL_H
 
 /********************************
  * RoutingProtocol.h 
@@ -75,12 +75,12 @@ protected:
 static mutex globalMux;
 
 /* Routing Protocol base class */
-class RoutingProtocol {
+class AdhocRoutingProtocol {
 public: 
 	// default constructor
-	RoutingProtocol();
+	AdhocRoutingProtocol();
     // Destructor
-    virtual ~RoutingProtocol();
+    virtual ~AdhocRoutingProtocol();
 
 	    // Functions
     /**

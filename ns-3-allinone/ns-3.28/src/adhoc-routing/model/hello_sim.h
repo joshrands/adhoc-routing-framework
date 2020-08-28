@@ -15,7 +15,7 @@
 class SimHelloMonitor : public HelloMonitor 
 {
 public:
-    SimHelloMonitor(int portId, RoutingProtocol* routing) : HelloMonitor(portId, routing) { }
+    SimHelloMonitor(int portId, AdhocRoutingProtocol* routing) : HelloMonitor(portId, routing) { }
 
     void(*waitSimulatedTime)(int duration_ms);
     uint64_t(*getSimulatedTime)();

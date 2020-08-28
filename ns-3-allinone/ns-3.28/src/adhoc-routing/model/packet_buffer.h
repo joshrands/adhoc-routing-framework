@@ -4,7 +4,7 @@
 /*********************************
  * packet_buffer.h
  *
- * C++ implementation of HelloMonitor for simulated environments
+ * C++ implementation of a Packet Buffer
  *
  * Author: Jonathan Diller
  * Date: 08/17/2020

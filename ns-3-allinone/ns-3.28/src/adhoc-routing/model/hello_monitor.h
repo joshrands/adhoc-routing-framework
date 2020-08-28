@@ -17,7 +17,7 @@
 class HelloMonitor : public Port
 {
 public:
-    HelloMonitor(int portId, RoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); m_active = true; }
+    HelloMonitor(int portId, AdhocRoutingProtocol* routing) : Port(portId, routing) { m_parentIp = routing->getIp(); m_active = true; }
     virtual ~HelloMonitor() {}
 
     /**
@@ -76,7 +76,7 @@ protected:
 class HelloTest : public HelloMonitor
 {
 public: 
-    HelloTest(int portId, RoutingProtocol* routing) : HelloMonitor(portId, routing) { }
+    HelloTest(int portId, AdhocRoutingProtocol* routing) : HelloMonitor(portId, routing) { }
 
 protected:
     bool _sleep(uint64_t duration_ms) override;

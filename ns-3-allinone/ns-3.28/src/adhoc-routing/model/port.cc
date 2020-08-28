@@ -16,14 +16,14 @@ Port::Port(int portId){
     this->portId = portId;
 }
 
-Port::Port(int portId, RoutingProtocol* routingProtocol){
+Port::Port(int portId, AdhocRoutingProtocol* routingProtocol){
     _init();
     this->portId = portId;
     this->routingProtocol = routingProtocol;
 }
 
 // Getters + Setters
-void Port::setRoutingProtocol(RoutingProtocol* routingProtocol){
+void Port::setRoutingProtocol(AdhocRoutingProtocol* routingProtocol){
     this->routingProtocol = routingProtocol;
 }
 

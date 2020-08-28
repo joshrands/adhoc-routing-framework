@@ -3,7 +3,7 @@
 
 #include "routing_protocol.h"
 
-class RoutingProtocol;
+class AdhocRoutingProtocol;
 
 class Port{
 private:
@@ -11,7 +11,7 @@ private:
     int portId; // The port number messages will be received and sent from
 
 protected:
-    RoutingProtocol* routingProtocol; // AdHocRouting member
+    AdhocRoutingProtocol* routingProtocol; // AdHocRouting member
 
 public:
     // Constructor
@@ -34,7 +34,7 @@ public:
      * @param portId the port number 
      * @param adhocRouting the routing protocol
      */
-    Port(int portId, RoutingProtocol* adhocRouting);
+    Port(int portId, AdhocRoutingProtocol* adhocRouting);
     
     // Destructor
     virtual ~Port(){}
@@ -52,9 +52,9 @@ public:
     /**
      * @brief Set the Routing Protocol object
      * 
-     * @param routingProtocol 
+     * @param AdhocRoutingProtocol
      */
-    void setRoutingProtocol(RoutingProtocol* routingProtocol);
+    void setRoutingProtocol(AdhocRoutingProtocol* routingProtocol);
     /**
      * @brief Set the Port Id object
      * 

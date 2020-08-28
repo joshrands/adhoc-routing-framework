@@ -84,12 +84,12 @@ void RoutingTable::updateTableEntry(const IP_ADDR dest, const IP_ADDR nextHop)
 	}
 }
 
-RoutingProtocol::RoutingProtocol(){
+AdhocRoutingProtocol::AdhocRoutingProtocol(){
 }
-RoutingProtocol::~RoutingProtocol(){
+AdhocRoutingProtocol::~AdhocRoutingProtocol(){
 }
 
-void RoutingProtocol::addPort(Port* p){
+void AdhocRoutingProtocol::addPort(Port* p){
 	if(ports.count(p->getPortId()) == 0){
 		if(ROUTING_DEBUG){
 			printf("[ROUTING]:[DEBUG]: Adding port %d\n",p->getPortId());
@@ -99,7 +99,7 @@ void RoutingProtocol::addPort(Port* p){
 	}
 }
 
-void RoutingProtocol::removePort(Port* p){
+void AdhocRoutingProtocol::removePort(Port* p){
 	if(ports.count(p->getPortId())){
 		if(ROUTING_DEBUG){
 			printf("[ROUTING]:[DEBUG]: Removing port %d\n",p->getPortId());
@@ -109,11 +109,11 @@ void RoutingProtocol::removePort(Port* p){
 	}
 }
 
-bool RoutingProtocol::sendPacket(Port* p, char* data, int length, IP_ADDR dest, IP_ADDR origIP){
+bool AdhocRoutingProtocol::sendPacket(Port* p, char* data, int length, IP_ADDR dest, IP_ADDR origIP){
 	return sendPacket(p->getPortId(), data, length, dest, origIP);
 }
 
-bool RoutingProtocol::linkExists(IP_ADDR dest) {
+bool AdhocRoutingProtocol::linkExists(IP_ADDR dest) {
     if (MONITOR_DEBUG){
         cout << "[ROUTING]:[DEBUG]: Checking if link exists from "
              << getStringFromIp(getIp()) << " to " << getStringFromIp(dest)
@@ -150,14 +150,14 @@ bool RoutingProtocol::linkExists(IP_ADDR dest) {
     return false;
 }
 
-void RoutingProtocol::resetLinks()
+void AdhocRoutingProtocol::resetLinks()
 {
 	globalMux.lock();
 	m_neighbors.clear();
 	globalMux.unlock();
 }
 
-void RoutingProtocol::addLink(IP_ADDR node)
+void AdhocRoutingProtocol::addLink(IP_ADDR node)
 {
 	if (ROUTING_DEBUG)
 		cout << "[ROUTING]:[DEBUG]: Adding link on " << getStringFromIp(getIp()) << " to node " << getStringFromIp(node) << endl;

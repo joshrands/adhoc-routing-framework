@@ -55,7 +55,7 @@ public:
     // abstract function for getting current battery level
     virtual double getCurrentBatteryLevel() = 0;
 
-    RoutingProtocol* routing;
+    AdhocRoutingProtocol* routing;
 
     // local models: only one battery model but multiple RSS models
     BatteryModel localBatteryModel;
