@@ -42,6 +42,14 @@
 
 using namespace ns3;
 
+int main (int argc, char *argv[])
+{
+	if (NS3_DEBUG)
+		std::cout << "Hello World! Greetings from adhoc-routing-example" << std::endl;
+
+	return 0;
+}
+
 /*
 NodeContainer c;
 //AODVns3* aodvArray[NUM_NODES];
