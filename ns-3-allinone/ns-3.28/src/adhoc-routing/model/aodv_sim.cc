@@ -14,7 +14,7 @@ int SimAODV::handlePackets()
         // enough for link breakage determination. We are using hello messages
         // to determine neighbors and storing last known rss with those hello
         // messages. No RSS prediction or REM models are done/calculated. 
-//        networkMonitor->updatePairData(p.packetPairData);
+        networkMonitor->updatePairData(p.packetPairData);
 
         // handle this packet
 		_handlePacket(p.portId, p.data, p.length, p.source);

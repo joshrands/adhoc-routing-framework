@@ -272,7 +272,7 @@ int main (int argc, char *argv[])
 
   Simulator::Schedule(Seconds(10.0), &testAdHoc);
   // TODO: Add network monitroing back.
-//  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
+  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
   // Drain battery
 //  Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);
 

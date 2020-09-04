@@ -46,11 +46,11 @@ public:
 
     // get monitoring information 
 //    virtual double getBatteryLevel(IP_ADDR ownerIp) = 0;
-//    virtual double getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp) = 0;
+    virtual double getRSSBetweenNodes(IP_ADDR pairIp, IP_ADDR ownerIp) = 0;
 
     // update local models with new data points 
 //    virtual void updateLocalBatteryModel(double batteryLevel) = 0;
-//    virtual void updateLocalRSSModel(IP_ADDR pairIp, double rss) = 0;
+    virtual void updateLocalRSSModel(IP_ADDR pairIp, double rss) = 0;
 
     bool localDataExistsForNode(IP_ADDR nodeIp);
     bool pairDataExistsForNode(IP_ADDR nodeIp);
