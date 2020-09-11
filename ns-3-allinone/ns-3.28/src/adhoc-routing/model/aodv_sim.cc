@@ -39,6 +39,31 @@ void SimAODV::_destroyPort(Port*)
     // unnecessary in simulation
 } 
 
+double SimAODV::getBandwidthShare(IP_ADDR linkIp) {
+	double retVal = 0.0;
+
+	if(linkExists(linkIp))
+	{
+		if(networkMonitor != nullptr)
+		{
+			vector<IP_ADDR> reighborsList = this->getCopyOfNeighbors();
+			double runningTotal = 0;
+
+			for(IP_ADDR nbIp: reighborsList)
+			{
+				runningTotal += networkMonitor->getRSSBetweenNodes(nbIp, this->ipAddress);
+			}
+
+			retVal = networkMonitor->getRSSBetweenNodes(linkIp, this->ipAddress)/runningTotal;
+		}
+	}
+
+    std::cout << "[JAD][AODV_SIM]: " << getStringFromIp(linkIp) << " to " << getStringFromIp(this->ipAddress) <<
+        " has link share of " << retVal << std::endl;
+
+    return retVal;
+}
+
 /* OLD 
 AODVSim::AODVSim()
 {

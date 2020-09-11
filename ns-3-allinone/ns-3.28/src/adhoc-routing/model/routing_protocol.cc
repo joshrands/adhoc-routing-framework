@@ -90,22 +90,22 @@ AdhocRoutingProtocol::~AdhocRoutingProtocol(){
 }
 
 void AdhocRoutingProtocol::addPort(Port* p){
-	if(ports.count(p->getPortId()) == 0){
+	if(m_ports.count(p->getPortId()) == 0){
 		if(ROUTING_DEBUG){
 			printf("[ROUTING]:[DEBUG]: Adding port %d\n",p->getPortId());
 		}
-		ports[p->getPortId()] = p;
+		m_ports[p->getPortId()] = p;
 		this->_buildPort(p);
 	}
 }
 
 void AdhocRoutingProtocol::removePort(Port* p){
-	if(ports.count(p->getPortId())){
+	if(m_ports.count(p->getPortId())){
 		if(ROUTING_DEBUG){
 			printf("[ROUTING]:[DEBUG]: Removing port %d\n",p->getPortId());
 		}
 		this->_destroyPort(p);
-		ports.erase(p->getPortId());
+		m_ports.erase(p->getPortId());
 	}
 }
 
@@ -177,4 +177,14 @@ void AdhocRoutingProtocol::addLink(IP_ADDR node)
 		if (ROUTING_DEBUG)
 			cout << "[ROUTING]:[INFO]: One hop neighbor: " << getStringFromIp(node) << " added to routing table." << endl; 
 	}
+}
+
+
+vector<IP_ADDR> AdhocRoutingProtocol::getCopyOfNeighbors()
+{
+	globalMux.lock();
+	vector<IP_ADDR> retNeighbors(m_neighbors);
+	globalMux.unlock();
+
+	return retNeighbors;
 }

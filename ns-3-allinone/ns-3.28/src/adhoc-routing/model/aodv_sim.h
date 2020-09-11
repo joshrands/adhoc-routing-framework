@@ -44,6 +44,13 @@ public:
     queue<SimPacket> packetQueue;
     // network monitoring
     NetworkMonitor* networkMonitor = nullptr;
+	/**
+     * @brief Returns the percentage of the bandwidth that can be used by the node linkIp, assuming that all
+     * other neighbors attempt to communicate at the same time.
+     *
+     * @param linkIp, the IP address of the link to check
+     */
+    double getBandwidthShare(IP_ADDR linkIp);
 
     // Override this function with a function to send data between two nodes in the desired simulation
     function<int(char* buffer, int length, IP_ADDR dest, int port, IP_ADDR source)> simSocketSendPacket;

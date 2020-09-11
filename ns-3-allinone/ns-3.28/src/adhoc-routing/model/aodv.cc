@@ -435,10 +435,10 @@ void AODV::_handlePacket(int port, char *packet, int length, IP_ADDR source) {
             // We are the final destinatin
             // Have socket handle the packet
             packet += HEADER_SIZE; // Get only the data part of the packet
-            if(ports.count(port)){
+            if(m_ports.count(port)){
                 if(AODV_DEBUG)
                     std::cout << "[AODV]:[INFO]: Received packet on port " << port << endl; 
-                ports[port]->handlePacket(packet, length - HEADER_SIZE, source);
+                m_ports[port]->handlePacket(packet, length - HEADER_SIZE, source);
             }else{
                 fprintf(stderr, "[AODV]:[ERROR]: Received packet on port with no port handler\n");
             }

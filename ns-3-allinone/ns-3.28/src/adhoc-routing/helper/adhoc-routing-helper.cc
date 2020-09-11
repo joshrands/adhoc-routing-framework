@@ -147,22 +147,15 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
 
 int AdHocRoutingHelper::getLinkBandwidthBits(IP_ADDR linkIp)
 {
-	// Determine if we have a direct link to linkIp Node
-	if(!this->directLink(linkIp))
-	{
-		// No direct link, link bandwidth is 0
-		return 0;
-	}
-
 	int bandwidthByLink = 0;
-
-	// Determine bandwidth used by IP link
-	std::map<IP_ADDR, int>::iterator it = m_bandwidthUsedMap.find(linkIp);
-	if(it != m_bandwidthUsedMap.end())
+	// TODO: JAD: Add dist based limit
+	if(this->directLink(linkIp))
 	{
-		bandwidthByLink = it->second;
+		// Determine bandwidth as a portion of available bandwith
+		bandwidthByLink = (int)((double)m_availableBandwidthBits * this->getBandwidthShare(linkIp));
 	}
-	return m_availableBandwidthBits + bandwidthByLink;
+
+	return bandwidthByLink;
 }
 
 void AdHocRoutingHelper::increaseAvailableBandwidthByBits(IP_ADDR linkIP, int numberOfBits)

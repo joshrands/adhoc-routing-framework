@@ -59,6 +59,10 @@ public:
 
 	// get the routing table 
 	AODVRoutingTable* getTable() { return (AODVRoutingTable*) m_pRoutingTable; } 
+	// returns the available bandwidth
+    int getAvailableBandwidthBits() { return m_availableBandwidthBits; }
+	// sets the available bandwidth for the model
+    void setAvailableBandwidthBits(int availableBandwidth) { this->m_availableBandwidthBits = availableBandwidth; }
 
 protected:
 	// node sequence number. MUST increment on a route discovery

@@ -49,9 +49,7 @@ public:
 
     // Network monitoring helpers for Rss and Bandwidth 
     map<uint32_t, double> getLinkRssMap() { return m_linkRssDb; } 
-    int getAvailableBandwidthBits() { return m_availableBandwidthBits; }
     int getLinkBandwidthBits(IP_ADDR linkIp);
-    void setAvailableBandwidthBits(int availableBandwidth) { this->m_availableBandwidthBits = availableBandwidth; }
     void increaseAvailableBandwidthByBits(IP_ADDR linkIP, int numberOfBits);
 
     void updateLinkRss(uint32_t ip, double rss) { m_linkRssDb[ip] = rss; }
@@ -64,9 +62,6 @@ protected:
 
     // Link RSS in decibels
     map<uint32_t, double> m_linkRssDb;
-
-    // Local bandwidth calculation over the last second 
-    int m_availableBandwidthBits;
 	// Holds how much bandwidth is used by each node over the last minute
 	std::map<IP_ADDR, int> m_bandwidthUsedMap;
 

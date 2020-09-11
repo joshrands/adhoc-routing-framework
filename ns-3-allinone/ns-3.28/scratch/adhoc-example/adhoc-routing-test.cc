@@ -61,11 +61,14 @@ void ReceiveCallback(Ptr<Socket> socket)
     AdHocRoutingHelper::receivePacket(socket);
 }
 
-void PrintBandwidth(AdHocRoutingHelper* adhocRoutingHelper, int freqMS)
+void PrintBandwidth(AdHocRoutingHelper* adhocHelperFrom, AdHocRoutingHelper* adhocHelperTo, int freqMS)
 {
-  std::cout << adhocRoutingHelper->getIpAddressStr() << " bandwidth= " << adhocRoutingHelper->getAvailableBandwidthBits() << endl; 
+  std::cout << "[JAD]" << adhocHelperFrom->getIpAddressStr() << " Available bandwidth = " << adhocHelperFrom->getAvailableBandwidthBits() << std::endl;
 
-  Simulator::Schedule(MilliSeconds(freqMS), &PrintBandwidth, adhocRoutingHelper, freqMS);
+  std::cout << "[JAD]" << adhocHelperFrom->getIpAddressStr() << " link bandwidth to " << adhocHelperTo->getIpAddressStr()
+		  << " : " << adhocHelperFrom->getLinkBandwidthBits(adhocHelperTo->getIp()) << std::endl;
+
+  Simulator::Schedule(MilliSeconds(freqMS), &PrintBandwidth, adhocHelperFrom, adhocHelperTo, freqMS);
 }
 
 void testAdHoc()
@@ -273,6 +276,8 @@ int main (int argc, char *argv[])
   Simulator::Schedule(Seconds(10.0), &testAdHoc);
   // TODO: Add network monitroing back.
   Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
+  // Print bandwidth
+  Simulator::Schedule(Seconds(1), &PrintBandwidth, nodes.Get(0)->m_AdHocRoutingHelper, nodes.Get(1)->m_AdHocRoutingHelper, 10);
   // Drain battery
 //  Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);
 

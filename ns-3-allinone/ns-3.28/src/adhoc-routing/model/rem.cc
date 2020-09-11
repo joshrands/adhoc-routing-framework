@@ -70,8 +70,6 @@ void REM::updateLocalModels()
     // clear pair monitoring data and update with new 
     pairMonitoringData.clear();
 
-    routing->resetLinks();
-
     auto it = localRssModels.begin();
     while (it != localRssModels.end())
     {
@@ -85,12 +83,11 @@ void REM::updateLocalModels()
             {
                 if (MONITOR_DEBUG)
                 {
-                    std::cout << "[JAD][REM]: " << getStringFromIp(m_parentIp) << " adding link to node " << getStringFromIp(data.pairIp) <<
+                    std::cout << "[REM]: Adding pair data, " << getStringFromIp(m_parentIp) << " to " << getStringFromIp(data.pairIp) <<
                         " with strength " << data.rss << std::endl;
                 }
 
                 pairMonitoringData[m_parentIp].push_back(data);
-//              routing->addLink(data.pairIp);
             }
         }
 
