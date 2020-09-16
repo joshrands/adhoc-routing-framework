@@ -145,24 +145,40 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
 }
 
 
-int AdHocRoutingHelper::getLinkBandwidthBits(IP_ADDR linkIp)
+int AdHocRoutingHelper::getLinkBandwidthBits(AdHocRoutingHelper* targetHelper)
 {
-	// Determine if we have a direct link to linkIp Node
-	if(!this->directLink(linkIp))
-	{
-		// No direct link, link bandwidth is 0
-		return 0;
-	}
-
 	int bandwidthByLink = 0;
+	Ptr<Node> targetNode = targetHelper->getNode();
+	Ptr<Object>  targetObject = targetNode;
+	Ptr<MobilityModel> model = targetObject->GetObject<MobilityModel>();
 
-	// Determine bandwidth used by IP link
-	std::map<IP_ADDR, int>::iterator it = m_bandwidthUsedMap.find(linkIp);
-	if(it != m_bandwidthUsedMap.end())
+	Ptr<Object> thisObject = this->m_node;
+	double distActual = model->GetDistanceFrom(thisObject->GetObject<MobilityModel>());
+
+
+	if (DEBUG)
 	{
-		bandwidthByLink = it->second;
+		std::cout << "[DEBUG] [BANDWIDTH]: Distance between " << this->getIpAddressStr()
+			<< " and " << getStringFromIp(targetNode->m_nodeIp)
+			<< " is: " << distActual << std::endl;
 	}
-	return m_availableBandwidthBits + bandwidthByLink;
+
+	if(this->directLink(targetNode->m_nodeIp))
+	{
+		// Determine bandwidth, the minimum as a portion of available bandwith OR quadratic loss by distance
+		bandwidthByLink = (int)fmin(((double)m_availableBandwidthBits * this->getBandwidthShare(targetNode->m_nodeIp)),
+				(BANDWIDTH_0 * sqrt(BANDWIDTH_DIST_0 / distActual)));
+
+		if (DEBUG)
+		{
+			std::cout << "[DEBUG] [BANDWIDTH]: bandwidth portion: "
+					<< ((double)m_availableBandwidthBits * this->getBandwidthShare(targetNode->m_nodeIp))
+					<< ",  bandwidth by distance: " << (BANDWIDTH_0 * sqrt(BANDWIDTH_DIST_0 / distActual))
+					<< ", reporting: " << bandwidthByLink << std::endl;
+		}
+	}
+
+	return bandwidthByLink;
 }
 
 void AdHocRoutingHelper::increaseAvailableBandwidthByBits(IP_ADDR linkIP, int numberOfBits)
@@ -244,6 +260,11 @@ void AdHocRoutingHelper::waitSimulatedTimeForHelloMonitor(int DURATION_MS, SimHe
     waitingHello->sendHellos(1);
 
     Simulator::Schedule(MilliSeconds(DURATION_MS), &waitSimulatedTimeForHelloMonitor, DURATION_MS, waitingHello);
+}
+
+Ptr<Node> AdHocRoutingHelper::getNode()
+{
+	return m_node;
 }
 
 void dumbySleep(int DURATION_MS)

@@ -151,6 +151,19 @@ public:
      */
     // TODO: Make add link a boolean
 	void addLink(IP_ADDR node);
+
+    /**
+     * @brief returns the available bandwidth
+     *
+     * @return number of bits available
+     */
+    virtual int getAvailableBandwidthBits() = 0;
+    /**
+     * @brief sets the available bandwidth for the model
+     *
+     * @param availableBandwidth, the maximum bandwidth in bits
+     */
+    virtual void setAvailableBandwidthBits(int availableBandwidth) = 0;
     
 	
 	// Getters and Setters
@@ -172,18 +185,23 @@ public:
     mutex neighborMux;
 
 protected:
+
 	// vector of one hop neighbors to this node. Can be from network monitoring, HELLO messages, etc
 	vector<IP_ADDR> m_neighbors;
     // The ip address of the cimputer this routing protocol is running on
 	uint32_t ipAddress;
     // The list of ports that can send and receive messages using this routing protocol
-	unordered_map<int, Port*> ports;
+	unordered_map<int, Port*> m_ports;
 
     RoutingTable* m_pRoutingTable;
+    // Local bandwidth calculation over the last second
+    int m_availableBandwidthBits;
 
 	// Functions
 	virtual void _buildPort(Port*) = 0;
     virtual void _destroyPort(Port*) = 0;
+
+	vector<IP_ADDR> getCopyOfNeighbors();
 };
 
 #endif

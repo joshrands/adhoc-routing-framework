@@ -61,11 +61,14 @@ void ReceiveCallback(Ptr<Socket> socket)
     AdHocRoutingHelper::receivePacket(socket);
 }
 
-void PrintBandwidth(AdHocRoutingHelper* adhocRoutingHelper, int freqMS)
+void PrintBandwidth(AdHocRoutingHelper* adhocHelperFrom, AdHocRoutingHelper* adhocHelperTo, int freqMS)
 {
-  std::cout << adhocRoutingHelper->getIpAddressStr() << " bandwidth= " << adhocRoutingHelper->getAvailableBandwidthBits() << endl; 
+  std::cout << "[TEST]" << adhocHelperFrom->getIpAddressStr() << " Available bandwidth = " << adhocHelperFrom->getAvailableBandwidthBits() << std::endl;
 
-  Simulator::Schedule(MilliSeconds(freqMS), &PrintBandwidth, adhocRoutingHelper, freqMS);
+  std::cout << "[TEST]" << adhocHelperFrom->getIpAddressStr() << " link bandwidth to " << adhocHelperTo->getIpAddressStr()
+		  << " : " << adhocHelperFrom->getLinkBandwidthBits(adhocHelperTo) << std::endl;
+
+  Simulator::Schedule(MilliSeconds(freqMS), &PrintBandwidth, adhocHelperFrom, adhocHelperTo, freqMS);
 }
 
 void testAdHoc()
@@ -90,7 +93,7 @@ void testAdHoc()
   {
     std::cout << "[TEST]: Per-link bandwidth from " << it->second->m_AdHocRoutingHelper->getIpAddressStr()
         << " to " << nodes.Get(i)->m_AdHocRoutingHelper->getIpAddressStr() << ": "
-        << it->second->m_AdHocRoutingHelper->getLinkBandwidthBits(nodes.Get(i)->m_AdHocRoutingHelper->getIp())
+        << it->second->m_AdHocRoutingHelper->getLinkBandwidthBits(nodes.Get(i)->m_AdHocRoutingHelper)
         << std::endl;
   }
 
@@ -114,7 +117,6 @@ void localMonitoring()
 int main (int argc, char *argv[])
 {
   std::string phyMode ("DsssRate1Mbps");
-  int dataRateMbps = 1;
 
   double rss = -80;  // -dBm
   uint16_t numNodes = NUM_NODES;
@@ -258,7 +260,7 @@ int main (int argc, char *argv[])
  
     adhocMap[nodes.Get(i)] = new AdHocRoutingHelper(nodes.Get(i), ip);
     nodes.Get(i)->m_AdHocRoutingHelper = adhocMap[nodes.Get(i)]; 
-    nodes.Get(i)->m_AdHocRoutingHelper->setAvailableBandwidthBits(dataRateMbps * 1000000);
+    nodes.Get(i)->m_AdHocRoutingHelper->setAvailableBandwidthBits(BANDWIDTH_BITS_MAX);
 
 //    Simulator::Schedule(Seconds(1 + i), &PrintBandwidth, nodes.Get(i)->m_AdHocRoutingHelper, 10);
 
@@ -272,7 +274,9 @@ int main (int argc, char *argv[])
 
   Simulator::Schedule(Seconds(10.0), &testAdHoc);
   // TODO: Add network monitroing back.
-//  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
+  Simulator::Schedule(Seconds(LOCAL_MONITOR_INTERVAL), &localMonitoring);
+  // Print bandwidth
+  Simulator::Schedule(Seconds(1), &PrintBandwidth, nodes.Get(0)->m_AdHocRoutingHelper, nodes.Get(1)->m_AdHocRoutingHelper, 10);
   // Drain battery
 //  Simulator::Schedule(Seconds(0.1), &DrainBatteryMobile, nodes, energySources, currentPositions);
 
