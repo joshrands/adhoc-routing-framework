@@ -63,10 +63,10 @@ void ReceiveCallback(Ptr<Socket> socket)
 
 void PrintBandwidth(AdHocRoutingHelper* adhocHelperFrom, AdHocRoutingHelper* adhocHelperTo, int freqMS)
 {
-  std::cout << "[JAD]" << adhocHelperFrom->getIpAddressStr() << " Available bandwidth = " << adhocHelperFrom->getAvailableBandwidthBits() << std::endl;
+  std::cout << "[TEST]" << adhocHelperFrom->getIpAddressStr() << " Available bandwidth = " << adhocHelperFrom->getAvailableBandwidthBits() << std::endl;
 
-  std::cout << "[JAD]" << adhocHelperFrom->getIpAddressStr() << " link bandwidth to " << adhocHelperTo->getIpAddressStr()
-		  << " : " << adhocHelperFrom->getLinkBandwidthBits(adhocHelperTo->getIp()) << std::endl;
+  std::cout << "[TEST]" << adhocHelperFrom->getIpAddressStr() << " link bandwidth to " << adhocHelperTo->getIpAddressStr()
+		  << " : " << adhocHelperFrom->getLinkBandwidthBits(adhocHelperTo) << std::endl;
 
   Simulator::Schedule(MilliSeconds(freqMS), &PrintBandwidth, adhocHelperFrom, adhocHelperTo, freqMS);
 }
@@ -93,7 +93,7 @@ void testAdHoc()
   {
     std::cout << "[TEST]: Per-link bandwidth from " << it->second->m_AdHocRoutingHelper->getIpAddressStr()
         << " to " << nodes.Get(i)->m_AdHocRoutingHelper->getIpAddressStr() << ": "
-        << it->second->m_AdHocRoutingHelper->getLinkBandwidthBits(nodes.Get(i)->m_AdHocRoutingHelper->getIp())
+        << it->second->m_AdHocRoutingHelper->getLinkBandwidthBits(nodes.Get(i)->m_AdHocRoutingHelper)
         << std::endl;
   }
 
@@ -117,7 +117,6 @@ void localMonitoring()
 int main (int argc, char *argv[])
 {
   std::string phyMode ("DsssRate1Mbps");
-  int dataRateMbps = 1;
 
   double rss = -80;  // -dBm
   uint16_t numNodes = NUM_NODES;
@@ -261,7 +260,7 @@ int main (int argc, char *argv[])
  
     adhocMap[nodes.Get(i)] = new AdHocRoutingHelper(nodes.Get(i), ip);
     nodes.Get(i)->m_AdHocRoutingHelper = adhocMap[nodes.Get(i)]; 
-    nodes.Get(i)->m_AdHocRoutingHelper->setAvailableBandwidthBits(dataRateMbps * 1000000);
+    nodes.Get(i)->m_AdHocRoutingHelper->setAvailableBandwidthBits(BANDWIDTH_BITS_MAX);
 
 //    Simulator::Schedule(Seconds(1 + i), &PrintBandwidth, nodes.Get(i)->m_AdHocRoutingHelper, 10);
 

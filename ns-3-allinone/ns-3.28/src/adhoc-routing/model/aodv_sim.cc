@@ -58,8 +58,11 @@ double SimAODV::getBandwidthShare(IP_ADDR linkIp) {
 		}
 	}
 
-    std::cout << "[JAD][AODV_SIM]: " << getStringFromIp(linkIp) << " to " << getStringFromIp(this->ipAddress) <<
-        " has link share of " << retVal << std::endl;
+	if(DEBUG)
+	{
+	    std::cout << "[DEBUG][AODV_SIM]: " << getStringFromIp(linkIp) << " to " << getStringFromIp(this->ipAddress) <<
+	        " has link share of " << retVal << std::endl;
+	}
 
     return retVal;
 }
