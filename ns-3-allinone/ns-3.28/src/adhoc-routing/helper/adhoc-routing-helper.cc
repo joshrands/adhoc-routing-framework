@@ -181,6 +181,21 @@ int AdHocRoutingHelper::getLinkBandwidthBits(AdHocRoutingHelper* targetHelper)
 	return bandwidthByLink;
 }
 
+// Returns the number of bits sent to destIP over the last second
+int AdHocRoutingHelper::getLinkBitsSent(IP_ADDR destIP)
+{
+	int retVal = 0;
+
+	// If this node is in the map, get the number of bits
+	std::map<IP_ADDR, int>::iterator it = m_bandwidthUsedMap.find(destIP);
+	if(it != m_bandwidthUsedMap.end())
+	{
+		retVal = it->second;
+	}
+
+	return retVal;
+}
+
 void AdHocRoutingHelper::increaseAvailableBandwidthByBits(IP_ADDR linkIP, int numberOfBits)
 {
 	// Remove packet size to bandwidth usage map

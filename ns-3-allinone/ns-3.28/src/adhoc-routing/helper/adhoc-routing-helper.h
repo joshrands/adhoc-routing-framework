@@ -51,7 +51,10 @@ public:
 
     // Network monitoring helpers for Rss and Bandwidth 
     map<uint32_t, double> getLinkRssMap() { return m_linkRssDb; } 
+    // Returns the available bandwidth based on bandwidth share and distance
     int getLinkBandwidthBits(AdHocRoutingHelper* targetHelper);
+    // Returns the number of bits sent to destIP over the last second
+    int getLinkBitsSent(IP_ADDR destIP);
     void increaseAvailableBandwidthByBits(IP_ADDR linkIP, int numberOfBits);
 
     void updateLinkRss(uint32_t ip, double rss) { m_linkRssDb[ip] = rss; }
