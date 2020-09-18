@@ -3,7 +3,7 @@
 
 PacketBuffer::PacketBuffer()
 {
-	m_nPacketCount = 0;
+	m_nByteCount = 0;
 }
 
 
@@ -33,29 +33,36 @@ void PacketBuffer::storePacket(BufferedPacket bufferedPacket)
 		m_oRREQPacketBuffer.insert(std::pair<IP_ADDR, std::queue<BufferedPacket>>(bufferedPacket.dest, std::queue<BufferedPacket>()));
 	}
 
-	if(m_nPacketCount < PACKET_BUFFER_SIZE)
+	do
 	{
-		m_oRREQPacketBuffer.at(bufferedPacket.dest).push(bufferedPacket);
-		m_nPacketCount++;
-	}
-	else
-	{
-		if(m_oRREQPacketBuffer.at(bufferedPacket.dest).size() > 0)
+		// Try to add packet
+		if((m_nByteCount + bufferedPacket.length) <= PACKET_BUFFER_SIZE)
 		{
-			// Throw away oldest packet waiting to go to this destination
-			free(m_oRREQPacketBuffer.at(bufferedPacket.dest).front().buffer);
-			m_oRREQPacketBuffer.at(bufferedPacket.dest).pop();
-
-			// Save newest packet
+			// Add packet
 			m_oRREQPacketBuffer.at(bufferedPacket.dest).push(bufferedPacket);
+			m_nByteCount += bufferedPacket.length;
+
+			break;
 		}
 		else
 		{
-			// Buffer is full and there are no old packets to throw away for this destination
-			// Just throw away this packet
-			free(bufferedPacket.buffer);
+			// Buffer is full, try to remove older packet
+			if(m_oRREQPacketBuffer.at(bufferedPacket.dest).size() > 0)
+			{
+				// Throw away oldest packet waiting to go to this destination
+				m_nByteCount -= m_oRREQPacketBuffer.at(bufferedPacket.dest).front().length;
+				free(m_oRREQPacketBuffer.at(bufferedPacket.dest).front().buffer);
+				m_oRREQPacketBuffer.at(bufferedPacket.dest).pop();
+			}
+			else
+			{
+				// Buffer is full and there are no old packets to throw away for this destination
+				// Just throw away this packet
+				free(bufferedPacket.buffer);
+				break;
+			}
 		}
-	}
+	} while (true);
 }
 
 bool PacketBuffer::packetsWaiting(IP_ADDR dest)
@@ -80,7 +87,7 @@ BufferedPacket PacketBuffer::getPacket(IP_ADDR dest)
 		{
 			returnPacket = BufferedPacket(m_oRREQPacketBuffer.at(dest).front());
 			m_oRREQPacketBuffer.at(dest).pop();
-			m_nPacketCount--;
+			m_nByteCount -= returnPacket.length;
 		}
 	}
 

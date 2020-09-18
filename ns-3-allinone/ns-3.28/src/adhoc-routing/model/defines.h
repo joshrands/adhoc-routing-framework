@@ -39,6 +39,7 @@
 #define SQRT_OF_10_PERC		0.316227766
 #define BANDWIDTH_DIST_0	BANDWIDTH_DIST_MAX * SQRT_OF_10_PERC
 
-#define PACKET_BUFFER_SIZE  10
+// Packet buffer size in bytes
+#define PACKET_BUFFER_SIZE  500000	// 500 KB
 
 #endif

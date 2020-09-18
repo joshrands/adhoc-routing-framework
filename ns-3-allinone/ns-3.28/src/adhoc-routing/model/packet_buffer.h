@@ -30,11 +30,13 @@ public:
 	bool packetsWaiting(IP_ADDR dest);
 	// Pops off the top packet for dest
 	BufferedPacket getPacket(IP_ADDR dest);
+	// Get the number of available bytes in the buffer
+//	long getAvailableBytes();
 
 protected:
 
 private:
-	int m_nPacketCount;
+	long m_nByteCount;
 	// map of rreq ids and their corresponding packet to be sent once the route is established
 	std::map<IP_ADDR, std::queue<BufferedPacket>> m_oRREQPacketBuffer;
 };
