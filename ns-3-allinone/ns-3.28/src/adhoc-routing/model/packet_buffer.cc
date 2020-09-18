@@ -94,6 +94,12 @@ BufferedPacket PacketBuffer::getPacket(IP_ADDR dest)
 	return returnPacket;
 }
 
+// Get the number of available bytes in the buffer
+long PacketBuffer::getAvailableBytes()
+{
+	return PACKET_BUFFER_SIZE - m_nByteCount;
+}
+
 /******************************
  * Protected Functions
  ******************************/

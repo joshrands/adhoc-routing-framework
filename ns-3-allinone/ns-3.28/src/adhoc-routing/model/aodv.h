@@ -63,6 +63,8 @@ public:
     int getAvailableBandwidthBits() { return m_availableBandwidthBits; }
 	// sets the available bandwidth for the model
     void setAvailableBandwidthBits(int availableBandwidth) { this->m_availableBandwidthBits = availableBandwidth; }
+    // get the available bytes in local packet buffer
+    long getPacketBufferAvailableBytes();
 
 protected:
 	// node sequence number. MUST increment on a route discovery
