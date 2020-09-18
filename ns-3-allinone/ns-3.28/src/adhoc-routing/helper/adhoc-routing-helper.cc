@@ -163,7 +163,7 @@ int AdHocRoutingHelper::getLinkBandwidthBits(AdHocRoutingHelper* targetHelper)
 			<< " is: " << distActual << std::endl;
 	}
 
-	if(this->directLink(targetNode->m_nodeIp))
+	if(this->linkExists(targetHelper->getIp()))
 	{
 		// Determine bandwidth, the minimum as a portion of available bandwith OR quadratic loss by distance
 		bandwidthByLink = (int)fmin(((double)m_availableBandwidthBits * this->getBandwidthShare(targetNode->m_nodeIp)),

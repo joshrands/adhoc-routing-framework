@@ -98,6 +98,8 @@ void testAdHoc()
     std::cout << "[TEST]: Per-link bandwidth from " << it->second->m_AdHocRoutingHelper->getIpAddressStr()
         << " to " << nodes.Get(i)->m_AdHocRoutingHelper->getIpAddressStr() << ": "
         << it->second->m_AdHocRoutingHelper->getLinkBandwidthBits(nodes.Get(i)->m_AdHocRoutingHelper)
+        << ". Direct link? "
+        << it->second->m_AdHocRoutingHelper->linkExists(nodes.Get(i)->m_AdHocRoutingHelper->getIp())
         << std::endl;
   }
 
