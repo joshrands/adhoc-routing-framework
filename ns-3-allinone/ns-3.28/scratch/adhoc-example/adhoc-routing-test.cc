@@ -88,12 +88,22 @@ void testAdHoc()
   IP_ADDR dest = it->first;
   adhoc->sendPacket(DATA_PORT, buffer, msg.length(), dest); 
 
+  std::cout << "[TEST]: Called sendPacket(), "
+      << adhoc->getIpAddressStr()
+      << " buffer size is "
+      << adhoc->getPacketBufferAvailableBytes()
+      << ". Bits sent to " << it->second->m_AdHocRoutingHelper->getIpAddressStr()
+      << ": " << adhoc->getLinkBitsSent(dest)
+      << std::endl;
+
   // Print per-link bandwidth for all nodes connected to node 2
   for(uint32_t i = 0; i < nodes.GetN(); i++)
   {
     std::cout << "[TEST]: Per-link bandwidth from " << it->second->m_AdHocRoutingHelper->getIpAddressStr()
         << " to " << nodes.Get(i)->m_AdHocRoutingHelper->getIpAddressStr() << ": "
         << it->second->m_AdHocRoutingHelper->getLinkBandwidthBits(nodes.Get(i)->m_AdHocRoutingHelper)
+        << ". Direct link? "
+        << it->second->m_AdHocRoutingHelper->linkExists(nodes.Get(i)->m_AdHocRoutingHelper->getIp())
         << std::endl;
   }
 

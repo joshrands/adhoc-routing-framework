@@ -253,6 +253,12 @@ bool AODV::directLink(IP_ADDR toIP)
 	}
 }
 
+// get the available bytes in local packet buffer
+long AODV::getPacketBufferAvailableBytes()
+{
+	return m_oPacketBuffer.getAvailableBytes();
+}
+
 
 
 /******************************
