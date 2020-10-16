@@ -100,6 +100,17 @@ long PacketBuffer::getAvailableBytes()
 	return PACKET_BUFFER_SIZE - m_nByteCount;
 }
 
+long PacketBuffer::getNumbPackets() {
+	long retVal = 0;
+	for(auto it = m_oRREQPacketBuffer.begin(); it != m_oRREQPacketBuffer.end(); ++it)
+	{
+		std::queue<BufferedPacket> packetQueue = it->second;
+		retVal += packetQueue.size();
+	}
+
+	return retVal;
+}
+
 /******************************
  * Protected Functions
  ******************************/

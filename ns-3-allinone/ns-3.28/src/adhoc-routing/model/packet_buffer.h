@@ -32,6 +32,7 @@ public:
 	BufferedPacket getPacket(IP_ADDR dest);
 	// Get the number of available bytes in the buffer
 	long getAvailableBytes();
+	long getNumbPackets();
 
 protected:
 
