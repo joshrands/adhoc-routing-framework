@@ -142,7 +142,7 @@ bool AODV::sendPacket(int portId, char* packet, int length, IP_ADDR dest, IP_ADD
         repairLink(portId, nextHop, dest, buffer, length, origIP);
     }
 
-    delete buffer;
+    free(buffer);
 
     return true;
 }
@@ -188,7 +188,7 @@ void AODV::repairLink(int port, IP_ADDR brokenLink, IP_ADDR finalDest, char *buf
         // TODO: ADD PACKET TO PACKET BUFFER QUEUE
         _socketSendPacket(ROUTING_PORT, packet, sizeof(rerr), nextHop);
 
-        delete packet;
+        free(packet);
     }
 }
 
@@ -272,7 +272,7 @@ void AODV::_broadcastRREQBuffer(rreqPacket rreq) {
     char *rreqBuffer = RREQHelper::createRREQBuffer(rreq);
     _socketSendPacket(ROUTING_PORT, rreqBuffer, sizeof(rreq), getIpFromString(BROADCAST_STR));
 
-    delete rreqBuffer;
+    free(rreqBuffer);
 }
 
 
@@ -323,7 +323,7 @@ void AODV::_handleRREQ(char *buffer, int length, IP_ADDR source) {
             cout << "[AODV]:[WARNING]: We don't try to repair failed RREPs..." << endl;
 
 
-        delete buffer;
+        free(buffer);
 
         return;
     }
@@ -369,7 +369,8 @@ void AODV::_handleRREP(char *buffer, int length, IP_ADDR source) {
 
             BufferedPacket packet = m_oPacketBuffer.getPacket(rrep.destIP);
             sendPacket(packet.portId, packet.buffer, packet.length, packet.dest);
-            delete packet.buffer;
+
+            free(packet.buffer);
         }
 
     } else {
@@ -390,7 +391,7 @@ void AODV::_handleRREP(char *buffer, int length, IP_ADDR source) {
         else 
             cout << "[AODV]:[WARNING]: We don't try to repair failed RREPs..." << endl;
 
-        delete buffer;
+        free(buffer);
     }
 }
 
@@ -426,6 +427,7 @@ void AODV::_handleRERR(char *buffer, int length, IP_ADDR source) {
         IP_ADDR nextHop = getTable()->getNextHop(rerr.origIP);
         _socketSendPacket(ROUTING_PORT, packet, sizeof(rerr), nextHop);
     }
+    free(packet);
 }
 
 void AODV::_handlePacket(int port, char *packet, int length, IP_ADDR source) {

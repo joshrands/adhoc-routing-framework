@@ -107,9 +107,9 @@ void testAdHoc()
         << std::endl;
   }
 
-  Simulator::Schedule(Seconds(0.5), &testAdHoc);
+  free(buffer);
 
-  delete buffer;
+  Simulator::Schedule(Seconds(0.5), &testAdHoc);
 }
 
 void localMonitoring()
@@ -278,6 +278,8 @@ int main (int argc, char *argv[])
     if (DEBUG)
       cout << "[DEBUG]: Node " << i << " at " << pos.x << ", " << pos.y << endl;
     currentPositions.push_back(pos);
+
+    free(ipBuf);
 
     Simulator::Schedule(MilliSeconds(1001 + i), &AdHocRoutingHelper::waitSimulatedTimeForHelloMonitor, 2000, adhocMap[nodes.Get(i)]->helloMonitor);
   }

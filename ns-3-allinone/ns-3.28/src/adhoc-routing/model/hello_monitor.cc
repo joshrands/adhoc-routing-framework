@@ -112,6 +112,8 @@ void HelloMonitor::_broadcastHelloMessage()
 
     // send data on HELLO port
     routingProtocol->sendPacket(getPortId(), buffer, packetSize, getIpFromString(BROADCAST_STR), m_parentIp);
+
+    free(buffer);
 }
 
 void HelloMonitor::receiveHelloMessage(IP_ADDR nodeIp)

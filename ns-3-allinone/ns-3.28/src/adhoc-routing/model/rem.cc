@@ -269,7 +269,7 @@ void REM::sendUpdatedModel(PredictionModel* model, IP_ADDR dest)
 
         routing->sendPacket(this->getPortId(), buffer, size, getIpFromString(BROADCAST_STR), MONITOR_PORT);
 
-        delete buffer;
+        free(buffer);
     }
 }
 
