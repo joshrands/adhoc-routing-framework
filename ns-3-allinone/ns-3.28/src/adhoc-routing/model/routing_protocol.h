@@ -121,15 +121,6 @@ public:
      * @returns Whether or not the packet was sent
      */
     virtual bool sendPacket(int portId, char* data, int length, IP_ADDR dest, IP_ADDR origIP = -1) = 0;
-    /**
-     * @brief Handles the receiving or processing of all packets
-     * @brief when implementing this should query each of the sockets corresponding to each port
-     * @brief and then "give" the data to each port
-     * TODO: By creating a Socket base class we could implement this code and avoid the above req. 
-     * 
-     * @returns the number of handled packets
-     */
-    virtual int handlePackets() = 0;
 	
     /**
      * @brief is there a link between this node and dest? 

@@ -81,7 +81,7 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
     int packetSize = 0;
 
     // Add this packet to the buffer of current packets and make callback to remove it in 1 second 
-    while (packet = socket->Recv ())
+    while (packet = socket->Recv())
     {
         packetSize = packet->GetSize();
         Ipv4Header header;
@@ -138,9 +138,11 @@ void AdHocRoutingHelper::receivePacket(Ptr<Socket> socket)
         // Update bandwidth 
         adhocRoutingHelper->updateLinkBandwidth(source, packetSize);
 
-        // Push the packet onto the packet queue and then handle it
-        adhocRoutingHelper->packetQueue.push(packet);
-        adhocRoutingHelper->handlePackets();
+        // Handle packet
+        adhocRoutingHelper->handleSimPackets(packet);
+
+        free(packetBuffer);
+        free(ipBuf);
     }
 }
 

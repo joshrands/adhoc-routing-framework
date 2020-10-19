@@ -37,11 +37,22 @@ public:
     // Destructors
     ~SimAODV() {}
 
-    // when handlePackets is called, network monitor gets pair data from the QueuedPacket
-    int handlePackets() override;
+    /**
+     * @brief Handles the receiving or processing of packets
+     * @brief when implementing this should query each of the sockets corresponding to each port
+     * @brief and then "give" the data to each port
+     * TODO: By creating a Socket base class we could implement this code and avoid the above req.
+     *
+     * Note: This probably isn't needed.. we could call _handlePacket directly
+     *
+     */
+    void handleSimPackets(SimPacket packet);
 
     // queue for storing packets
+    // JAD: NOT USED! This queue was only ever holding one packet at a time...
+    // Member object is still here only because removing it will break the test cases
     queue<SimPacket> packetQueue;
+
     // network monitoring
     NetworkMonitor* networkMonitor = nullptr;
 	/**
