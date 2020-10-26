@@ -64,6 +64,7 @@ protected:
 
 };
 
+// TODO: this class is redefined in aodv... We should remove this one!!
 class PrintPort : public Port{
 public:
     PrintPort(int portId):Port(portId){}

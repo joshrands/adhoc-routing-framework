@@ -11,6 +11,8 @@
  ********************************/
 
 #define RSS_OUT_OF_RANGE        -90
+// Max rss data points to hold
+#define RSS_DATA_LIMIT			100
 
 #include "rem_parameters.h"
 #include "rem_defines.h"
@@ -32,7 +34,7 @@ public:
     double ERROR_MAX = 20; // percentage error max
     int MAX_DIFF_COUNT = 4; // number of bad data point in a row
     double MAX_THRESH_DIFF = 30; // difference that data can be to be accepted, was 16
-    int INIT_COUNT = 3; // number of data values needed to build a model
+    uint16_t INIT_COUNT = 3; // number of data values needed to build a model
     double NUM_DEVIATIONS = 4; // number of standard deviations to fall within threshold
     double MIN_DEVIATION = MAX_THRESH_DIFF / 5;
 
@@ -60,7 +62,7 @@ public:
     virtual void performRegression(vector<double> times, vector<double> values, vector<double> wAvgs) = 0; // perform a regression on the data provided
     /*************************/
 
-    int getDataCount() { return data.size(); }
+    int getDataCount() { return mvData.size(); }
     int getWindowSize() { return windowSize; }
 
     ModelState getState() { return state; }
@@ -77,8 +79,6 @@ public:
     Ptr<Node> parentNode;
     */
 
-    int dataCount = 0;
-
     // only for RSS model
     IP_ADDR pairIp; // ip of pair node
 
@@ -90,15 +90,12 @@ protected:
     double timeToLive; // ttl
     ModelState state;
 
-    vector<double> data;
-    vector<double> times;
-    vector<double> weightedAverages;
+    vector<double> mvData;
+    vector<double> mvTimes;
+    vector<double> mvWeightedAverages;
 
     // consecutive bad data counter
     int difCount = 0; // initialize to 0
-
-    // vector of outlier indeces
-    vector<int> outliers;
 
     // previous deviation for trend analysis
     double lastDeviation = 0;

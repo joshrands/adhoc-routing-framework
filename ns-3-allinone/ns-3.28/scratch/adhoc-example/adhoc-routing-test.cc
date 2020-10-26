@@ -21,6 +21,7 @@
 #include "ns3/adhoc-routing-helper.h"
 
 #define NS3_DEBUG         1
+#define EXPML_TEST        0
 
 #define TRANS_POWER       10
 #define RX_GAIN           10
@@ -63,17 +64,21 @@ void ReceiveCallback(Ptr<Socket> socket)
 
 void PrintBandwidth(AdHocRoutingHelper* adhocHelperFrom, AdHocRoutingHelper* adhocHelperTo, int freqMS)
 {
-  std::cout << "[TEST]" << adhocHelperFrom->getIpAddressStr() << " Available bandwidth = " << adhocHelperFrom->getAvailableBandwidthBits() << std::endl;
+  if(EXPML_TEST) {
+      std::cout << "[TEST]" << adhocHelperFrom->getIpAddressStr() << " Available bandwidth = " << adhocHelperFrom->getAvailableBandwidthBits() << std::endl;
 
-  std::cout << "[TEST]" << adhocHelperFrom->getIpAddressStr() << " link bandwidth to " << adhocHelperTo->getIpAddressStr()
-		  << " : " << adhocHelperFrom->getLinkBandwidthBits(adhocHelperTo) << std::endl;
+      std::cout << "[TEST]" << adhocHelperFrom->getIpAddressStr() << " link bandwidth to " << adhocHelperTo->getIpAddressStr()
+          << " : " << adhocHelperFrom->getLinkBandwidthBits(adhocHelperTo) << std::endl;
+  }
 
   Simulator::Schedule(MilliSeconds(freqMS), &PrintBandwidth, adhocHelperFrom, adhocHelperTo, freqMS);
 }
 
 void testAdHoc()
 {
-  std::cout << "[TEST]: Sending message from node 1 to node 2" << std::endl;
+  if(EXPML_TEST)
+    std::cout << "[TEST]: Sending message from node 1 to node 2" << std::endl;
+
   // Test sending from node 1 to node 2
   string msg = "Hello friend!";
   uint32_t length = msg.length();
@@ -88,23 +93,27 @@ void testAdHoc()
   IP_ADDR dest = it->first;
   adhoc->sendPacket(DATA_PORT, buffer, msg.length(), dest); 
 
-  std::cout << "[TEST]: Called sendPacket(), "
-      << adhoc->getIpAddressStr()
-      << " buffer size is "
-      << adhoc->getPacketBufferAvailableBytes()
-      << ". Bits sent to " << it->second->m_AdHocRoutingHelper->getIpAddressStr()
-      << ": " << adhoc->getLinkBitsSent(dest)
-      << std::endl;
-
-  // Print per-link bandwidth for all nodes connected to node 2
-  for(uint32_t i = 0; i < nodes.GetN(); i++)
+  if(EXPML_TEST)
   {
-    std::cout << "[TEST]: Per-link bandwidth from " << it->second->m_AdHocRoutingHelper->getIpAddressStr()
-        << " to " << nodes.Get(i)->m_AdHocRoutingHelper->getIpAddressStr() << ": "
-        << it->second->m_AdHocRoutingHelper->getLinkBandwidthBits(nodes.Get(i)->m_AdHocRoutingHelper)
-        << ". Direct link? "
-        << it->second->m_AdHocRoutingHelper->linkExists(nodes.Get(i)->m_AdHocRoutingHelper->getIp())
+    std::cout << "[TEST]: Called sendPacket(), "
+        << adhoc->getIpAddressStr()
+        << " buffer size is "
+        << adhoc->getPacketBufferAvailableBytes()
+        << ". Bits sent to " << it->second->m_AdHocRoutingHelper->getIpAddressStr()
+        << ": " << adhoc->getLinkBitsSent(dest)
         << std::endl;
+
+    // Print per-link bandwidth for all nodes connected to node 2
+    for(uint32_t i = 0; i < nodes.GetN(); i++)
+    {
+      std::cout << "[TEST]: Per-link bandwidth from " << it->second->m_AdHocRoutingHelper->getIpAddressStr()
+          << " to " << nodes.Get(i)->m_AdHocRoutingHelper->getIpAddressStr() << ": "
+          << it->second->m_AdHocRoutingHelper->getLinkBandwidthBits(nodes.Get(i)->m_AdHocRoutingHelper)
+          << ". Direct link? "
+          << it->second->m_AdHocRoutingHelper->linkExists(nodes.Get(i)->m_AdHocRoutingHelper->getIp())
+          << std::endl;
+    }
+
   }
 
   free(buffer);

@@ -77,6 +77,7 @@ protected:
 	uint32_t packetIdCount;	
 	// map of rreq ids and their corresponding packet to be sent once the route is established
 	// TODO: Update unit-testing
+	// TODO: This isn't being used...
 	map<IP_ADDR, queue<BufferedPacket>> rreqPacketBuffer;
 	// RREQ - Route Request 
 	RREQHelper rreqHelper;

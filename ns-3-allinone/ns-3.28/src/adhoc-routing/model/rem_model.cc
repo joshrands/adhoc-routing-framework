@@ -9,34 +9,50 @@ void PredictionModel::addDataPoint(double value, double time)
         cout << "[DEBUG]: New data point added to model "
                 << time << ", " << value << endl;
 
-    this->data.push_back(value);
-    this->times.push_back(time);
+    // add new value and verify vector size
+    mvData.push_back(value);
+    if(mvData.size() > RSS_DATA_LIMIT)
+    {
+        mvData.erase(mvData.begin());
+    }
+
+    this->mvTimes.push_back(time);
+    if(mvTimes.size() > RSS_DATA_LIMIT)
+    {
+        mvTimes.erase(mvTimes.begin());
+    }
 
     // add new weighted average point
-    if (this->dataCount == 0)
+    if (mvData.size() < 2)
     {
         // add value as initial weighted average
-        this->weightedAverages.push_back(value);
+        this->mvWeightedAverages.push_back(value);
     }
     else
     {
-        double wAvg = this->weightedAverages.at(this->dataCount - 1) * (1 - this->alpha)
+        double wAvg = this->mvWeightedAverages.back() * (1 - this->alpha)
         + value * this->alpha;
 
-        this->weightedAverages.push_back(wAvg);
+        // add point to weighted averages and verify vector length
+        this->mvWeightedAverages.push_back(wAvg);
+        if(mvWeightedAverages.size() > RSS_DATA_LIMIT)
+        {
+            mvWeightedAverages.erase(mvWeightedAverages.begin());
+        }
     }
 
-    dataCount++;
-    windowSize++;
+    if(windowSize < RSS_DATA_LIMIT) {
+        windowSize++;
+    }
 
     // check if initializing
-    if (dataCount < INIT_COUNT)
+    if (mvData.size() < INIT_COUNT)
     {
         if (REM_DEBUG)
             cout << "[DEBUG]: Not enough data to fit model " << endl;
         return;
     }
-    else if (dataCount == INIT_COUNT)
+    else if (mvData.size() == INIT_COUNT)
     {
         // generate a fit
         fitModel();
@@ -167,15 +183,15 @@ void PredictionModel::adaptModel()
     vector<double> newTimes;
     vector<double> newAvgs;
 
-    for (int i = dataCount - windowSize; i < dataCount; i++)
+    for (uint16_t i = min(mvData.size(), mvTimes.size()) - windowSize; i < min(mvData.size(), mvTimes.size()); i++)
     {
         if (newAvgs.size() > 0)
-            newAvgs.push_back(data[i - 1] * (1 - alpha) + data[i] * alpha);
+            newAvgs.push_back(mvData[i - 1] * (1 - alpha) + mvData[i] * alpha);
         else
-            newAvgs.push_back(data[i]);
+            newAvgs.push_back(mvData[i]);
 
-        newData.push_back(data[i]);
-        newTimes.push_back(times[i]);
+        newData.push_back(mvData[i]);
+        newTimes.push_back(mvTimes[i]);
     }
 
     this->performRegression(newTimes, newData, newAvgs);
@@ -231,7 +247,7 @@ void BatteryModel::fitModel()
 //  if (windowSize >= INIT_COUNT)
 //   cout << "[DEBUG]: Fitting battery modelParameters. << endl;
 
-    performRegression(times, data, weightedAverages);
+    performRegression(mvTimes, mvData, mvWeightedAverages);
 
     modelParameters.timeToLive = DEFAULT_TTL;
 
@@ -301,7 +317,7 @@ void RssModel::fitModel()
   //if (windowSize >= INIT_COUNT)
    // cout << "[DEBUG]: Fitting rss modelParameters. << endl;
 
-    performRegression(times, data, weightedAverages);
+    performRegression(mvTimes, mvData, mvWeightedAverages);
 
     modelParameters.timeToLive = DEFAULT_TTL;
     // NS3-TODO: Abstarct???

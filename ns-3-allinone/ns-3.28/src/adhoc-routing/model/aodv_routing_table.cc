@@ -166,7 +166,7 @@ void AODVRoutingTable::updateAODVRoutingTableFromRREP(rrepPacket* receivedRREP, 
 		this->setDestSequenceNumber(receivedRREP->destIP, receivedRREP->destSeqNum);
 		this->setHopCount(receivedRREP->destIP, receivedRREP->hopCount);
 	}
-	else 
+	else
 		cout << "[TABLE]:[WARNING]: Routing table NOT updated from RREP packet." << endl;
 }
 
