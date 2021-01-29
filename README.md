@@ -15,7 +15,8 @@ Classes designed for physical implementation as well as simulated implementation
 ## Requirements
 cmake
 git
-python3 >= 3.5
+python3 >= 3.7
+libpcap-dev
 
 ## Running the code
 
