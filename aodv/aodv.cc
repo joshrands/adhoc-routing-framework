@@ -360,6 +360,7 @@ void AODV::_handleRREP(char *buffer, int length, IP_ADDR source) {
                 BufferedPacket packet;
                 this->rreqPacketBuffer[rrep.destIP]->pop(packet);
                 sendPacket(packet.portId, packet.buffer, packet.length, rrep.destIP);
+                delete packet.buffer;
             }
         }
         this->rreqPacketBuffer.erase(rrep.destIP);
