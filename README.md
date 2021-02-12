@@ -12,6 +12,12 @@ Joshua Rands | joshrands1@gmail.com
 
 Classes designed for physical implementation as well as simulated implementation of an ad-hoc network on a single decentralized subnet.
 
+## Requirements
+cmake
+git
+python3 >= 3.7
+libpcap-dev
+
 ## Running the code
 
 This codebase is organized into several 'modules'. Modules are code grouped in a subdirectory of the main directory. Each module has been developed with a built in test framework and is compiled into a static library (.a) file for linking capabilities. 
